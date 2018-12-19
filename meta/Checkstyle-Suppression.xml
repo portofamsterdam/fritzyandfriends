@@ -1,0 +1,10 @@
+<?xml version="1.0"?>
+<!DOCTYPE suppressions PUBLIC
+    "-//Puppy Crawl//DTD Suppressions 1.1//EN"
+    "http://www.puppycrawl.com/dtds/suppressions_1_1.dtd">
+<suppressions>
+    <suppress checks="[a-zA-Z0-9]*" files="[\\/]build[\\/]"/>
+    <suppress checks="FileTabCharacter|FileLength" files="(.*\.crt|.*\.png|.*\.jpg|.*\.gif|.*\.xml|.*\.xsd|.*\.html|.*\.jks|.*\.txt|.*\.zip|.*\.pdf|.*\.ini|.*\.as|.*\.js|.*\.sql|.*\.c)"/>
+    <suppress checks="JavadocMethod|JavadocVariable|HideUtilityClassConstructor" files="(.*Test\.java|.*TestCase\.java|.*TestHelper\.java)"/>
+    <suppress checks="JavadocMethod|JavadocVariable|HideUtilityClassConstructor|NestedTryDepth|NPathComplexity|MethodLength|ExecutableStatementCount|CyclomaticComplexity" files="(.*Tool\.java)"/>
+</suppressions>

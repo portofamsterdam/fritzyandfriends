@@ -1,0 +1,9 @@
+
+apply plugin: 'java'
+
+dependencies {
+    compile libraries.dropwizard
+    
+    compile project(':common')
+    compile project(':appliance')
+}

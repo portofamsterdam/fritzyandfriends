@@ -1,0 +1,28 @@
+apply plugin: 'techno-jaxb'
+
+// Convert EFI xsd to JAR
+task generateEfiLib(type: techno.BindXmlLib){
+    xsdFiles = files('src/main/xsd/efi-2.0.xsd')
+    outputLib = file('build/libs/efi-2.0.jar') 
+}
+
+// Remove generated jar
+task cleanEfiLib(type: Delete) {
+    delete fileTree(dir: 'build/libs/', includes: [
+        'efi-*.*'        
+    ])
+}
+
+dependencies {	
+	compile files(generateEfiLib.outputLib)
+	compile libraries.javax_measure
+	
+	// Special entries for techno-jax plugin
+	technoJaxb libraries.jaxb_xjc	  
+    technoJaxb libraries.jaxb_impl    
+}
+
+// Run the generate tasks before compiling and creating eclipse classpath
+eclipseClasspath.dependsOn(generateEfiLib)
+compileJava.dependsOn(generateEfiLib)
+clean.dependsOn(cleanEfiLib)

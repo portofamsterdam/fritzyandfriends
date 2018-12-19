@@ -1,0 +1,67 @@
+node ('rivm_build') {
+
+    env.JAVA_HOME = "${ tool 'JDK8u171' }"
+    env."PATH+WHATEVER" = "${env.JAVA_HOME}/bin"
+
+    // Should be defined so the Technolution gradle scripts get the version number from git
+    env.GIT_BRANCH = BRANCH_NAME
+
+    // Keep the artifacts of 1 builds.
+    properties([[$class: 'BuildDiscarderProperty', strategy: [$class: 'LogRotator', artifactNumToKeepStr: '1']]]);
+
+    // Depending if the Jenkins slave is Windows or Linux based gradle
+    // should be started either as Windows batch file or Linux Shell script.
+    def gradleTask = { String gradleTasks -> 
+        ansiColor('xterm') {
+            dir('gradle') {
+                if (isUnix()) { 
+                    sh "chmod +x gradlew"
+                    sh "./gradlew --no-daemon " + gradleTasks
+                }
+                else {
+                    bat "./gradlew --no-daemon " + gradleTasks 
+                }
+            }
+        }
+    }    
+      
+    stage ('Checkout') {
+        def scmDef = checkout scm
+        env.GIT_COMMIT = scmDef['GIT_COMMIT']
+    }
+
+    stage ('Clean') {
+        gradleTask("clean")
+    }
+
+    stage ('Build') {
+        gradleTask("assemble")
+    }
+
+    stage ('Archive artifacts') {
+        archiveArtifacts artifacts: '**/build/distributions/*.zip, **/build/distributions/*.tar'
+    }
+
+    stage ('Quality check') {
+		try {
+			gradleTask("sonar")
+			jacoco inclusionPattern: '**/*.class'
+			junit allowEmptyResults: true, testResults: '**/build/test-results/**/TEST*.xml'
+			// Web project has no tests for now, so nothing to publish to sonar
+			// step([$class: 'CoberturaPublisher', autoUpdateHealth: false, autoUpdateStability: false, coberturaReportFile: '**/cobertura-coverage.xml', failUnhealthy: false, failUnstable: false, maxNumberOfBuilds: 0, onlyStable: false, sourceEncoding: 'ASCII', zoomCoverageChart: false])
+		} catch (err) {
+		    junit allowEmptyResults: true, testResults: '**/build/test-results/**/TEST*.xml'
+			currentBuild.result = 'UNSTABLE'
+		}
+    }
+    
+    // For the develop and master branch, also do dependency testing
+    if (BRANCH_NAME == 'master' || BRANCH_NAME == 'develop') {
+        
+        stage ('Dependency check') {
+            dependencyCheckAnalyzer datadir: 'dependency-check-data', isFailOnErrorDisabled: true, hintsFile: '', includeCsvReports: false, includeHtmlReports: false, includeJsonReports: false, isAutoupdateDisabled: false, outdir: '', scanpath: '', skipOnScmChange: false, skipOnUpstreamChange: false, suppressionFile: '', zipExtensions: ''
+            dependencyCheckPublisher canComputeNew: false, defaultEncoding: '', healthy: '', pattern: '', unHealthy: ''
+            archiveArtifacts allowEmptyArchive: true, artifacts: '**/dependency-check-report.xml', onlyIfSuccessful: true
+        }
+    }   
+}

@@ -1,0 +1,54 @@
+ext { 
+    // The version number is appended automatically with a build number and revision number when building on the CI server. 
+    // When building locally, the version number is appended with '-SNAPSHOT' to indicate a non-approved version.
+    major = '0'
+    minor = '1'
+    bugfix = '0'
+    
+    // Global project variable -- used by version info.
+    set('dateString', new Date().format('yyyyMMdd-HHmmss'))
+}
+
+version = '1.0'
+
+// Apply the version number to all projects
+// apply from:'kp_version.gradle'
+
+// All our projects have the same group id, this is used when publishing the archives
+// NOTE: projects are listed in settings.gradle
+allprojects { group = 'fritzy' }
+
+// Define all library dependencies in one file for clarity
+apply from:'dependencies.gradle'
+
+// NOTE: the following is only needed for (Technolution) plugins.
+buildscript {
+    repositories {
+        maven { url="http://nexus/nexus/content/groups/public/" }
+        maven { url="http://nexus/nexus/content/repositories/tnl_gradle_plugins" }
+    }
+    dependencies {        
+		classpath 'nl.technolution:techno-jax:0.2.618'
+
+    }
+}
+
+// Configuration for all subprojects.
+subprojects {
+        apply plugin: 'java'
+            
+	    plugins.withType(JavaPlugin) {
+			// JDK version
+			sourceCompatibility = JavaVersion.VERSION_1_8
+			targetCompatibility = JavaVersion.VERSION_1_8
+			tasks.withType(JavaCompile) {
+				// Force UTF-8 as the default character encoding (instead of the platform default, which may be CP1252 in Windows)
+				options.encoding = 'UTF-8'
+			}
+        }
+        // Standard libraries added to all projects
+        dependencies {
+            testCompile libraries.test_junit
+        }
+}
+

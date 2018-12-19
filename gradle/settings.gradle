@@ -1,0 +1,18 @@
+// Here we set the overall project name. All other projects are seen as 'sub project' of this root project.
+rootProject.name = 'gradle'
+
+// Find all subprojects identified by a 'build.gradle'
+def discoverGradleSubProjectDirs = { ->
+    def list = []
+    rootDir.getParentFile().eachDir() { dir ->
+        if (rootDir != dir && new File(dir, 'build.gradle').exists()) {
+            list.add(dir)
+        }
+    }
+    return list
+}
+
+// Include all gradle subprojects
+discoverGradleSubProjectDirs().each {
+    includeFlat it.name
+}

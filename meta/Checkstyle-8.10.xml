@@ -1,0 +1,260 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE module PUBLIC "-//Puppy Crawl//DTD Check Configuration 1.3//EN" "http://www.puppycrawl.com/dtds/configuration_1_3.dtd">
+<!--
+    Checkstyle-Configuration: Technolution
+    Description: none
+-->
+<module name="Checker">
+  <property name="severity" value="warning"/>
+  <property name="charset" value="UTF-8"/>
+  <property name="fileExtensions" value="java"/>
+  <module name="TreeWalker">
+    <property name="tabWidth" value="4"/>
+    <module name="AnnotationUseStyle">
+      <property name="severity" value="info"/>
+    </module>
+    <module name="AnonInnerLength">
+      <property name="max" value="60"/>
+    </module>
+    <module name="ArrayTypeStyle"/>
+    <module name="AtclauseOrder">
+      <property name="severity" value="info"/>
+    </module>
+    <module name="AvoidNestedBlocks"/>
+    <module name="AvoidStarImport"/>
+    <module name="AvoidStaticImport">
+      <property name="excludes" value="org.junit.Assert.*,org.hamcrest.MatcherAssert.*,org.hamcrest.CoreMatchers.*,org.hamcrest.core.IsNull.*,org.hamcrest.Matchers.*,org.mockito.Matchers.*,org.mockito.Mockito.*,org.mockito.ArgumentMatchers.*,org.easymock.EasyMock.*"/>
+    </module>
+    <module name="BooleanExpressionComplexity">
+      <property name="severity" value="info"/>
+      <property name="max" value="6"/>
+    </module>
+    <module name="ClassTypeParameterName">
+      <property name="format" value="^[A-Z][a-zA-Z]*$"/>
+    </module>
+    <module name="ConstantName"/>
+    <module name="CovariantEquals"/>
+    <module name="CyclomaticComplexity">
+      <property name="max" value="30"/>
+    </module>
+    <module name="DeclarationOrder">
+      <property name="severity" value="info"/>
+    </module>
+    <module name="DefaultComesLast"/>
+    <module name="DesignForExtension">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="info"/>
+    </module>
+    <module name="EmptyBlock">
+      <property name="option" value="text"/>
+    </module>
+    <module name="EmptyCatchBlock"/>
+    <module name="EmptyForInitializerPad"/>
+    <module name="EmptyForIteratorPad"/>
+    <module name="EmptyLineSeparator">
+      <property name="severity" value="info"/>
+      <property name="tokens" value="IMPORT,CLASS_DEF,INTERFACE_DEF,CTOR_DEF,METHOD_DEF,STATIC_INIT,INSTANCE_INIT"/>
+      <property name="allowMultipleEmptyLines" value="false"/>
+    </module>
+    <module name="EmptyStatement"/>
+    <module name="EqualsAvoidNull">
+      <property name="severity" value="info"/>
+    </module>
+    <module name="EqualsHashCode"/>
+    <module name="ExecutableStatementCount">
+      <property name="max" value="100"/>
+      <property name="tokens" value="INSTANCE_INIT,STATIC_INIT,METHOD_DEF,CTOR_DEF"/>
+    </module>
+    <module name="FallThrough"/>
+    <module name="FinalClass"/>
+    <module name="GenericWhitespace">
+      <property name="severity" value="info"/>
+    </module>
+    <module name="HiddenField">
+      <property name="tokens" value="VARIABLE_DEF"/>
+      <property name="ignoreConstructorParameter" value="true"/>
+      <property name="ignoreSetter" value="true"/>
+    </module>
+    <module name="HideUtilityClassConstructor">
+      <property name="severity" value="info"/>
+    </module>
+    <module name="IllegalCatch">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="IllegalThrows">
+      <property name="illegalClassNames" value="java.lang.Throwable, java.lang.Error"/>
+    </module>
+    <module name="IllegalImport"/>
+    <module name="ImportOrder">
+      <property name="severity" value="info"/>
+      <property name="option" value="top"/>
+      <property name="groups" value="/^java\./,javax,com,org,nl"/>
+      <property name="ordered" value="false"/>
+      <property name="separated" value="true"/>
+      <property name="caseSensitive" value="false"/>
+    </module>
+    <module name="InnerAssignment"/>
+    <module name="InterfaceIsType">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="InterfaceTypeParameterName">
+      <property name="format" value="^[A-Z][a-zA-Z]*$"/>
+    </module>
+    <module name="JavadocMethod">
+      <property name="allowedAnnotations" value="Override, Test, Before, After, BeforeClass, AfterClass"/>
+      <property name="scope" value="protected"/>
+      <property name="allowUndeclaredRTE" value="true"/>
+      <property name="allowMissingParamTags" value="true"/>
+      <property name="allowMissingThrowsTags" value="true"/>
+      <property name="allowMissingReturnTag" value="true"/>
+      <property name="allowMissingPropertyJavadoc" value="true"/>
+      <property name="tokens" value="METHOD_DEF"/>
+    </module>
+    <module name="JavadocStyle">
+      <property name="checkFirstSentence" value="false"/>
+    </module>
+    <module name="JavadocType">
+      <property name="scope" value="package"/>
+    </module>
+    <module name="LeftCurly">
+      <property name="tokens" value="CLASS_DEF,CTOR_DEF,INTERFACE_DEF,LITERAL_CATCH,LITERAL_DO,LITERAL_ELSE,LITERAL_FINALLY,LITERAL_FOR,LITERAL_IF,LITERAL_SWITCH,LITERAL_SYNCHRONIZED,LITERAL_TRY,LITERAL_WHILE,METHOD_DEF"/>
+    </module>
+    <module name="LineLength">
+      <property name="severity" value="info"/>
+      <property name="ignorePattern" value="^import.*"/>
+      <property name="max" value="120"/>
+    </module>
+    <module name="LocalFinalVariableName"/>
+    <module name="LocalVariableName"/>
+    <module name="MemberName"/>
+    <module name="MethodLength">
+      <property name="max" value="120"/>
+    </module>
+    <module name="MethodName">
+      <property name="format" value="^[a-z][a-zA-Z0-9_]*$"/>
+    </module>
+    <module name="MethodParamPad">
+      <property name="tokens" value="CTOR_DEF,LITERAL_NEW,METHOD_CALL,METHOD_DEF,SUPER_CTOR_CALL"/>
+    </module>
+    <module name="MethodTypeParameterName">
+      <property name="format" value="^[A-Z][a-zA-Z]*$"/>
+    </module>
+    <module name="MissingDeprecated"/>
+    <module name="MissingOverride"/>
+    <module name="MissingSwitchDefault">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="ModifiedControlVariable"/>
+    <module name="ModifierOrder"/>
+    <module name="MultipleVariableDeclarations">
+      <property name="severity" value="info"/>
+    </module>
+    <module name="MutableException"/>
+    <module name="NPathComplexity">
+      <property name="max" value="1024"/>
+    </module>
+    <module name="NeedBraces"/>
+    <module name="NestedForDepth">
+      <property name="max" value="3"/>
+    </module>
+    <module name="NestedIfDepth">
+      <property name="max" value="4"/>
+    </module>
+    <module name="NestedTryDepth"/>
+    <module name="NoClone"/>
+    <module name="NoFinalizer"/>
+    <module name="NoWhitespaceAfter">
+      <property name="tokens" value="BNOT,DEC,INC,LNOT,UNARY_MINUS,UNARY_PLUS,TYPECAST"/>
+    </module>
+    <module name="NoWhitespaceAfter">
+      <property name="allowLineBreaks" value="false"/>
+      <property name="tokens" value="DOT"/>
+    </module>
+    <module name="NoWhitespaceBefore">
+      <property name="allowLineBreaks" value="true"/>
+      <property name="tokens" value="DOT"/>
+    </module>
+    <module name="OneStatementPerLine"/>
+    <module name="OperatorWrap">
+      <property name="option" value="eol"/>
+      <property name="tokens" value="BAND,BOR,BSR,BXOR,DIV,EQUAL,GE,GT,LE,LITERAL_INSTANCEOF,LOR,LT,MINUS,MOD,NOT_EQUAL,QUESTION,SL,SR,STAR"/>
+    </module>
+    <module name="OuterTypeFilename"/>
+    <module name="OuterTypeNumber"/>
+    <module name="PackageDeclaration"/>
+    <module name="PackageName"/>
+    <module name="ParameterAssignment">
+      <property name="severity" value="ignore"/>
+      <metadata name="net.sf.eclipsecs.core.lastEnabledSeverity" value="inherit"/>
+    </module>
+    <module name="ParameterName"/>
+    <module name="ParameterNumber">
+      <property name="max" value="9"/>
+      <property name="ignoreOverriddenMethods" value="true"/>
+      <property name="tokens" value="METHOD_DEF"/>
+    </module>
+    <module name="ParenPad">
+      <property name="tokens" value="CTOR_CALL,METHOD_CALL,SUPER_CTOR_CALL"/>
+    </module>
+    <module name="RedundantImport"/>
+    <module name="RedundantModifier"/>
+    <module name="RightCurly">
+      <property name="tokens" value="LITERAL_CATCH,LITERAL_ELSE,LITERAL_TRY"/>
+    </module>
+    <module name="SeparatorWrap">
+      <property name="tokens" value="COMMA"/>
+    </module>
+    <module name="SimplifyBooleanExpression"/>
+    <module name="SimplifyBooleanReturn">
+      <property name="severity" value="info"/>
+    </module>
+    <module name="StaticVariableName"/>
+    <module name="StringLiteralEquality"/>
+    <module name="SuperClone"/>
+    <module name="SuperFinalize"/>
+    <module name="SuppressWarningsHolder"/>
+    <module name="TodoComment">
+      <property name="severity" value="info"/>
+      <property name="format" value="TODO"/>
+    </module>
+    <module name="TypecastParenPad">
+      <property name="tokens" value="RPAREN,TYPECAST"/>
+    </module>
+    <module name="TypeName">
+      <property name="format" value="^[A-Z][a-zA-Z0-9_]*$"/>
+    </module>
+    <module name="UnusedImports"/>
+    <module name="UpperEll"/>
+    <module name="VisibilityModifier">
+      <property name="packageAllowed" value="true"/>
+      <property name="protectedAllowed" value="true"/>
+    </module>
+    <module name="WhitespaceAfter">
+      <property name="tokens" value="COMMA,SEMI"/>
+    </module>
+    <module name="WhitespaceAround">
+      <property name="tokens" value="ASSIGN,BAND,BAND_ASSIGN,BOR,BOR_ASSIGN,BSR,BSR_ASSIGN,BXOR,BXOR_ASSIGN,COLON,DIV,DIV_ASSIGN,EQUAL,GE,GT,LAND,LCURLY,LE,LITERAL_ASSERT,LITERAL_CATCH,LITERAL_DO,LITERAL_ELSE,LITERAL_FINALLY,LITERAL_FOR,LITERAL_IF,LITERAL_RETURN,LITERAL_SYNCHRONIZED,LITERAL_TRY,LITERAL_WHILE,LOR,LT,MINUS,MINUS_ASSIGN,MOD,MOD_ASSIGN,NOT_EQUAL,PLUS,PLUS_ASSIGN,QUESTION,RCURLY,SL,SLIST,SL_ASSIGN,SR,SR_ASSIGN,STAR,STAR_ASSIGN"/>
+    </module>
+    <module name="SuppressWithNearbyCommentFilter">
+      <property name="checkFormat" value="$1"/>
+      <property name="influenceFormat" value="1"/>
+    </module>
+  </module>
+  <module name="Header">
+    <property name="header" value="/*\n  (C) COPYRIGHT YYYY TECHNOLUTION BV, GOUDA NL\n| =======          I                   ==          I    =\n|    I             I                    I          I\n|    I   ===   === I ===  I ===   ===   I  I    I ====  I   ===  I ===\n|    I  /   \ I    I/   I I/   I I   I  I  I    I  I    I  I   I I/   I\n|    I  ===== I    I    I I    I I   I  I  I    I  I    I  I   I I    I\n|    I  \     I    I    I I    I I   I  I  I   /I  \    I  I   I I    I\n|    I   ===   === I    I I    I  ===  ===  === I   ==  I   ===  I    I\n|                 +---------------------------------------------------+\n+----+            |  +++++++++++++++++++++++++++++++++++++++++++++++++|\n     |            |             ++++++++++++++++++++++++++++++++++++++|\n     +------------+                          +++++++++++++++++++++++++|\n                                                        ++++++++++++++|\n                                                                 +++++|\n */\n"/>
+    <property name="ignoreLines" value="2"/>
+    <property name="fileExtensions" value="java"/>
+  </module>
+  <module name="FileLength">
+    <property name="max" value="1000"/>
+    <property name="fileExtensions" value="src/.+java$"/>
+  </module>
+  <module name="FileTabCharacter"/>
+  <module name="SuppressWarningsFilter"/>
+  <module name="SuppressionFilter">
+    <property name="file" value="${config_loc}/Checkstyle-Suppression.xml"/>
+  </module>
+</module>
