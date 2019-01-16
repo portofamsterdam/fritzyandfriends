@@ -1,0 +1,13 @@
+#
+# Constructs the docker image for the consumer application
+# 
+FROM docker-proxy.intranet.technolution.nl/java:openjdk-8-jdk
+ADD ./src/main/resource/librxtxSerial.so /usr/lib/librxtxSerial.so
+ADD ./src/main/resource/librxtxParallel.so /usr/lib/librxtxParallel.so
+ADD ./build/libs/fritzy-main-all-1.0-SNAPSHOT-all.jar /opt/fritzy/fritzy-main-all-1.0-SNAPSHOT-all.jar
+ADD ./src/main/dist/fritzy.json /opt/config/fritzy.json
+
+CMD java -jar /opt/fritzy/fritzy-main-all-1.0-SNAPSHOT-all.jar server /opt/config/fritzy.json
+
+EXPOSE 8080 
+EXPOSE 8081

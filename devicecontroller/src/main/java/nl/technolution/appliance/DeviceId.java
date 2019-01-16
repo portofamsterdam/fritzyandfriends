@@ -14,26 +14,47 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.netty;
+package nl.technolution.appliance;
 
-import nl.technolution.appliance.DeviceControllerApp;
-import nl.technolution.appliance.DeviceId;
+import com.google.common.base.Preconditions;
+
+import org.apache.commons.lang3.StringUtils;
 
 /**
- * Simulator for net Power
+ * Device Id used to communicate with Efi
  */
-public class Netty extends DeviceControllerApp<NettyConfig> {
+public final class DeviceId {
 
-    private DeviceId deviceId = null;
+    private final String deviceId;
 
-    @Override
-    public DeviceId getDeviceId() {
+    public DeviceId(String deviceId) {
+        Preconditions.checkArgument(StringUtils.isNotBlank(deviceId), "DeviceId may not be empty");
+        this.deviceId = deviceId;
+    }
+
+    public String getDeviceId() {
         return deviceId;
     }
 
     @Override
-    protected void initDevice(NettyConfig configuration) {
-        this.deviceId = new DeviceId(configuration.getDevicveId());
+    public String toString() {
+        return "DeviceId [deviceId=" + deviceId + "]";
+    }
+
+    @Override
+    public int hashCode() {
+        return deviceId.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) {
+            return true;
+        }
+        if (obj == null) {
+            return false;
+        }
+        return deviceId.equals(((DeviceId)obj).deviceId);
     }
 
 }

@@ -1,6 +1,20 @@
 
 apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+
+mainClassName = 'nl.technolution.fritzy.Fritzy'
 
 dependencies {
-    compile project(':appliance')
+    compile libraries.gnuio
+    compile project(':devicecontroller')
+}
+
+def dockerJarName = 'fritzy-main-all'
+
+
+shadowJar {
+    baseName = "$dockerJarName"
+    mergeServiceFiles()
 }

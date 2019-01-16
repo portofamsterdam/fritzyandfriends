@@ -14,26 +14,27 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.netty;
+package nl.technolution.marketnegotiator;
 
-import nl.technolution.appliance.DeviceControllerApp;
-import nl.technolution.appliance.DeviceId;
+import static org.junit.Assert.assertFalse;
+
+import java.util.List;
+
+import org.junit.Test;
+
+import nl.technolution.appliance.IDeviceControler;
+import nl.technolution.core.resources.TypeFinder;
 
 /**
- * Simulator for net Power
+ * Test if a device controller can be found
  */
-public class Netty extends DeviceControllerApp<NettyConfig> {
+public class FindDeviceControllerTest {
 
-    private DeviceId deviceId = null;
-
-    @Override
-    public DeviceId getDeviceId() {
-        return deviceId;
-    }
-
-    @Override
-    protected void initDevice(NettyConfig configuration) {
-        this.deviceId = new DeviceId(configuration.getDevicveId());
+    @Test
+    public void findDeviceControllerTest() {
+        List<Class<? extends IDeviceControler>> classes = TypeFinder.findImplementingClasses("nl.technolution",
+                IDeviceControler.class);
+        assertFalse(classes.isEmpty());
     }
 
 }

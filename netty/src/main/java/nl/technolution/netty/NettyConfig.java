@@ -16,24 +16,26 @@
  */
 package nl.technolution.netty;
 
-import nl.technolution.appliance.DeviceControllerApp;
-import nl.technolution.appliance.DeviceId;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.dropwizard.Configuration;
 
 /**
- * Simulator for net Power
+ * Configuration for Netty
  */
-public class Netty extends DeviceControllerApp<NettyConfig> {
+public class NettyConfig extends Configuration {
 
-    private DeviceId deviceId = null;
+    @JsonProperty("deviceId")
+    private final String deviceId;
 
-    @Override
-    public DeviceId getDeviceId() {
-        return deviceId;
+    @JsonCreator
+    public NettyConfig(@JsonProperty("deviceId") String deviceId) {
+        this.deviceId = deviceId;
     }
 
-    @Override
-    protected void initDevice(NettyConfig configuration) {
-        this.deviceId = new DeviceId(configuration.getDevicveId());
+    public String getDevicveId() {
+        return deviceId;
     }
 
 }

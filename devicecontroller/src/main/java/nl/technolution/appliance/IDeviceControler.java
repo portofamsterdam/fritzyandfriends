@@ -14,26 +14,16 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.netty;
-
-import nl.technolution.appliance.DeviceControllerApp;
-import nl.technolution.appliance.DeviceId;
+package nl.technolution.appliance;
 
 /**
- * Simulator for net Power
  */
-public class Netty extends DeviceControllerApp<NettyConfig> {
+public interface IDeviceControler {
 
-    private DeviceId deviceId = null;
-
-    @Override
-    public DeviceId getDeviceId() {
-        return deviceId;
-    }
-
-    @Override
-    protected void initDevice(NettyConfig configuration) {
-        this.deviceId = new DeviceId(configuration.getDevicveId());
-    }
-
+    /**
+     * Is used by a device to identify itself
+     * 
+     * @return id of device
+     */
+    DeviceId getDeviceId();
 }

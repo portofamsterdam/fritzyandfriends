@@ -14,26 +14,27 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.netty;
+package nl.technolution.fritzy;
 
-import nl.technolution.appliance.DeviceControllerApp;
-import nl.technolution.appliance.DeviceId;
+import nl.technolution.fritzy.tempsensor.TemperatureSensor;
+import nl.technolution.fritzy.webrelay.WebRelay;
 
 /**
- * Simulator for net Power
+ * Defines Fritzy object
  */
-public class Netty extends DeviceControllerApp<NettyConfig> {
+public interface IFritzy {
 
-    private DeviceId deviceId = null;
+    /**
+     * Get the webrelay of the fridge to start or end cooling
+     * 
+     * @return webrelay
+     */
+    WebRelay getWebRelay();
 
-    @Override
-    public DeviceId getDeviceId() {
-        return deviceId;
-    }
-
-    @Override
-    protected void initDevice(NettyConfig configuration) {
-        this.deviceId = new DeviceId(configuration.getDevicveId());
-    }
-
+    /**
+     * Get the temparature sensor of the fridge
+     * 
+     * @return temparature sensor
+     */
+    TemperatureSensor getTemperatureSensor();
 }

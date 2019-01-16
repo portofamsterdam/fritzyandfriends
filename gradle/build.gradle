@@ -29,7 +29,7 @@ buildscript {
     }
     dependencies {        
 		classpath 'nl.technolution:techno-jax:0.2.618'
-
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
     }
 }
 

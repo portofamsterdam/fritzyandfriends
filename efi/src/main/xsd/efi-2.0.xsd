@@ -102,7 +102,7 @@
 	</element>
 	<element name="InstructionRevoke">
 		<complexType>
-			<complexContent"src/main/xsd/efi-1.0.xsd">
+			<complexContent>
 				<extension base="efi:EfiMessage">
 					<sequence>
 						<element name="instructionId" type="efi:Identifier"/>

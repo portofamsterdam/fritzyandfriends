@@ -88,7 +88,7 @@ public class WebRelayTest {
 
         WebRelayState exp = new WebRelayState(true, true, 0, 0);
         setExpectedReturnState(exp);
-        WebRelay relay = new WebRelay(InetAddress.getLocalHost());
+        WebRelay relay = new WebRelay(InetAddress.getLocalHost(), PORT);
         WebRelayState act = relay.getState();
         assertEquals(exp, act);
     }
@@ -97,14 +97,14 @@ public class WebRelayTest {
     public void testSwitchRelayOn() throws IOException {
         exprectedServerCommand = "GET /state.xml?relayState=1 HTTP/1.1 \r\n\r\n";
         setExpectedReturnState(new WebRelayState(true, true, 0, 0));
-        new WebRelay(InetAddress.getLocalHost()).setRelay(true);
+        new WebRelay(InetAddress.getLocalHost(), PORT).setRelay(true);
     }
 
     @Test
     public void testSwitchRelayOff() throws IOException {
         exprectedServerCommand = "GET /state.xml?relayState=0 HTTP/1.1 \r\n\r\n";
         setExpectedReturnState(new WebRelayState(true, true, 0, 0));
-        new WebRelay(InetAddress.getLocalHost()).setRelay(false);
+        new WebRelay(InetAddress.getLocalHost(), PORT).setRelay(false);
     }
 
     private void setExpectedReturnState(WebRelayState exp) {

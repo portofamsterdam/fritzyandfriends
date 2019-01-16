@@ -51,3 +51,6 @@ libraries.awsiotsdk = 'com.amazonaws:aws-iot-device-sdk-java:1.2.0'
 
 // Bouncy Castle Crypto (v1.60, 2018-07-06), also checked but no better one available for higher jdk version
 libraries.bouncycastle = 'org.bouncycastle:bcprov-jdk15on:1.60'
+
+// serial
+libraries.gnuio = 'org.rxtx:rxtx:2.1.7'

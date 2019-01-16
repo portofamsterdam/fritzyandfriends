@@ -32,14 +32,16 @@ import java.nio.charset.StandardCharsets;
 public final class WebRelay {
 
     private final InetAddress address;
+    private final int port;
 
     /**
      * Constructor for {@link WebRelay} objects
      *
      * @param address where to find the relay
      */
-    public WebRelay(InetAddress address) {
+    public WebRelay(InetAddress address, int port) {
         this.address = address;
+        this.port = port;
     }
 
     /**
@@ -64,7 +66,7 @@ public final class WebRelay {
     
     private  WebRelayState readResponse(String command) throws IOException {
         // Note UrlConnection complains about invalid response. This is easiest way to fix it
-        try (Socket s = new Socket(address.getHostAddress(), 80);
+        try (Socket s = new Socket(address.getHostAddress(), port);
                 OutputStream out = s.getOutputStream();
                 InputStream in = s.getInputStream()) {
             // Writh http request
@@ -72,7 +74,7 @@ public final class WebRelay {
             out.flush();
             
             // Read XML response
-            ByteBuffer bb = ByteBuffer.allocate(255);
+            ByteBuffer bb = ByteBuffer.allocate(1024);
             int c;
             while ((c = in.read()) != -1) {
                 bb.put((byte)c);
