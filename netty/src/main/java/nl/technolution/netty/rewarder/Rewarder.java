@@ -20,8 +20,8 @@ import java.time.Instant;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import nl.technolution.DeviceId;
 import nl.technolution.TimedTaskService;
-import nl.technolution.protocols.efi.util.DeviceId;
 
 /**
  * 
@@ -48,5 +48,4 @@ public class Rewarder extends TimedTaskService {
     private double calculateReward(Instant ts, DeviceId buyer, DeviceId seller) {
         return 0d;
     }
-
 }

@@ -13,9 +13,10 @@ task cleanEfiLib(type: Delete) {
     ])
 }
 
-dependencies {	
+dependencies {
 	compile files(generateEfiLib.outputLib)
 	compile libraries.javax_measure
+	compile project(':common');
 	
 	// Special entries for techno-jax plugin
 	technoJaxb libraries.jaxb_xjc	  

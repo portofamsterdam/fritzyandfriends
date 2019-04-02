@@ -14,7 +14,7 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.protocols.efi.util;
+package nl.technolution;
 
 /**
  * Device Id used to communicate with Efi

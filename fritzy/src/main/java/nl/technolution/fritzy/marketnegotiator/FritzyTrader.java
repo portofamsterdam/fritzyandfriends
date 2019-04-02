@@ -21,9 +21,9 @@ import java.time.Instant;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
+import nl.technolution.DeviceId;
 import nl.technolution.TimedTaskService;
 import nl.technolution.market.ISupplierMarket;
-import nl.technolution.protocols.efi.util.DeviceId;
 
 /**
  * 

@@ -20,6 +20,7 @@ import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
 
+import nl.technolution.DeviceId;
 import nl.technolution.appliance.resourcemanager.IDeviceResourceHandler;
 import nl.technolution.protocols.efi.CommodityEnum;
 import nl.technolution.protocols.efi.DeviceClass;
@@ -32,7 +33,6 @@ import nl.technolution.protocols.efi.SequentialProfiles;
 import nl.technolution.protocols.efi.ShiftableRegistration;
 import nl.technolution.protocols.efi.ShiftableUpdate;
 import nl.technolution.protocols.efi.SupportedCommodities;
-import nl.technolution.protocols.efi.util.DeviceId;
 import nl.technolution.protocols.efi.util.Efi;
 
 /**

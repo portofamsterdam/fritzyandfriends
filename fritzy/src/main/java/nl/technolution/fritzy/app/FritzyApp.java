@@ -27,6 +27,7 @@ import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
 import gnu.io.UnsupportedCommOperationException;
 import io.dropwizard.setup.Environment;
+import nl.technolution.DeviceId;
 import nl.technolution.Services;
 import nl.technolution.appliance.DeviceControllerApp;
 import nl.technolution.appliance.resourcemanager.IDeviceResourceHandler;
@@ -41,7 +42,6 @@ import nl.technolution.fritzy.marketnegotiator.FritzyTrader;
 import nl.technolution.market.ISupplierMarket;
 import nl.technolution.market.Market;
 import nl.technolution.marketnegotiator.ICustomerEnergyManager;
-import nl.technolution.protocols.efi.util.DeviceId;
 
 /**
  * Device that controls Fridge.
@@ -106,7 +106,7 @@ public final class FritzyApp extends DeviceControllerApp<FritzyConfig> implement
 
     @Override
     protected void initEnvironment(Environment environment, FritzyConfig configuration) {
-        ICustomerEnergyManager cem = new FritzyFlexibilityManager();
+        ICustomerEnergyManager cem = new FritzyFlexibilityManager(new DeviceId(configuration.getDevicveId()));
         IDeviceResourceHandler deviceResource = new Fritzy(id);
         environment.lifecycle().manage(new ResourceManagerService(cem, deviceResource));
         ISupplierMarket market = new Market(configuration.getMarket());
