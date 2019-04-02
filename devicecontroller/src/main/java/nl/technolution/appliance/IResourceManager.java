@@ -16,9 +16,9 @@
  */
 package nl.technolution.appliance;
 
+import nl.technolution.DeviceId;
 import nl.technolution.protocols.efi.Instruction;
 import nl.technolution.protocols.efi.InstructionRevoke;
-import nl.technolution.protocols.efi.util.DeviceId;
 
 /**
  */

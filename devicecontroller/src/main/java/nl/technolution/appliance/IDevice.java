@@ -16,7 +16,7 @@
  */
 package nl.technolution.appliance;
 
-import nl.technolution.protocols.efi.util.DeviceId;
+import nl.technolution.DeviceId;
 
 /**
  * Marks a device

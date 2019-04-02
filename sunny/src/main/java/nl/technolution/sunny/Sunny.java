@@ -18,6 +18,7 @@ package nl.technolution.sunny;
 
 import java.time.Instant;
 
+import nl.technolution.DeviceId;
 import nl.technolution.appliance.resourcemanager.IDeviceResourceHandler;
 import nl.technolution.protocols.efi.CommodityEnum;
 import nl.technolution.protocols.efi.DeviceClass;
@@ -31,7 +32,6 @@ import nl.technolution.protocols.efi.InflexibleRegistration;
 import nl.technolution.protocols.efi.Measurement;
 import nl.technolution.protocols.efi.Measurement.ElectricityMeasurement;
 import nl.technolution.protocols.efi.SupportedCommodities;
-import nl.technolution.protocols.efi.util.DeviceId;
 import nl.technolution.protocols.efi.util.Efi;
 
 /**

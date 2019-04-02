@@ -18,6 +18,7 @@ package nl.technolution.batty;
 
 import java.time.Instant;
 
+import nl.technolution.DeviceId;
 import nl.technolution.appliance.resourcemanager.IDeviceResourceHandler;
 import nl.technolution.protocols.efi.Actuator;
 import nl.technolution.protocols.efi.ActuatorBehaviour;
@@ -38,7 +39,6 @@ import nl.technolution.protocols.efi.StorageRunningModes;
 import nl.technolution.protocols.efi.StorageSystemDescription;
 import nl.technolution.protocols.efi.Timer;
 import nl.technolution.protocols.efi.Timers;
-import nl.technolution.protocols.efi.util.DeviceId;
 import nl.technolution.protocols.efi.util.Efi;
 
 /**

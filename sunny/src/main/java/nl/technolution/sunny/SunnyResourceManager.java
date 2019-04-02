@@ -16,10 +16,10 @@
  */
 package nl.technolution.sunny;
 
+import nl.technolution.DeviceId;
 import nl.technolution.appliance.IResourceManager;
 import nl.technolution.protocols.efi.Instruction;
 import nl.technolution.protocols.efi.InstructionRevoke;
-import nl.technolution.protocols.efi.util.DeviceId;
 
 /**
  * Resource Manager of sunny
