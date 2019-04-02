@@ -29,8 +29,8 @@ import com.codahale.metrics.annotation.Timed;
 import nl.technolution.IEndpoint;
 import nl.technolution.Services;
 import nl.technolution.fritzy.IFritzy;
-import nl.technolution.fritzy.tempsensor.TemperatureSensor;
-import nl.technolution.fritzy.webrelay.WebRelayState;
+import nl.technolution.fritzy.io.tempsensor.TemperatureSensor;
+import nl.technolution.fritzy.io.webrelay.WebRelayState;
 
 /**
  * 

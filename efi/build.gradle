@@ -23,6 +23,6 @@ dependencies {
 }
 
 // Run the generate tasks before compiling and creating eclipse classpath
-eclipseClasspath.dependsOn(generateEfiLib)
+// eclipseClasspath.dependsOn(generateEfiLib)
 compileJava.dependsOn(generateEfiLib)
 clean.dependsOn(cleanEfiLib)

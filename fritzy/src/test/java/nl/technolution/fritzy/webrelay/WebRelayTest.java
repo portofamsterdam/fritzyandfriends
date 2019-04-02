@@ -35,6 +35,9 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import nl.technolution.fritzy.io.webrelay.WebRelay;
+import nl.technolution.fritzy.io.webrelay.WebRelayState;
+
 /**
  * Test webrelay
  */

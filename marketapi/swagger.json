@@ -1,0 +1,1139 @@
+{
+  "info": {
+    "title": "Fritzy 2.0 Token API",
+    "version": "0.0.1",
+    "description": "This api provides functionality to interact with an ethereum blockchain"
+  },
+  "host": "82.196.13.251/api",
+  "basePath": "/",
+  "swagger": "2.0",
+  "paths": {
+    "/users": {
+      "get": {
+        "tags": [
+          "Account"
+        ],
+        "description": "Get users in the chain",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns an array of users",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/User"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/login": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "description": "Authenticate a user",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "password",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns logged in user",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "user": {
+                  "$ref": "#/definitions/User"
+                },
+                "accessToken": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/register": {
+      "post": {
+        "tags": [
+          "Account"
+        ],
+        "description": "Register a user",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "email",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "name",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "password",
+            "in": "formData",
+            "required": true,
+            "type": "password"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns created user",
+            "schema": {
+              "$ref": "#/definitions/User"
+            }
+          }
+        }
+      }
+    },
+    "/me": {
+      "get": {
+        "tags": [
+          "Authenticated"
+        ],
+        "description": "Get the logged in user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Return authenticated user",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/User"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/balance": {
+      "get": {
+        "tags": [
+          "Authenticated"
+        ],
+        "description": "Get balance of authenticated user",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns balances per token",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "balance": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Balance"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders": {
+      "get": {
+        "tags": [
+          "Order"
+        ],
+        "description": "Get orderbook from relayer",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns orders array",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "orders": {
+                  "type": "object",
+                  "properties": {
+                    "records": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/definitions/Order"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/orders/{orderHash}": {
+      "get": {
+        "tags": [
+          "Order"
+        ],
+        "description": "Get an order by order hash from orderbook of relayer",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns order",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "order": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Order"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/order": {
+      "post": {
+        "tags": [
+          "Order"
+        ],
+        "description": "Post a new limit order to relayer",
+        "parameters": [
+          {
+            "name": "makerToken",
+            "description": "The token you are offering. Can be the symbol (kwh, eur) or a contract address (0x0000000000000000000000000000000000000000)",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "takerToken",
+            "description": "The token you would like to receive. The token you are offering. Can be the symbol (kwh, eur) or a contract address (0x0000000000000000000000000000000000000000)",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "makerAmount",
+            "description": "The amount of token you are offering. Specify the amount in Wei or the smallest denomination possible for token. 1 = 1000000000000000000",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "takerAmount",
+            "description": "The amount of token you want to receive. Specify the amount in Wei or the smallest denomination possible for token. 1 = 1000000000000000000",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns order",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "order": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Order"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/order/{orderHash}": {
+      "post": {
+        "tags": [
+          "Order"
+        ],
+        "description": "Fill an order in full via exchange contract",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the executed Ethereum transaction details",
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          }
+        }
+      }
+    },
+    "/me/order/{orderHash}/cancel": {
+      "post": {
+        "tags": [
+          "Order"
+        ],
+        "description": "Cancel an order by hash via exchange contract",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns the executed Ethereum transaction details",
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          }
+        }
+      }
+    },
+    "/token/balance/{address}": {
+      "get": {
+        "tags": [
+          "Token"
+        ],
+        "description": "Get balance of an address",
+        "parameters": [
+          {
+            "name": "address",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns balances per token",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "balance": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Balance"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me/token/mint": {
+      "post": {
+        "tags": [
+          "Authenticated"
+        ],
+        "description": "Mint new tokens to the address from authenticated user",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "address",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Ethereum transaction details",
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          }
+        }
+      }
+    },
+    "/me/transfer": {
+      "post": {
+        "tags": [
+          "Authenticated"
+        ],
+        "description": "Transfer ethereum from authenticated user",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "to",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Ethereum transaction details",
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          }
+        }
+      }
+    },
+    "/transfer": {
+      "post": {
+        "tags": [
+          "Authenticated"
+        ],
+        "description": "Transfer ethereum from signer",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "to",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "signer",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Ethereum transaction details",
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          }
+        }
+      }
+    },
+    "/me/token/transfer": {
+      "post": {
+        "tags": [
+          "Authenticated"
+        ],
+        "description": "Transfer tokens from authenticated user",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "to",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Ethereum transaction details",
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          }
+        }
+      }
+    },
+    "/token/transfer": {
+      "post": {
+        "tags": [
+          "Token"
+        ],
+        "description": "Transfer tokens from signer",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "to",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "signer",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Ethereum transaction details",
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          }
+        }
+      }
+    },
+    "/me/token/approve": {
+      "post": {
+        "tags": [
+          "Authenticated"
+        ],
+        "description": "Approve an address to spend (set allowance) from authenticated user",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "address",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Ethereum transaction details",
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          }
+        }
+      }
+    },
+    "/token/approve": {
+      "post": {
+        "tags": [
+          "Token"
+        ],
+        "description": "Approve an address to spend (set allowance) from signer (externally signed)",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "address",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "signer",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Ethereum transaction details",
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          }
+        }
+      }
+    },
+    "/me/token/increaseAllowance": {
+      "post": {
+        "tags": [
+          "Authenticated"
+        ],
+        "description": "Increase amount an address can spend (set allowance) from authenticated user",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "address",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Ethereum transaction details",
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          }
+        }
+      }
+    },
+    "/token/increaseAllowance": {
+      "post": {
+        "tags": [
+          "Token"
+        ],
+        "description": "Increase amount an address can spend (set allowance) from signer (externally signed)",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "address",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "signer",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Ethereum transaction details",
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          }
+        }
+      }
+    },
+    "/me/token/decreaseAllowance": {
+      "post": {
+        "tags": [
+          "Authenticated"
+        ],
+        "description": "Decrease amount (substract value) an address can spend (set allowance) from authenticated user",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "address",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Ethereum transaction details",
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          }
+        }
+      }
+    },
+    "/token/decreaseAllowance": {
+      "post": {
+        "tags": [
+          "Token"
+        ],
+        "description": "Decrease amount (substract value) an address can spend (set allowance) from signer (externally signed)",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "address",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "signer",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Ethereum transaction details",
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          }
+        }
+      }
+    },
+    "/me/token/allowance/{spenderAddress}": {
+      "get": {
+        "tags": [
+          "Authenticated"
+        ],
+        "description": "Get allowance the authenticated user has given the spenderAddress",
+        "parameters": [
+          {
+            "name": "spenderAddress",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns allowance",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "allowance": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/token/allowance/{ownerAddress}/{spenderAddress}": {
+      "get": {
+        "tags": [
+          "Token"
+        ],
+        "description": "Get allowance that ownerAddress has given the spenderAddress",
+        "parameters": [
+          {
+            "name": "ownerAddress",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "spenderAddress",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns allowance",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "allowance": {
+                  "type": "number"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/node/accounts": {
+      "get": {
+        "tags": [
+          "Node"
+        ],
+        "description": "Get unlocked Ethereum addresses in the connected node",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns an array of addresses",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/EthBalance"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/node/addMinter": {
+      "post": {
+        "tags": [
+          "Node"
+        ],
+        "description": "Add a minter from the authenticated account of the node (account",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "address",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Ethereum transaction details",
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          }
+        }
+      }
+    },
+    "/me/escrow": {
+      "post": {
+        "tags": [
+          "Escrow"
+        ],
+        "description": "Create an escrow transaction from authenticated user",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "to",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "approver",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "msg",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Ethereum transaction details",
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          }
+        }
+      }
+    },
+    "/token/escrow": {
+      "post": {
+        "tags": [
+          "Escrow"
+        ],
+        "description": "Create an escrow transaction form signer (externally signed)",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "to",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "approver",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "value",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "signedMsg",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Ethereum transaction details",
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          }
+        }
+      }
+    },
+    "/node/sendRawTx": {
+      "post": {
+        "tags": [
+          "Ethereum"
+        ],
+        "description": "Send an already signed transaction in hex encoded",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "txHex",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          }
+        ]
+      }
+    }
+  },
+  "definitions": {
+    "User": {
+      "type": "object",
+      "required": [
+        "username",
+        "password"
+      ],
+      "properties": {
+        "name": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        }
+      }
+    },
+    "Transaction": {
+      "type": "object",
+      "properties": {
+        "tx": {
+          "type": "string"
+        },
+        "receipt": {
+          "type": "object"
+        },
+        "logs": {
+          "type": "object"
+        }
+      }
+    },
+    "Event": {
+      "type": "object",
+      "properties": {
+        "tx": {
+          "type": "string"
+        },
+        "logs": {
+          "type": "object"
+        }
+      }
+    },
+    "Balance": {
+      "type": "object",
+      "properties": {
+        "symbol": {
+          "type": "string"
+        },
+        "balance": {
+          "type": "number"
+        }
+      }
+    },
+    "EthBalance": {
+      "type": "object",
+      "properties": {
+        "address": {
+          "type": "string"
+        },
+        "balance": {
+          "type": "number"
+        }
+      }
+    },
+    "Order": {
+      "type": "object",
+      "properties": {
+        "signature": {
+          "type": "string"
+        },
+        "senderAddress": {
+          "type": "string"
+        },
+        "makerAddress": {
+          "type": "string"
+        },
+        "takerAddress": {
+          "type": "string"
+        },
+        "makerFee": {
+          "type": "string"
+        },
+        "takerFee": {
+          "type": "string"
+        },
+        "makerAssetAmount": {
+          "type": "string"
+        },
+        "takerAssetAmount": {
+          "type": "string"
+        },
+        "makerAssetData": {
+          "type": "string"
+        },
+        "takerAssetData": {
+          "type": "string"
+        },
+        "salt": {
+          "type": "string"
+        },
+        "exchangeAddress": {
+          "type": "string"
+        },
+        "feeRecipientAddress": {
+          "type": "string"
+        },
+        "expirationTimeSeconds": {
+          "type": "string"
+        },
+        "hash": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "responses": {
+    "200": {
+      "description": "OK"
+    },
+    "400": {
+      "description": "Bad request."
+    },
+    "401": {
+      "description": "Authorization information is missing or invalid."
+    },
+    "404": {
+      "description": "Item was not found."
+    }
+  },
+  "parameters": {},
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header"
+    }
+  },
+  "tags": []
+}

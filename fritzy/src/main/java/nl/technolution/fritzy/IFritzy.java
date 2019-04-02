@@ -16,8 +16,8 @@
  */
 package nl.technolution.fritzy;
 
-import nl.technolution.fritzy.tempsensor.TemperatureSensor;
-import nl.technolution.fritzy.webrelay.WebRelay;
+import nl.technolution.fritzy.io.tempsensor.TemperatureSensor;
+import nl.technolution.fritzy.io.webrelay.WebRelay;
 
 /**
  * Defines Fritzy object

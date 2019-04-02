@@ -16,81 +16,76 @@
  */
 package nl.technolution.fritzy;
 
-import java.io.IOException;
-import java.net.InetAddress;
-import java.net.UnknownHostException;
-import java.util.TooManyListenersException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 
-import org.slf4j.Logger;
-
-import gnu.io.NoSuchPortException;
-import gnu.io.PortInUseException;
-import gnu.io.UnsupportedCommOperationException;
-import nl.technolution.Services;
-import nl.technolution.appliance.DeviceControllerApp;
-import nl.technolution.appliance.DeviceId;
-import nl.technolution.core.Log;
-import nl.technolution.fritzy.tempsensor.TemperatureSensor;
-import nl.technolution.fritzy.webrelay.WebRelay;
+import nl.technolution.appliance.resourcemanager.IDeviceResourceHandler;
+import nl.technolution.protocols.efi.CommodityEnum;
+import nl.technolution.protocols.efi.DeviceClass;
+import nl.technolution.protocols.efi.DeviceDescription;
+import nl.technolution.protocols.efi.FlexibilityRegistration;
+import nl.technolution.protocols.efi.FlexibilityUpdate;
+import nl.technolution.protocols.efi.Measurement;
+import nl.technolution.protocols.efi.SequentialProfile;
+import nl.technolution.protocols.efi.SequentialProfiles;
+import nl.technolution.protocols.efi.ShiftableRegistration;
+import nl.technolution.protocols.efi.ShiftableUpdate;
+import nl.technolution.protocols.efi.SupportedCommodities;
+import nl.technolution.protocols.efi.util.DeviceId;
+import nl.technolution.protocols.efi.util.Efi;
 
 /**
- * Device that controls Fridge.
+ * 
  */
-public final class Fritzy extends DeviceControllerApp<FritzyConfig> implements IFritzy {
+public class Fritzy implements IDeviceResourceHandler {
 
-    private Logger log = Log.getLogger();
+    private final DeviceId deviceId;
 
-    private DeviceId id = null;
+    /**
+     * @param deviceId id of device
+     */
+    public Fritzy(DeviceId deviceId) {
+        this.deviceId = deviceId;
+    }
 
-    private WebRelay webRelay;
-    private TemperatureSensor tempSensor;
+    @Override
+    public FlexibilityRegistration getRegistration() {
+        ShiftableRegistration reg = Efi.build(ShiftableRegistration.class, deviceId);
+        SupportedCommodities commodity = new SupportedCommodities();
+        commodity.getCommodityType().add(CommodityEnum.ELECTRICITY);
+        DeviceDescription description = new DeviceDescription();
+        description.setDeviceClass(DeviceClass.REFRIGERATOR);
+        reg.setDeviceDescription(description);
+        reg.setSupportedCommodities(commodity);
+        reg.setInstructionProcessingDelay(Efi.DATATYPE_FACTORY.newDuration(0));
+        return null;
+    }
+
+    @Override
+    public FlexibilityUpdate getFlexibility() {
+        ShiftableUpdate shiftableUpdate = Efi.build(ShiftableUpdate.class, deviceId);
+        shiftableUpdate.setEndBefore(Efi.calendarOfInstant(Instant.now().plus(1, ChronoUnit.DAYS)));
+        SequentialProfiles profiles = new SequentialProfiles();
+        List<SequentialProfile> sequentialProfileList = profiles.getSequentialProfile();
+
+        // TODO MKE create flexibility
+        SequentialProfile profile = new SequentialProfile();
+
+        sequentialProfileList.add(profile);
+        shiftableUpdate.setSequentialProfiles(profiles);
+        return null;
+    }
+
+    @Override
+    public Measurement getMeasurement() {
+        // TODO MKE, can this be measured?
+        return null;
+    }
 
     @Override
     public DeviceId getDeviceId() {
-        return id;
+        return deviceId;
     }
 
-    @Override
-    public WebRelay getWebRelay() {
-        return webRelay;
-    }
-
-    @Override
-    public TemperatureSensor getTemperatureSensor() {
-        return tempSensor;
-    }
-
-    @Override
-    protected void initDevice(FritzyConfig configuration) {
-        this.id = new DeviceId(configuration.getDevicveId());
-        Services.put(IFritzy.class, this);
-        try {
-            log.info("Opening connection webrelay: {}:{}", configuration.getHost(), configuration.getPort());
-            webRelay = new WebRelay(InetAddress.getByName(configuration.getHost()), configuration.getPort());
-
-            log.info("Opening connection to temp sensor: {}", configuration.getSerailPort());
-            tempSensor = new TemperatureSensor(configuration.getSerailPort());
-            tempSensor.init();
-        } catch (UnknownHostException e) {
-            log.error("Failed to init WebRelay: {}", e);
-            throw new RuntimeException(e);
-        } catch (IOException e) {
-            log.error("Unable to read fritzy config: {}", e);
-            throw new RuntimeException(e);
-        } catch (NoSuchPortException | PortInUseException | TooManyListenersException | 
-                UnsupportedCommOperationException e) {
-            log.error("Unable init comm port: {}", e);
-            throw new RuntimeException(e);
-        }
-    }
-
-    /**
-     * Run Fritzy
-     * 
-     * @param args passed by CLI
-     * @throws Exception
-     */
-    public static void main(String[] args) throws Exception {
-        new Fritzy().run(args);
-    }
 }

@@ -1,0 +1,11 @@
+{
+  "modelPackage": "nl.technolution.fritzy.gen.model",
+  "apiPackage": "nl.technolution.fritzy.gen.api",
+  "invokerPackage": "nl.technolution.fritzy.gen",
+  "library": "jersey2",
+  "dateLibrary": "java8",
+  "java8": "true",
+  "hideGenerationTimestamp": true,
+  "modelNamePrefix": "Web",
+  "sourceFolder": "src/gen/java"
+}

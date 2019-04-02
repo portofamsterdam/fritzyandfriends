@@ -1,0 +1,61 @@
+
+apply plugin: "org.hidetake.swagger.generator"
+
+ext {
+    generatedCodeDir = "src/gen/java"
+}
+ 
+ 
+dependencies {
+    compile libraries.dropwizard
+    compile libraries.techno_core
+    compile libraries.javax_validation
+    compile libraries.jackson_annotations
+    compile libraries.swagger_annotate
+    // compile libraries.codegen
+    
+    swaggerCodegen libraries.swagger_codegen
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs 'src/tools/java'
+        }
+    }
+}
+ 
+swaggerSources {
+  registrationsApi {
+    inputFile = file('swagger.json')
+    code {
+      language = 'jaxrs-jersey'
+      configFile = file('config.json')
+      components = ['models']
+      rawOptions = [
+        '--output', "${project(':marketapi').projectDir}",
+        '--type-mappings', 'OffsetDateTime=Instant',
+        '--import-mappings', 'java.time.OffsetDateTime=java.time.Instant'
+      ]
+      dependsOn {
+        createDirectoryForGeneratingResults
+      }
+    }
+  }
+}
+
+// Tasks that creates the directory for the generated code results
+task createDirectoryForGeneratingResults {
+    mkdir project.generatedCodeDir
+}
+
+// Adds the generated code as source set to the project
+sourceSets {
+    main {
+        java {
+            srcDir project.generatedCodeDir
+        }
+    }
+}
+
+compileJava.dependsOn swaggerSources.registrationsApi.code

@@ -29,31 +29,35 @@ import io.dropwizard.setup.Environment;
 import nl.technolution.IEndpoint;
 import nl.technolution.core.Log;
 import nl.technolution.core.resources.TypeFinder;
-import nl.technolution.marketnegotiator.MarketManager;
 
 /**
  * Simulator for net Power
  * 
  * @param <T> Configuration
  */
-public abstract class DeviceControllerApp<T extends Configuration> extends Application<T> implements IDeviceControler {
+public abstract class DeviceControllerApp<T extends Configuration> extends Application<T> implements IDevice {
 
     private static final Logger LOG = Log.getLogger();
     
-    private IDeviceControler deviceControler;
-
     @Override
-    public void run(T configuration, Environment environment) throws Exception {
+    public final void run(T configuration, Environment environment) throws Exception {
 
         LOG.info("Setup webservices");
         setupWebservices(environment);
 
         LOG.info("Setup market manager");
-        environment.lifecycle().manage(new MarketManager());
+        initEnvironment(environment, configuration);
 
         LOG.info("Setup device");
         initDevice(configuration);
     }
+
+    /**
+     * Device initialised
+     * 
+     * @param configuration
+     */
+    protected abstract void initEnvironment(Environment environment, T configuration);
 
     /**
      * Device initialised

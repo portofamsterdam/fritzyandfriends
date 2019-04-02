@@ -3,6 +3,7 @@ apply plugin: 'java'
 
 dependencies {
     compile libraries.dropwizard
-    compile project(':common')
+    compile project(':efi')
+    compile project(':marketapi')
 }
 
