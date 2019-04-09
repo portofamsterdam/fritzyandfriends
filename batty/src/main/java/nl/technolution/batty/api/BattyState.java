@@ -14,37 +14,34 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.netty.rewarder;
+package nl.technolution.batty.api;
 
-import java.time.Instant;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
-import nl.technolution.DeviceId;
-import nl.technolution.TimedTaskService;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 
  */
-public class Rewarder extends TimedTaskService {
+public class BattyState {
 
-    /**
-     * Constructor for {@link Rewarder} objects
-     */
-    public Rewarder() {
-        // TODO MKE load rewards program
+    @JsonProperty("isCooling")
+    private final String batteryState;
+
+    @JsonProperty("temparature")
+    private final double chargeLevel;
+
+    @JsonCreator
+    public BattyState(@JsonProperty("batteryState") String batteryState,
+            @JsonProperty("chargeLevel") double chargeLevel) {
+        this.batteryState = batteryState;
+        this.chargeLevel = chargeLevel;
     }
 
-    @Override
-    public void init(ScheduledExecutorService executor) {
-        executor.scheduleAtFixedRate(this::processRewards, 0, 1, TimeUnit.MINUTES);
+    public String getBatteryState() {
+        return batteryState;
     }
 
-    private void processRewards() {
-
-    }
-
-    private double calculateReward(Instant ts, DeviceId buyer, DeviceId seller) {
-        return 0d;
+    public double getChargeLevel() {
+        return chargeLevel;
     }
 }

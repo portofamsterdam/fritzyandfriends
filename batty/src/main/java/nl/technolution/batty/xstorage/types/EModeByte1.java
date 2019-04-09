@@ -19,7 +19,7 @@ package nl.technolution.batty.xstorage.types;
 /**
  * 
  */
-public enum EMode {
+public enum EModeByte1 {
     // Standby 0x00 0xXX Inverter does not working due to user’s command or system failure.
     STANDBY(0),
     // Waiting 0x01 0xXX Receive the “Power On” command and waiting the connection check before grid-tied operation.
@@ -51,9 +51,28 @@ public enum EMode {
     // another country, however the philosophy remains the same.
     FREQUENCY_REGULATION(10);
 
-    private final int bitNo;
+    private final int index;
 
-    EMode(int bitNo) {
-        this.bitNo = bitNo;
+    EModeByte1(int index) {
+        this.index = index;
+    }
+
+    /**
+     * Find mode for index
+     * 
+     * @param index to find
+     * @return mode (byte 0)
+     */
+    public static EModeByte1 fromIndex(int index) {
+        for (EModeByte1 mode0 : values()) {
+            if (mode0.index == index) {
+                return mode0;
+            }
+        }
+        throw new IllegalArgumentException("unspecified index " + index);
+    }
+
+    public int getIndex() {
+        return index;
     }
 }

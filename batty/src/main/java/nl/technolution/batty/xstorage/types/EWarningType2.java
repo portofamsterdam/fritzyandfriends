@@ -16,20 +16,22 @@
  */
 package nl.technolution.batty.xstorage.types;
 
+import nl.technolution.IEnumBitset;
+
 /**
  * 
  */
-public enum EWaringType2 {
+public enum EWarningType2 implements IEnumBitset {
     // Bit 31 Error Code 31
     ERRORCODE31(31),
     // Bit 30 Error Code 30
     ERRORCODE30(30),
     // Bit 29 Grid Fac Fail Grid frequency is out of grid code range
-    GRIDFACFAILGRIDFREQUENCYISOUTOFGRIDCODERANGE(29),
+    GRIDFACFAIL(29),
     // Bit 28 Battery OV reached Battery reach over voltage point
-    BATTERYOVREACHEDBATTERYREACHOVERVOLTAGEPOINT(28),
+    BATTERY_OV_REACHED(28),
     // Bit 27 Battery UV reached Battery reach under voltage point
-    BATTERYUVREACHEDBATTERYREACHUNDERVOLTAGEPOINT(27),
+    BATTERY_UV_REACHED(27),
     // Bit 26 Over Load The load level is exceeded
     OVERLOADTHELOADLEVELISEXCEEDED(26),
     // Bit 25 Error Code 25
@@ -47,27 +49,27 @@ public enum EWaringType2 {
     // Bit 19 Error Code 19
     ERRORCODE19(19),
     // Bit 18 Zpv PE Fail Isolation resistance of PV panel out of tolerable range before connecting to the grid
-    ZPVPEFAILISOLATIONRESISTANCEOFPVPANELOUTOFTOLERABLERANGEBEFORECONNECTINGTOTHEGRID(18),
+    ZPVPEFAIL(18),
     // Bit 17 Grid Vac Fail Grid voltage is out of grid code range
-    GRIDVACFAILGRIDVOLTAGEISOUTOFGRIDCODERANGE(17),
+    GRIDVACFAIL(17),
     // Bit 16 Reserved Fan Lock warning
-    RESERVEDFANLOCKWARNING(16),
+    RESERVED_FANLOCKWARNING(16),
     // Bit 15 Vpv Max Fail PV input voltage is over the maximum tolerable value
-    VPVMAXFAILPVINPUTVOLTAGEISOVERTHEMAXIMUMTOLERABLEVALUE(15),
+    VPVMAXFAIL(15),
     // Bit 14 Test Fail Auto Test failed
     TESTFAILAUTOTESTFAILED(14),
     // Bit 13 Temperature Fail The temperature is over the maximum tolerable value
-    TEMPERATUREFAILTHETEMPERATUREISOVERTHEMAXIMUMTOLERABLEVALUE(13),
+    TEMPERATUREFAIL(13),
     // Bit 12 M-S Version Fail Master and Slave firmware version is mismatch
-    MSVERSIONFAILMASTERANDSLAVEFIRMWAREVERSIONISMISMATCH(12),
+    MSVERSIONFAIL(12),
     // Bit 11 Error Code 11 Error code 11
-    ERRORCODE11ERRORCODE11(11),
+    ERRORCODE11(11),
     // Bit 10 RCMU Curr Fail Residual current is too high
-    RCMUCURRFAILRESIDUALCURRENTISTOOHIGH(10),
+    RCMUCURRFAIL(10),
     // Bit 9 No Utility Grid voltage is lost
-    NOUTILITYGRIDVOLTAGEISLOST(9),
+    NOUTILITY(9),
     // Bit 8 No Battery Battery communication or connection is lost
-    NOBATTERYBATTERYCOMMUNICATIONORCONNECTIONISLOST(8),
+    NOBATTERY(8),
     // Bit 7 Error Code 7
     ERRORCODE7(7),
     // Bit 6 Error Code 6
@@ -85,10 +87,15 @@ public enum EWaringType2 {
     // Bit 0 Error Code 0
     ERRORCODE0(0);
 
-    private final int bitNo;
 
-    EWaringType2(int bitNo) {
-        this.bitNo = bitNo;
+    private final long bitMask;
+
+    EWarningType2(int bitNr) {
+        this.bitMask = 1L << bitNr;
     }
 
+    @Override
+    public long getMask() {
+        return bitMask;
+    }
 }

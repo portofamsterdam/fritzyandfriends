@@ -14,37 +14,48 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.netty.rewarder;
+package nl.technolution.batty.app;
 
-import java.time.Instant;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
+import org.slf4j.Logger;
 
+import io.dropwizard.setup.Environment;
 import nl.technolution.DeviceId;
-import nl.technolution.TimedTaskService;
+import nl.technolution.appliance.DeviceControllerApp;
+import nl.technolution.core.Log;
 
 /**
- * 
+ * Device that controls Fridge.
  */
-public class Rewarder extends TimedTaskService {
+public final class BattyApp extends DeviceControllerApp<BattyConfig> {
 
-    /**
-     * Constructor for {@link Rewarder} objects
-     */
-    public Rewarder() {
-        // TODO MKE load rewards program
+    private Logger log = Log.getLogger();
+
+    private DeviceId id = null;
+
+
+    @Override
+    public DeviceId getDeviceId() {
+        return id;
     }
 
     @Override
-    public void init(ScheduledExecutorService executor) {
-        executor.scheduleAtFixedRate(this::processRewards, 0, 1, TimeUnit.MINUTES);
-    }
-
-    private void processRewards() {
+    protected void initDevice(BattyConfig configuration) {
+        this.id = new DeviceId(configuration.getDeviceId());
 
     }
 
-    private double calculateReward(Instant ts, DeviceId buyer, DeviceId seller) {
-        return 0d;
+    /**
+     * Run Fritzy
+     * 
+     * @param args passed by CLI
+     * @throws Exception
+     */
+    public static void main(String[] args) throws Exception {
+        new BattyApp().run(args);
+    }
+
+    @Override
+    protected void initEnvironment(Environment environment, BattyConfig configuration) {
+
     }
 }

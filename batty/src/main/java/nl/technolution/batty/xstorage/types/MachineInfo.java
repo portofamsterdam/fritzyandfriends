@@ -18,6 +18,9 @@ package nl.technolution.batty.xstorage.types;
 
 import com.google.common.base.Preconditions;
 
+/**
+ * 
+ */
 public class MachineInfo {
 
     // 0 Communication card firmware version
@@ -93,6 +96,11 @@ public class MachineInfo {
         return nominalVpv;
     }
 
-
-
+    @Override
+    public String toString() {
+        return "MachineInfo [communicationCardFirmwareVersion=" + communicationCardFirmwareVersion + ", macAddress=" +
+                macAddress + ", inverterSerial=" + inverterSerial + ", inverterModelName=" + inverterModelName +
+                ", phase=" + phase + ", inverterFirmwareVersion=" + inverterFirmwareVersion + ", inverterVARating=" +
+                inverterVARating + ", nominalVpv=" + nominalVpv + "]";
+    }
 }
