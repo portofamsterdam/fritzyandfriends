@@ -72,7 +72,7 @@ public final class FritzyApp extends DeviceControllerApp<FritzyConfig> implement
 
     @Override
     protected void initDevice(FritzyConfig configuration) {
-        this.id = new DeviceId(configuration.getDevicveId());
+        this.id = new DeviceId(configuration.getDeviceId());
         Services.put(IFritzy.class, this);
         try {
             log.info("Opening connection webrelay: {}:{}", configuration.getHost(), configuration.getPort());
@@ -106,7 +106,7 @@ public final class FritzyApp extends DeviceControllerApp<FritzyConfig> implement
 
     @Override
     protected void initEnvironment(Environment environment, FritzyConfig configuration) {
-        ICustomerEnergyManager cem = new FritzyFlexibilityManager(new DeviceId(configuration.getDevicveId()));
+        ICustomerEnergyManager cem = new FritzyFlexibilityManager(new DeviceId(configuration.getDeviceId()));
         IDeviceResourceHandler deviceResource = new Fritzy(id);
         environment.lifecycle().manage(new ResourceManagerService(cem, deviceResource));
         ISupplierMarket market = new Market(configuration.getMarket());

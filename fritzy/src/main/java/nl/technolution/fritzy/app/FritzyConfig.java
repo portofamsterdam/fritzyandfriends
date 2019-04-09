@@ -58,7 +58,7 @@ public class FritzyConfig extends Configuration {
         this.market = market;
     }
 
-    public String getDevicveId() {
+    public String getDeviceId() {
         return deviceId;
     }
 
