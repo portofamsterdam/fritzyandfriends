@@ -26,7 +26,14 @@ task copyArtifactsToDocker(type: Copy) {
         include "${jarName}.jar"
     }
     from ('src/main/dist/') {
-        include 'conf.json'
+        include 'fritzy.json'
+    }
+    from ('src/main/resource/') {
+        include 'librxtxParallel.so'
+        include 'librxtxSerial.so'  
+        include 'RXTXcomm.jar'
+        include 'rxtxParallel.dll'  
+        include 'rxtxSerial.dll'
     }
     into '../docker/fritzy/build'
 }
