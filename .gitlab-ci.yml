@@ -1,0 +1,60 @@
+variables:
+    GRADLE_OPTS: "-Dorg.gradle.daemon=false"
+    VERSION_MAJOR: "0"
+    VERSION_MINOR: "1"
+    VERSION_BUGFIX: "0"
+    BUILD_VERSION: $VERSION_MAJOR.$VERSION_MINOR.$VERSION_BUGFIX
+    
+
+before_script:
+  - export GRADLE_USER_HOME=`pwd`/.gradle
+  - export ORG_GRADLE_PROJECT_version=$BUILD_VERSION
+  # We are using a build image with techno-gradle 4.4.1 that does not have support yet for gitlab.
+  # By setting a few specific environment variables we can still use the Technolution gradle scripts set for this build image
+  - export JENKINS_HOME=true
+  - export GIT_COMMIT=$CI_COMMIT_SHA
+  - export GIT_BRANCH=$CI_COMMIT_REF_NAME
+ 
+stages:
+  - build
+  - create_images
+  - quality
+
+build_fritzy:
+  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.4.1
+  stage: build
+  script: 
+    - cd gradle
+    - gradle :fritzy:build :fritzy:copyArtifactsToDocker
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    paths:
+      - build/
+      - .gradle
+  artifacts:
+    paths: 
+      - docker/fritzy/
+
+create_images:
+  # Use the proxied docker image
+  image: docker-proxy.intranet.technolution.nl/edsn/edsn_docker_aws:latest
+  stage: create_images
+  script:
+    # build and push consumer
+    - cd docker/fritzy
+    - docker build -t fritzy2.0/fritzy .
+  only:
+    - master
+
+sonar_quality_check:
+  image: docker-proxy.intranet.technolution.nl/techno_gradle_4_node_8_stretch:8.12
+  stage: quality
+  # When the quality job fails, the entire build should not be marked as failed.
+  allow_failure: true
+  script:
+    - cd gradle
+    - gradle --build-cache sonar
+  dependencies:
+    - build_fritzy
+  only:
+    - master

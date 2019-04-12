@@ -1,5 +1,5 @@
 /*
- (C) COPYRIGHT 2015 TECHNOLUTION BV, GOUDA NL
+ (C) COPYRIGHT TECHNOLUTION BV, GOUDA NL
 | =======          I                   ==          I    =
 |    I             I                    I          I
 |    I   ===   === I ===  I ===   ===   I  I    I ====  I   ===  I ===
@@ -14,37 +14,47 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.sunny.solaredge.beans;
+package nl.technolution.sunny.app;
+
+import org.slf4j.Logger;
+
+import io.dropwizard.setup.Environment;
+import nl.technolution.DeviceId;
+import nl.technolution.appliance.DeviceControllerApp;
+import nl.technolution.core.Log;
 
 /**
- * Abstract RPC class definition
+ * Device that controls Fridge.
  */
-public abstract class Rpc {
-    private String version;    
-    private String id;
-    private String format;    
-    
-    public final String getVersion() {
-        return version;
-    }
-    
-    public final void setVersion(String version) {
-        this.version = version;
-    }
+public final class SunnyApp extends DeviceControllerApp<SunnyConfig> {
 
-    public final String getId() {
+    private Logger log = Log.getLogger();
+
+    private DeviceId id = null;
+
+
+    @Override
+    public DeviceId getDeviceId() {
         return id;
     }
 
-    public final void setId(String id) {
-        this.id = id;
+    @Override
+    protected void initDevice(SunnyConfig conf) {
+        // TODO MKE: init sunny
     }
 
-    public final String getFormat() {
-        return format;
+    /**
+     * Run Fritzy
+     * 
+     * @param args passed by CLI
+     * @throws Exception
+     */
+    public static void main(String[] args) throws Exception {
+        new SunnyApp().run(args);
     }
 
-    public final void setFormat(String format) {
-        this.format = format;
+    @Override
+    protected void initEnvironment(Environment environment, SunnyConfig conf) {
+        this.id = new DeviceId(conf.getDeviceId());
     }
 }

@@ -1,5 +1,5 @@
 /*
- (C) COPYRIGHT 2015 TECHNOLUTION BV, GOUDA NL
+ (C) COPYRIGHT TECHNOLUTION BV, GOUDA NL
 | =======          I                   ==          I    =
 |    I             I                    I          I
 |    I   ===   === I ===  I ===   ===   I  I    I ====  I   ===  I ===
@@ -14,30 +14,34 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.sunny.solaredge.beans;
+package nl.technolution.sunny.api;
 
-import java.util.ArrayList;
-import java.util.List;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
+
+import com.codahale.metrics.annotation.Timed;
+
+import nl.technolution.IEndpoint;
 
 /**
- * Class defines RPC response
+ * 
  */
-public final class ProcessDataResponse extends Rpc implements IRpcResponse {
-    private Result result = new Result();   
+@Path("/sunny")
+@Produces(MediaType.APPLICATION_JSON)
+public class SunnyApi implements IEndpoint {
 
-    public Result getResult() {
-        return result;
-    }    
-    
     /**
-     * Class defines RPC Response result 
+     * Retrieve state of Fritzy
+     * 
+     * @return state of cooler and temparature
      */
-    public final class Result {
-        private List<Device<Channel>> devices = new ArrayList<Device<Channel>>();
-
-        public List<Device<Channel>> getDevices() {
-            return devices;
-        }
+    @GET
+    @Timed
+    @Path("state")
+    @Produces(MediaType.APPLICATION_JSON)
+    public SunnyState getState() {
+        return null;
     }
-
 }

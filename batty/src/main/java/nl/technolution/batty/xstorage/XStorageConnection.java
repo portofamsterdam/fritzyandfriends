@@ -54,7 +54,7 @@ import nl.technolution.core.Log;
 /**
  * Connection to Nissan xStorage device
  */
-public class XStorageConnection {
+public class XStorageConnection implements IXStorageConnection {
 
     private static final String GET_MACHINE_INFO_CMD = "GetMachineInfo";
     private static final String GET_MACHINE_DATA_CMD = "GetMachineData";
@@ -71,8 +71,7 @@ public class XStorageConnection {
     private SSLSocketFactory sslSF;
 
     /**
-     * https://172.30.133.212/Dashboard.php -- wifi
-     * https://172.30.133.212/Dashboard.php -- technolan
+     * https://172.30.133.212/Dashboard.php -- wifi https://172.30.133.212/Dashboard.php -- technolan
      * 
      * Constructor for {@link XStorageConnection} objects
      *
@@ -101,16 +100,16 @@ public class XStorageConnection {
 
         KeyStore ks = KeyStore.getInstance("JKS");
         ks.load(new FileInputStream(trustStorePath), trustStorePass.toCharArray());
-       File truststorefile = new File(trustStorePath);
-       Preconditions.checkArgument(truststorefile.exists(), "file not found");
+        File truststorefile = new File(trustStorePath);
+        Preconditions.checkArgument(truststorefile.exists(), "file not found");
 
-       TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-       tmf.init(ks);
+        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+        tmf.init(ks);
 
-       SSLContext sslCtx = SSLContext.getInstance("TLS");
-       sslCtx.init(null, tmf.getTrustManagers(), null);
-       sslSF = sslCtx.getSocketFactory();
-   }
+        SSLContext sslCtx = SSLContext.getInstance("TLS");
+        sslCtx.init(null, tmf.getTrustManagers(), null);
+        sslSF = sslCtx.getSocketFactory();
+    }
 
     private HttpsURLConnection getHttpsURLConnection(String url) throws IOException {
         HttpsURLConnection urlConnection = (HttpsURLConnection)new URL(url).openConnection();
@@ -126,37 +125,32 @@ public class XStorageConnection {
 
     /**
      * @return machine info
-     * @throws JsonParseException
-     * @throws JsonMappingException
-     * @throws IOException
-     * @throws CertificateException
-     * @throws NoSuchAlgorithmException
-     * @throws KeyStoreException
-     * @throws KeyManagementException
      */
-    public MachineInfo getMachineInfo() throws JsonParseException, JsonMappingException, IOException,
-            NoSuchAlgorithmException, CertificateException, KeyStoreException, KeyManagementException {
+    @Override
+    public MachineInfo getMachineInfo() throws XStorageException {
         String url = String.format("%s?action=%s&D0=%s&D1=%s", address, GET_MACHINE_INFO_CMD, username, password);
         log.debug(url);
         try (InputStream in = getHttpsURLConnection(url).getInputStream()) {
             MachineInfoJson result = mapper.readValue(in, MachineInfoJson.class);
             return MachineInfo.fromData(result.getData());
+        } catch (IOException e) {
+            throw new XStorageException(e.getMessage(), e);
         }
     }
 
     /**
      * @return machine data
-     * @throws JsonParseException
-     * @throws JsonMappingException
-     * @throws IOException
      */
-    public MachineData getMachineData() throws JsonParseException, JsonMappingException, IOException {
+    @Override
+    public MachineData getMachineData() throws XStorageException {
         String url = String.format("%s?action=%s&D0=%s&D1=%s", address, GET_MACHINE_DATA_CMD, username, password);
         log.debug(url);
         try (InputStream in = getHttpsURLConnection(url).getInputStream()) {
             MachineDataJson result = mapper.readValue(in, MachineDataJson.class);
             System.out.println(mapper.writeValueAsString(result));
             return MachineData.fromData(result.getData());
+        } catch (XStorageException | IOException e) {
+            throw new XStorageException(e.getMessage(), e);
         }
     }
 
@@ -166,13 +160,16 @@ public class XStorageConnection {
      * @throws JsonMappingException
      * @throws IOException
      */
-    public BmsData getBmsData() throws JsonParseException, JsonMappingException, IOException {
+    @Override
+    public BmsData getBmsData() throws XStorageException {
         String url = String.format("%s?action=%s&D0=%s&D1=%s", address, GET_BMS_DATA_CMD, username, password);
         log.debug(url);
         try (InputStream in = getHttpsURLConnection(url).getInputStream()) {
             BmsDataJson result = mapper.readValue(in, BmsDataJson.class);
             System.out.println(mapper.writeValueAsString(result));
             return BmsData.fromData(result.getData());
+        } catch (IOException e) {
+            throw new XStorageException(e.getMessage(), e);
         }
     }
 
@@ -182,15 +179,21 @@ public class XStorageConnection {
      * @param percentage
      * @throws IOException
      */
-    public void charge(int percentage) throws IOException {
+    @Override
+    public void charge(int percentage) throws XStorageException {
         Preconditions.checkArgument(percentage >= 0 && percentage <= 100);
-        String url = String.format("%s?action=%s&D0=%s&D1=%sD2=0&D3=%d", address, SET_MACHINE_DATA_CMD, username,
+        String url = String.format("%s?action=%s&D0=%s&D1=%sD2=2&D3=%d", address, SET_MACHINE_DATA_CMD, username,
                 password, percentage);
         log.debug(url);
-        int response = getHttpsURLConnection(url).getResponseCode();
-        if (response != 200) {
-            log.error("Unexpected response " + response);
+        try {
+            int response = getHttpsURLConnection(url).getResponseCode();
+            if (response != 200) {
+                log.error("Unexpected response " + response);
+            }
+        } catch (IOException e) {
+            throw new XStorageException(e.getMessage(), e);
         }
+
     }
 
     /**
@@ -198,29 +201,37 @@ public class XStorageConnection {
      * @param percentage
      * @throws IOException
      */
-    public void discharge(int percentage) throws IOException {
+    @Override
+    public void discharge(int percentage) throws XStorageException {
         Preconditions.checkArgument(percentage >= 0 && percentage <= 100);
         String url = String.format("%s?action=%s&D0=%s&D1=%sD2=3&D3=%d", address, SET_MACHINE_DATA_CMD, username,
                 password, percentage);
         log.debug(url);
-        int response = getHttpsURLConnection(url).getResponseCode();
-        if (response != 200) {
-            log.error("Unexpected response " + response);
+        try {
+            int response = getHttpsURLConnection(url).getResponseCode();
+            if (response != 200) {
+                log.error("Unexpected response " + response);
+            }
+        } catch (IOException e) {
+            throw new XStorageException(e.getMessage(), e);
         }
     }
 
     /**
      * @throws IOException
      */
-    public void powerOn() throws IOException {
-        // String url = String.format("%s?action=%s&D0=%s&D1=%sD2=1&D3=1", address, SET_MACHINE_DATA_CMD, username,
-        // password);
-        String url = String.format("%s?action=%s&D0=%s&D1=%sD2=2&D3=1", address, SET_MACHINE_DATA_CMD, username,
+    @Override
+    public void powerOn() throws XStorageException {
+        String url = String.format("%s?action=%s&D0=%s&D1=%sD2=1&D3=1", address, SET_MACHINE_DATA_CMD, username,
                 password);
         log.debug(url);
-        int response = getHttpsURLConnection(url).getResponseCode();
-        if (response != 200) {
-            log.error("Unexpected response " + response);
+        try {
+            int response = getHttpsURLConnection(url).getResponseCode();
+            if (response != 200) {
+                log.error("Unexpected response " + response);
+            }
+        } catch (IOException e) {
+            throw new XStorageException(e.getMessage(), e);
         }
 
     }
@@ -228,13 +239,18 @@ public class XStorageConnection {
     /**
      * @throws IOException
      */
-    public void powerOff() throws IOException {
+    @Override
+    public void powerOff() throws XStorageException {
         String url = String.format("%s?action=%s&D0=%s&D1=%sD2=0&D3=0", address, SET_MACHINE_DATA_CMD, username,
                 password);
         log.debug(url);
-        int response = getHttpsURLConnection(url).getResponseCode();
-        if (response != 200) {
-            log.error("Unexpected response " + response);
+        try {
+            int response = getHttpsURLConnection(url).getResponseCode();
+            if (response != 200) {
+                log.error("Unexpected response " + response);
+            }
+        } catch (IOException e) {
+            throw new XStorageException(e.getMessage(), e);
         }
 
     }
@@ -246,9 +262,16 @@ public class XStorageConnection {
      * @throws JsonMappingException
      * @throws IOException
      */
-    public MeterInfo getMeterInfo() throws JsonParseException, JsonMappingException, IOException {
+    @Override
+    public MeterInfo getMeterInfo() throws XStorageException {
         InputStream src = null;
-        MachineInfoJson result = mapper.readValue(src, MachineInfoJson.class);
+        MachineInfoJson result;
+        try {
+            result = mapper.readValue(src, MachineInfoJson.class);
+        } catch (IOException e) {
+            //
+            throw new RuntimeException(e.getMessage(), e);
+        }
         String[] data = result.getData();
         return MeterInfo.fromData(data[0]);
     }

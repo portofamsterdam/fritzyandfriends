@@ -42,11 +42,11 @@ public abstract class DeviceControllerApp<T extends Configuration> extends Appli
     @Override
     public final void run(T configuration, Environment environment) throws Exception {
 
-        LOG.info("Setup webservices");
-        setupWebservices(environment);
-
         LOG.info("Setup market manager");
         initEnvironment(environment, configuration);
+
+        LOG.info("Setup webservices");
+        setupWebservices(environment);
 
         LOG.info("Setup device");
         initDevice(configuration);
@@ -88,5 +88,6 @@ public abstract class DeviceControllerApp<T extends Configuration> extends Appli
             }
         }
     }
+
 
 }

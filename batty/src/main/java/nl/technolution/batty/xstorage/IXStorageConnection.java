@@ -1,5 +1,5 @@
 /*
- (C) COPYRIGHT 2015 TECHNOLUTION BV, GOUDA NL
+ (C) COPYRIGHT TECHNOLUTION BV, GOUDA NL
 | =======          I                   ==          I    =
 |    I             I                    I          I
 |    I   ===   === I ===  I ===   ===   I  I    I ====  I   ===  I ===
@@ -14,43 +14,32 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.sunny.solaredge.beans;
+package nl.technolution.batty.xstorage;
+
+import nl.technolution.batty.xstorage.types.BmsData;
+import nl.technolution.batty.xstorage.types.MachineData;
+import nl.technolution.batty.xstorage.types.MachineInfo;
+import nl.technolution.batty.xstorage.types.MeterInfo;
 
 /**
- * Marker interface for RPC Response classes
+ * 
  */
-public interface IRpcResponse {
-    /** 
-     * @return Version of RPC
-     */
-    String getVersion();    
-    
-    /** 
-     * @param version
-     *      Version of RPC
-     */
-    void setVersion(String version);
-    
-    /** 
-     * @return ID of RPC request
-     */
-    String getId();
+public interface IXStorageConnection {
 
-    /**
-     * 
-     * @param id 
-     *       ID of RPC request
-     */
-    void setId(String id);
+    MachineInfo getMachineInfo() throws XStorageException;
 
-    /**
-     * @return Format of RPC request
-     */
-    String getFormat();
+    MachineData getMachineData() throws XStorageException;
 
-    /**
-     * @param format
-     *      Format of RPC request
-     */
-    void setFormat(String format);
+    BmsData getBmsData() throws XStorageException;
+
+    void charge(int percentage) throws XStorageException;
+
+    void discharge(int percentage) throws XStorageException;
+
+    void powerOn() throws XStorageException;
+
+    void powerOff() throws XStorageException;
+
+    MeterInfo getMeterInfo() throws XStorageException;
+
 }

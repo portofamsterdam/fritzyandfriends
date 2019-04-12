@@ -24,10 +24,10 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class BattyState {
 
-    @JsonProperty("isCooling")
+    @JsonProperty("batteryState")
     private final String batteryState;
 
-    @JsonProperty("temparature")
+    @JsonProperty("chargeLevel")
     private final double chargeLevel;
 
     @JsonCreator

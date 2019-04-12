@@ -20,7 +20,10 @@ import org.slf4j.Logger;
 
 import io.dropwizard.setup.Environment;
 import nl.technolution.DeviceId;
+import nl.technolution.Services;
 import nl.technolution.appliance.DeviceControllerApp;
+import nl.technolution.batty.xstorage.IXStorageConnection;
+import nl.technolution.batty.xstorage.XStorageConnection;
 import nl.technolution.core.Log;
 
 /**
@@ -39,9 +42,11 @@ public final class BattyApp extends DeviceControllerApp<BattyConfig> {
     }
 
     @Override
-    protected void initDevice(BattyConfig configuration) {
-        this.id = new DeviceId(configuration.getDeviceId());
-
+    protected void initDevice(BattyConfig conf) {
+        IXStorageConnection c = new XStorageConnection(conf.getHost(), conf.getUsername(), conf.getPassword());
+        Services.put(IXStorageConnection.class, c);
+        log.info("Power on Battery");
+        c.powerOn();
     }
 
     /**
@@ -55,7 +60,7 @@ public final class BattyApp extends DeviceControllerApp<BattyConfig> {
     }
 
     @Override
-    protected void initEnvironment(Environment environment, BattyConfig configuration) {
-
+    protected void initEnvironment(Environment environment, BattyConfig conf) {
+        this.id = new DeviceId(conf.getDeviceId());
     }
 }

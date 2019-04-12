@@ -1,5 +1,5 @@
 /*
- (C) COPYRIGHT 2015 TECHNOLUTION BV, GOUDA NL
+ (C) COPYRIGHT TECHNOLUTION BV, GOUDA NL
 | =======          I                   ==          I    =
 |    I             I                    I          I
 |    I   ===   === I ===  I ===   ===   I  I    I ====  I   ===  I ===
@@ -14,48 +14,25 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.sunny.solaredge.beans;
+package nl.technolution.sunny.api;
+
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Marker interface for RPC Request classes
+ * 
  */
-public interface IRpcRequest {
-    /** 
-     * @return Version of RPC
-     */
-    String getVersion();    
-    
-    /** 
-     * @param version
-     *      Version of RPC
-     */
-    void setVersion(String version);
-    
-    /** 
-     * @return ID of RPC request
-     */
-    String getId();
+public class SunnyState {
 
-    /**
-     * 
-     * @param id 
-     *       ID of RPC request
-     */
-    void setId(String id);
+    @JsonProperty("production")
+    private final double production;
 
-    /**
-     * @return Format of RPC request
-     */
-    String getFormat();
+    @JsonCreator
+    public SunnyState(@JsonProperty("production") double production) {
+        this.production = production;
+    }
 
-    /**
-     * @param format
-     *      Format of RPC request
-     */
-    void setFormat(String format);
-    
-    /**
-     * @return Procedure call of RPC request
-     */
-    String getProc();
+    public double getProduction() {
+        return production;
+    }
 }

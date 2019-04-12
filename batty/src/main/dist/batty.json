@@ -1,0 +1,9 @@
+{
+    "deviceId": "batty",
+    "host": "https://172.30.16.212",
+    "username": "batty",
+    "password": "batty",
+    "market": {
+        "marketUrl": "https://localhost"   
+    }
+}

@@ -127,7 +127,6 @@ public class Batty implements IDeviceResourceHandler {
 
     @Override
     public DeviceId getDeviceId() {
-        //
-        return null;
+        return deviceId;
     }
 }
