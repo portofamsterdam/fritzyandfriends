@@ -7,7 +7,7 @@
 */build
 gradle/.gradle
 docker/*/build
-
+!docker/*/build/Dockerfile
 # Log file
 *.log
 
