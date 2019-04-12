@@ -11,10 +11,22 @@ dependencies {
     compile project(':devicecontroller')
 }
 
-def dockerJarName = 'fritzy-main-all'
+def jarName = 'fritzy-app'
 
 
 shadowJar {
-    baseName = "$dockerJarName"
+    baseName = "$jarName"
+    classifier = null
+    version = null
     mergeServiceFiles()
+}
+
+task copyArtifactsToDocker(type: Copy) {
+    from ('build/libs/') {
+        include "${jarName}.jar"
+    }
+    from ('src/main/dist/') {
+        include 'conf.json'
+    }
+    into '../docker/fritzy/build'
 }
