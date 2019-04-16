@@ -4,9 +4,9 @@ ADD ./build/librxtxSerial.so /usr/lib/librxtxSerial.so
 ADD ./build/librxtxParallel.so /usr/lib/librxtxParallel.so
 
 ADD ./build/fritzy-app.jar /opt/appgw/fritzy-app.jar
-ADD ./build/conf.json /opt/config/conf.json
+ADD ./build/fritzy.json /opt/config/fritzy.json
 
-CMD java -jar ~/fritzy-app.jar server /opt/config/conf.json
+CMD java -jar ~/fritzy-app.jar server /opt/config/fritzy.json
 
 EXPOSE 8080 
 EXPOSE 8081
