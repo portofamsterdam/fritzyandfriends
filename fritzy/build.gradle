@@ -4,7 +4,7 @@ apply plugin: 'application'
 apply plugin: 'com.github.johnrengelman.shadow'
 
 
-mainClassName = 'nl.technolution.fritzy.Fritzy'
+mainClassName = 'nl.technolution.fritzy.app.FritzyApp'
 
 dependencies {
     compile libraries.gnuio
