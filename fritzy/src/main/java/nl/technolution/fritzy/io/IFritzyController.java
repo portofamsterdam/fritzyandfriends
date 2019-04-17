@@ -14,34 +14,29 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.sunny.api;
+package nl.technolution.fritzy.io;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
-import com.codahale.metrics.annotation.Timed;
-
-import nl.technolution.dropwizard.IEndpoint;
+import nl.technolution.dropwizard.IService;
+import nl.technolution.fritzy.app.FritzyConfig;
+import nl.technolution.fritzy.io.tempsensor.TemperatureSensor;
+import nl.technolution.fritzy.io.webrelay.WebRelay;
 
 /**
- * 
+ * Defines Fritzy object
  */
-@Path("/sunny")
-@Produces(MediaType.APPLICATION_JSON)
-public class SunnyApi implements IEndpoint {
+public interface IFritzyController extends IService<FritzyConfig> {
 
     /**
-     * Retrieve state of Fritzy
+     * Get the webrelay of the fridge to start or end cooling
      * 
-     * @return state of cooler and temparature
+     * @return webrelay
      */
-    @GET
-    @Timed
-    @Path("state")
-    @Produces(MediaType.APPLICATION_JSON)
-    public SunnyState getState() {
-        return null;
-    }
+    WebRelay getWebRelay();
+
+    /**
+     * Get the temparature sensor of the fridge
+     * 
+     * @return temparature sensor
+     */
+    TemperatureSensor getTemperatureSensor();
 }

@@ -18,7 +18,6 @@ package nl.technolution.batty.xstorage;
 
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
@@ -42,6 +41,7 @@ import com.google.common.base.Preconditions;
 
 import org.slf4j.Logger;
 
+import nl.technolution.batty.app.BattyConfig;
 import nl.technolution.batty.xstorage.types.BmsData;
 import nl.technolution.batty.xstorage.types.BmsDataJson;
 import nl.technolution.batty.xstorage.types.MachineData;
@@ -59,68 +59,46 @@ public class XStorageConnection implements IXStorageConnection {
     private static final String GET_MACHINE_INFO_CMD = "GetMachineInfo";
     private static final String GET_MACHINE_DATA_CMD = "GetMachineData";
     private static final String SET_MACHINE_DATA_CMD = "SetMachineData";
-    private static final Object GET_BMS_DATA_CMD = "GetBMSData";
+    private static final String GET_BMS_DATA_CMD = "GetBMSData";
 
     private final Logger log = Log.getLogger();
     private final ObjectMapper mapper = new ObjectMapper();
 
-    private final String address;
-    private final String username;
-    private final String password;
-
+    private String address;
+    private String username;
+    private String password;
     private SSLSocketFactory sslSF;
 
     /**
      * https://172.30.133.212/Dashboard.php -- wifi https://172.30.133.212/Dashboard.php -- technolan
-     * 
-     * Constructor for {@link XStorageConnection} objects
-     *
-     * @param address where to find the battery
      */
-    public XStorageConnection(String address, String username, String password) {
-        this.address = address;
-        this.username = username;
-        this.password = password;
+    public XStorageConnection() {
     }
 
-    /**
-     * init connection, load certificates
-     * 
-     * @param trustStorePath
-     * @param trustStorePass
-     * @throws KeyStoreException
-     * @throws NoSuchAlgorithmException
-     * @throws CertificateException
-     * @throws FileNotFoundException
-     * @throws IOException
-     * @throws KeyManagementException
-     */
-    public void init(String trustStorePath, String trustStorePass) throws KeyStoreException, NoSuchAlgorithmException,
-            CertificateException, FileNotFoundException, IOException, KeyManagementException {
+    @Override
+    public void init(BattyConfig config) {
+        File truststorefile = new File(config.getTruststore());
+        Preconditions.checkArgument(truststorefile.exists(), "truststore not found in: " + config.getTruststore());
 
-        KeyStore ks = KeyStore.getInstance("JKS");
-        ks.load(new FileInputStream(trustStorePath), trustStorePass.toCharArray());
-        File truststorefile = new File(trustStorePath);
-        Preconditions.checkArgument(truststorefile.exists(), "file not found");
+        this.address = config.getHost();
+        this.username = config.getUsername();
+        this.password = config.getPassword();
 
-        TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
-        tmf.init(ks);
+        try {
+            KeyStore ks = KeyStore.getInstance("JKS");
+            ks.load(new FileInputStream(truststorefile), config.getTruststorepass().toCharArray());
 
-        SSLContext sslCtx = SSLContext.getInstance("TLS");
-        sslCtx.init(null, tmf.getTrustManagers(), null);
-        sslSF = sslCtx.getSocketFactory();
-    }
+            TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
+            tmf.init(ks);
 
-    private HttpsURLConnection getHttpsURLConnection(String url) throws IOException {
-        HttpsURLConnection urlConnection = (HttpsURLConnection)new URL(url).openConnection();
-        urlConnection.setHostnameVerifier(new HostnameVerifier() {
-            @Override
-            public boolean verify(String hostname, SSLSession session) {
-                return true;
-            }
-        });
-        urlConnection.setSSLSocketFactory(sslSF);
-        return urlConnection;
+            SSLContext sslCtx = SSLContext.getInstance("TLS");
+            sslCtx.init(null, tmf.getTrustManagers(), null);
+            sslSF = sslCtx.getSocketFactory();
+        } catch (IOException | KeyManagementException | NoSuchAlgorithmException | CertificateException | 
+                KeyStoreException ex) {
+            log.error("Unable to load certificate", ex);
+            throw new RuntimeException(ex);
+        }
     }
 
     /**
@@ -274,5 +252,19 @@ public class XStorageConnection implements IXStorageConnection {
         }
         String[] data = result.getData();
         return MeterInfo.fromData(data[0]);
+    }
+
+
+    private HttpsURLConnection getHttpsURLConnection(String url) throws IOException {
+        Preconditions.checkNotNull(sslSF, "init first");
+        HttpsURLConnection urlConnection = (HttpsURLConnection)new URL(url).openConnection();
+        urlConnection.setHostnameVerifier(new HostnameVerifier() {
+            @Override
+            public boolean verify(String hostname, SSLSession session) {
+                return true;
+            }
+        });
+        urlConnection.setSSLSocketFactory(sslSF);
+        return urlConnection;
     }
 }

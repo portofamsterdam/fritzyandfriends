@@ -14,7 +14,7 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.appliance;
+package nl.technolution.dropwizard;
 
 import java.io.IOException;
 

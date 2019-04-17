@@ -14,27 +14,31 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.fritzy;
+package nl.technolution.netty.supplylimit;
 
-import nl.technolution.fritzy.io.tempsensor.TemperatureSensor;
-import nl.technolution.fritzy.io.webrelay.WebRelay;
+import java.util.Map;
+
+import com.google.common.collect.Maps;
+
+import nl.technolution.DeviceId;
+import nl.technolution.netty.app.NettyConfig;
 
 /**
- * Defines Fritzy object
+ * 
  */
-public interface IFritzy {
+public class GridConnectionManager implements IGridCapacityManager {
 
-    /**
-     * Get the webrelay of the fridge to start or end cooling
-     * 
-     * @return webrelay
-     */
-    WebRelay getWebRelay();
+    private Map<DeviceId, Double> griConnectionLimitRegister = Maps.newHashMap();
 
-    /**
-     * Get the temparature sensor of the fridge
-     * 
-     * @return temparature sensor
-     */
-    TemperatureSensor getTemperatureSensor();
+    private double defaultGridConnectionLimit;
+
+    @Override
+    public void init(NettyConfig config) {
+        defaultGridConnectionLimit = config.getDefaultGridConnectionLimit();
+    }
+
+    @Override
+    public double getGridConnectionLimit(DeviceId id) {
+        return griConnectionLimitRegister.computeIfAbsent(id, (k) -> defaultGridConnectionLimit);
+    }
 }

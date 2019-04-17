@@ -32,7 +32,6 @@ public class FritzyState {
 
     @JsonCreator
     public FritzyState(@JsonProperty("isCooling") boolean isCooling, @JsonProperty("temparature") double temparature) {
-        super();
         this.isCooling = isCooling;
         this.temparature = temparature;
     }

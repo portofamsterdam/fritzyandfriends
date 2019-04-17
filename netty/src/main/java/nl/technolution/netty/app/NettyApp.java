@@ -27,6 +27,15 @@ public class NettyApp extends Application<NettyConfig> {
     @Override
     public void run(NettyConfig configuration, Environment environment) throws Exception {
         //
+    }
 
+    /**
+     * Run Netty
+     * 
+     * @param args passed by CLI
+     * @throws Exception
+     */
+    public static void main(String[] args) throws Exception {
+        new NettyApp().run(args);
     }
 }

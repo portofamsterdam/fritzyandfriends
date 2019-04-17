@@ -21,16 +21,13 @@ import java.io.IOException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
 import com.codahale.metrics.annotation.Timed;
 
-import nl.technolution.IEndpoint;
 import nl.technolution.Services;
-import nl.technolution.fritzy.IFritzy;
-import nl.technolution.fritzy.io.tempsensor.TemperatureSensor;
-import nl.technolution.fritzy.io.webrelay.WebRelayState;
+import nl.technolution.dropwizard.IEndpoint;
+import nl.technolution.fritzy.io.IFritzyController;
 
 /**
  * 
@@ -49,20 +46,16 @@ public class FritzyApi implements IEndpoint {
     @Path("state")
     @Produces(MediaType.APPLICATION_JSON)
     public FritzyState getState() {
-        IFritzy fritzy = Services.get(IFritzy.class);
-        WebRelayState state;
+        IFritzyController fritzy = Services.get(IFritzyController.class);
+        
+        boolean isCooling;
         try {
-            state = fritzy.getWebRelay().getState();
+            isCooling = fritzy.getWebRelay().getState().isRelaystate();
         } catch (IOException e) {
-            // TODO MKE create clear errors
-            throw new WebApplicationException(e);
+            isCooling = false;
         }
 
-        boolean isCooling = state.isRelaystate();
-
-        TemperatureSensor temperatureSensor = fritzy.getTemperatureSensor();
-        // TODO MKE temparature sensor
-        double temparature = temperatureSensor.getTemparature();
+        double temparature = fritzy.getTemperatureSensor().getTemparature();
         return new FritzyState(isCooling, temparature);
     }
 }

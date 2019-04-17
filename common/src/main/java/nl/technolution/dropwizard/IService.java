@@ -14,34 +14,21 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.sunny.api;
+package nl.technolution.dropwizard;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
-import com.codahale.metrics.annotation.Timed;
-
-import nl.technolution.dropwizard.IEndpoint;
+import io.dropwizard.Configuration;
 
 /**
+ * Service to be registered by Fritzy dropwizard app
  * 
+ * @param <T> DropWizard configuration type
  */
-@Path("/sunny")
-@Produces(MediaType.APPLICATION_JSON)
-public class SunnyApi implements IEndpoint {
+public interface IService<T extends Configuration> {
 
     /**
-     * Retrieve state of Fritzy
+     * init service
      * 
-     * @return state of cooler and temparature
+     * @param config
      */
-    @GET
-    @Timed
-    @Path("state")
-    @Produces(MediaType.APPLICATION_JSON)
-    public SunnyState getState() {
-        return null;
-    }
+    void init(T config);
 }

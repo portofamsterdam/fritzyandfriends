@@ -1,8 +1,22 @@
 
 apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
     compile project(':devicecontroller')
+}
+
+
+mainClassName = 'nl.technolution.batty.app.BattyApp'
+
+def jarName = 'batty-app'
+
+shadowJar {
+    baseName = "$jarName"
+    classifier = null
+    version = null
+    mergeServiceFiles()
 }
 
 sourceSets {
@@ -12,3 +26,4 @@ sourceSets {
         }
     }
 }
+

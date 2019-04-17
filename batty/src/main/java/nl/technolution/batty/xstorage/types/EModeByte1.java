@@ -20,9 +20,9 @@ package nl.technolution.batty.xstorage.types;
  * 
  */
 public enum EModeByte1 {
-    // Standby 0x00 0xXX Inverter does not working due to user’s command or system failure.
+    // Standby 0x00 0xXX Inverter does not working due to user's command or system failure.
     STANDBY(0),
-    // Waiting 0x01 0xXX Receive the “Power On” command and waiting the connection check before grid-tied operation.
+    // Waiting 0x01 0xXX Receive the "Power On" command and waiting the connection check before grid-tied operation.
     // (The countdown timing is defined by grid regulation.)
     WAITING(1),
     // Basic 0x02 0xXX Inverter starts working but no other command input. Grid Tied Mode 1 (Grid to Loads)
