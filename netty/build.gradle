@@ -1,6 +1,31 @@
 
 apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: 'com.github.johnrengelman.shadow'
 
 dependencies {
     compile project(':common')
 }
+
+mainClassName = 'nl.technolution.netty.app.NettyApp'
+
+def jarName = 'netty-app'
+
+shadowJar {
+    baseName = "$jarName"
+    classifier = null
+    version = null
+    mergeServiceFiles()
+}
+
+
+task copyArtifactsToDocker(type: Copy) {
+    from ('build/libs/') {
+        include "${jarName}.jar"
+    }
+    from ('src/main/dist/') {
+        include 'netty.json'
+    }
+    into '../docker/netty/build'
+}
+copyArtifactsToDocker.dependsOn shadowJar

@@ -36,20 +36,20 @@ buildscript {
 
 // Configuration for all subprojects.
 subprojects {
-        apply plugin: 'java'
-            
-	    plugins.withType(JavaPlugin) {
-			// JDK version
-			sourceCompatibility = JavaVersion.VERSION_1_8
-			targetCompatibility = JavaVersion.VERSION_1_8
-			tasks.withType(JavaCompile) {
-				// Force UTF-8 as the default character encoding (instead of the platform default, which may be CP1252 in Windows)
-				options.encoding = 'UTF-8'
-			}
-        }
-        // Standard libraries added to all projects
-        dependencies {
-            testCompile libraries.test_junit
-        }
+    apply plugin: 'java'
+        
+    plugins.withType(JavaPlugin) {
+		// JDK version
+		sourceCompatibility = JavaVersion.VERSION_1_8
+		targetCompatibility = JavaVersion.VERSION_1_8
+		tasks.withType(JavaCompile) {
+			// Force UTF-8 as the default character encoding (instead of the platform default, which may be CP1252 in Windows)
+			options.encoding = 'UTF-8'
+		}
+    }
+    // Standard libraries added to all projects
+    dependencies {
+        testCompile libraries.test_junit
+    }
 }
 
