@@ -16,18 +16,12 @@
  */
 package nl.technolution.netty.app;
 
-import io.dropwizard.Application;
-import io.dropwizard.setup.Environment;
+import nl.technolution.dropwizard.FritzyDropWizardApp;
 
 /**
  * Simulator for net Power
  */
-public class NettyApp extends Application<NettyConfig> {
-
-    @Override
-    public void run(NettyConfig configuration, Environment environment) throws Exception {
-        //
-    }
+public class NettyApp extends FritzyDropWizardApp<NettyConfig> {
 
     /**
      * Run Netty
