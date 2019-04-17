@@ -69,6 +69,9 @@ public final class WebRelay {
         try (Socket s = new Socket(address.getHostAddress(), port);
                 OutputStream out = s.getOutputStream();
                 InputStream in = s.getInputStream()) {
+
+            s.setSoTimeout(5000);
+
             // Writh http request
             out.write(command.getBytes(StandardCharsets.UTF_8));
             out.flush();

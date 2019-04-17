@@ -25,10 +25,9 @@ import java.security.cert.CertificateException;
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
+import nl.technolution.batty.app.BattyConfig;
 import nl.technolution.batty.xstorage.XStorageConnection;
-import nl.technolution.batty.xstorage.types.BmsData;
 import nl.technolution.batty.xstorage.types.MachineData;
-import nl.technolution.batty.xstorage.types.MachineInfo;
 
 /**
  * 
@@ -37,19 +36,22 @@ public class ConnectionTest {
 
     public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException,
             KeyManagementException, NoSuchAlgorithmException, CertificateException, KeyStoreException {
-        XStorageConnection conn = new XStorageConnection("https://172.30.133.212/assets/inc/server.inc.php", "batty",
-                "batty");
-        conn.init("src/main/resource/truststore.jks", "12345678");
+
+        BattyConfig b = new BattyConfig("", "https://172.30.133.212/assets/inc/server.inc.php", "batty", "batty",
+                "src/main/resource/truststore.jks", "12345678", null);
+
+        XStorageConnection conn = new XStorageConnection();
+        conn.init(b);
 
         // conn.powerOff();
 
-        MachineInfo machineInfo = conn.getMachineInfo();
-        System.out.println(machineInfo.toString());
+        // MachineInfo machineInfo = conn.getMachineInfo();
+        // System.out.println(machineInfo.toString());
         MachineData machineData = conn.getMachineData();
         System.out.println(machineData.toString());
 
-        BmsData bmsData = conn.getBmsData();
-        System.out.println(bmsData.toString());
+        // BmsData bmsData = conn.getBmsData();
+        // System.out.println(bmsData.toString());
 
         // conn.powerOn();
         // conn.discharge(0);

@@ -85,7 +85,7 @@ public class MachineDataTest {
         assertEquals(0, data.getIpv1(), 0.0001d);
         assertEquals(98.4d, data.getvBatSys(), 0.0001d);
         assertEquals(-10.92d, data.getiBatSys(), 0.0001d);
-        assertEquals(100, data.getsOC());
+        assertEquals(100, data.getSoc());
         assertEquals(65535, data.getmTF());
         assertEquals(255, data.getmTE());
         assertEquals(0, data.getIac(), 0.0001d);

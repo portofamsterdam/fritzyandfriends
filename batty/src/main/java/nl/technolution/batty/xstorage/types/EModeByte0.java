@@ -20,7 +20,7 @@ package nl.technolution.batty.xstorage.types;
  * 
  */
 public enum EModeByte0 {
-    // System is ready to turn on and start to output power. There isn’t any fault in this state and no output power
+    // System is ready to turn on and start to output power. There isn't any fault in this state and no output power
     // transmitted to grid or load.
     WAIT(0),
     // In the normal state, the system could be grid connected or load protected depends on the condition of grid. The

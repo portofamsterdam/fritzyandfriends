@@ -23,7 +23,10 @@ import javax.ws.rs.core.MediaType;
 
 import com.codahale.metrics.annotation.Timed;
 
-import nl.technolution.IEndpoint;
+import nl.technolution.Services;
+import nl.technolution.batty.xstorage.IXStorageConnection;
+import nl.technolution.batty.xstorage.XStorageException;
+import nl.technolution.dropwizard.IEndpoint;
 
 /**
  * 
@@ -42,6 +45,12 @@ public class BattyApi implements IEndpoint {
     @Path("state")
     @Produces(MediaType.APPLICATION_JSON)
     public BattyState getState() {
-        return null;
+        IXStorageConnection connection = Services.get(IXStorageConnection.class);
+        try {
+            int soc = connection.getMachineData().getSoc();
+            return new BattyState("on", soc);
+        } catch (XStorageException ex) {
+            return new BattyState("unreachable", -1);
+        }
     }
 }

@@ -95,8 +95,7 @@ public class TemperatureSensor {
                         String stringValue = new String(buffer, StandardCharsets.UTF_8);
                         temparature = Double.parseDouble(stringValue.trim());
                     } catch (IOException e) {
-                        //
-                        throw new RuntimeException(e.getMessage(), e);
+                        temparature = Double.MIN_VALUE;
                     }
                 }
 

@@ -25,11 +25,11 @@ public final class BmsData {
     private double highestCellVoltage;
     // 2~3 1.5mV Lowest cell voltage 2 Bytes Dec(Hex(2)hex(3))
     private double lowestCellVoltage;
-    // 4~5 0.1 °C System maximum temperature 2 Bytes Dec(Hex(4)hex(5))
+    // 4~5 0.1 C System maximum temperature 2 Bytes Dec(Hex(4)hex(5))
     private double systemMaxTemparature;
-    // 6~7 0.1 °C System average temperature 2 Bytes Dec(Hex(6)hex(7))
+    // 6~7 0.1 C System average temperature 2 Bytes Dec(Hex(6)hex(7))
     private double systemAvgTemparature;
-    // 8~9 0.1 °C System minimum temperature 2 Bytes Dec(Hex(8)hex(9))
+    // 8~9 0.1 C System minimum temperature 2 Bytes Dec(Hex(8)hex(9))
     private double systemMinTemparature;
 
     private BmsData() {

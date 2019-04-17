@@ -14,34 +14,11 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.sunny.api;
-
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
-import com.codahale.metrics.annotation.Timed;
-
-import nl.technolution.dropwizard.IEndpoint;
+package nl.technolution.dropwizard;
 
 /**
- * 
+ * Marker interface for Rest endpoints
  */
-@Path("/sunny")
-@Produces(MediaType.APPLICATION_JSON)
-public class SunnyApi implements IEndpoint {
+public interface IEndpoint {
 
-    /**
-     * Retrieve state of Fritzy
-     * 
-     * @return state of cooler and temparature
-     */
-    @GET
-    @Timed
-    @Path("state")
-    @Produces(MediaType.APPLICATION_JSON)
-    public SunnyState getState() {
-        return null;
-    }
 }

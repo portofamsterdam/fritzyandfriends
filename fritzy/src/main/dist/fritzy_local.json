@@ -2,7 +2,7 @@
     "deviceId": "fritzy",
     "host": "172.16.192.17",
     "port": 80,
-    "serialPort": "/dev/ttyS3",
+    "serialPort": "COM3",
     "market": { "marketUrl": "https://localhost:8080/test" }
     
 }

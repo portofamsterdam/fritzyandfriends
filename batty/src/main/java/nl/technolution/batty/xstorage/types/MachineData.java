@@ -180,7 +180,7 @@ public class MachineData {
         return iBatSys;
     }
 
-    public int getsOC() {
+    public int getSoc() {
         return sOC;
     }
 

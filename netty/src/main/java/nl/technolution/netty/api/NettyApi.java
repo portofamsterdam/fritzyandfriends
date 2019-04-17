@@ -23,25 +23,29 @@ import javax.ws.rs.core.MediaType;
 
 import com.codahale.metrics.annotation.Timed;
 
-import nl.technolution.IEndpoint;
+import nl.technolution.DeviceId;
+import nl.technolution.Services;
+import nl.technolution.dropwizard.IEndpoint;
+import nl.technolution.netty.supplylimit.IGridCapacityManager;
 
 /**
  * 
  */
-@Path("/sunny")
+@Path("/netty")
 @Produces(MediaType.APPLICATION_JSON)
 public class NettyApi implements IEndpoint {
 
     /**
+     * Determine grid connection limit of device
      * 
-     * @param deviceId
-     * @return
+     * @param deviceId to find limit for
+     * @return limit in amps
      */
     @GET
     @Timed
     @Path("capacity")
     @Produces(MediaType.APPLICATION_JSON)
-    int getCapacity(String deviceId) {
-        return 0;
+    double getCapacity(String deviceId) {
+        return Services.get(IGridCapacityManager.class).getGridConnectionLimit(new DeviceId(deviceId));
     }
 }

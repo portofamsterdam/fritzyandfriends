@@ -1,0 +1,4 @@
+{
+    "defaultLimit":16.0,
+    "limit": {"sunny":12.0,"batty":12.0,"fritzy":12.0}
+}

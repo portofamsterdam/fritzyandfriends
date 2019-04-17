@@ -31,12 +31,17 @@ import java.util.concurrent.Executors;
 
 import javax.net.ServerSocketFactory;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
+import nl.technolution.fritzy.app.FritzyConfig;
 import nl.technolution.fritzy.io.webrelay.WebRelay;
 import nl.technolution.fritzy.io.webrelay.WebRelayState;
+import nl.technolution.market.MarketConfig;
 
 /**
  * Test webrelay
@@ -57,6 +62,14 @@ public class WebRelayTest {
             "\t<rebootstate>%d</rebootstate>\n" +
             "\t<totalreboots>%d</totalreboots>\n" +
             "</datavalues>\n";
+
+    @Test
+    public void testConfig() throws JsonProcessingException {
+        FritzyConfig obj = new FritzyConfig("Fritsy", "localhost", 80, "/dev/tty",
+                new MarketConfig("https://localhost"));
+        System.out.println(
+                new ObjectMapper().writeValueAsString(obj));
+    }
 
     @Before
     public void setup() throws IOException {

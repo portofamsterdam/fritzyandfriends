@@ -14,34 +14,22 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.sunny.api;
+package nl.technolution.netty.supplylimit;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
-import com.codahale.metrics.annotation.Timed;
-
-import nl.technolution.dropwizard.IEndpoint;
+import nl.technolution.DeviceId;
+import nl.technolution.dropwizard.IService;
+import nl.technolution.netty.app.NettyConfig;
 
 /**
  * 
  */
-@Path("/sunny")
-@Produces(MediaType.APPLICATION_JSON)
-public class SunnyApi implements IEndpoint {
+public interface IGridCapacityManager extends IService<NettyConfig> {
 
     /**
-     * Retrieve state of Fritzy
+     * Get the supply limit for a specific device
      * 
-     * @return state of cooler and temparature
+     * @param id of device
+     * @return supply limit in amps
      */
-    @GET
-    @Timed
-    @Path("state")
-    @Produces(MediaType.APPLICATION_JSON)
-    public SunnyState getState() {
-        return null;
-    }
+    double getGridConnectionLimit(DeviceId id);
 }

@@ -16,32 +16,12 @@
  */
 package nl.technolution.sunny.app;
 
-import org.slf4j.Logger;
-
-import io.dropwizard.setup.Environment;
-import nl.technolution.DeviceId;
-import nl.technolution.appliance.DeviceControllerApp;
-import nl.technolution.core.Log;
+import nl.technolution.dropwizard.FritzyDropWizardApp;
 
 /**
  * Device that controls Fridge.
  */
-public final class SunnyApp extends DeviceControllerApp<SunnyConfig> {
-
-    private Logger log = Log.getLogger();
-
-    private DeviceId id = null;
-
-
-    @Override
-    public DeviceId getDeviceId() {
-        return id;
-    }
-
-    @Override
-    protected void initDevice(SunnyConfig conf) {
-        // TODO MKE: init sunny
-    }
+public final class SunnyApp extends FritzyDropWizardApp<SunnyConfig> {
 
     /**
      * Run Fritzy
@@ -53,8 +33,4 @@ public final class SunnyApp extends DeviceControllerApp<SunnyConfig> {
         new SunnyApp().run(args);
     }
 
-    @Override
-    protected void initEnvironment(Environment environment, SunnyConfig conf) {
-        this.id = new DeviceId(conf.getDeviceId());
-    }
 }
