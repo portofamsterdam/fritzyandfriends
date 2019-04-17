@@ -26,7 +26,7 @@ import org.slf4j.Logger;
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
 import gnu.io.UnsupportedCommOperationException;
-import nl.technolution.core.Log;
+import nl.technolution.Log;
 import nl.technolution.fritzy.app.FritzyConfig;
 import nl.technolution.fritzy.io.tempsensor.TemperatureSensor;
 import nl.technolution.fritzy.io.webrelay.WebRelay;
