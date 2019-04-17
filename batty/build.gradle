@@ -27,3 +27,18 @@ sourceSets {
     }
 }
 
+
+task copyArtifactsToDocker(type: Copy) {
+    from ('build/libs/') {
+        include "${jarName}.jar"
+    }
+    from ('src/main/dist/') {
+        include 'batty.json'
+    }
+    from ('src/main/resource/') {
+        include 'truststore.jks'
+    }
+    into '../docker/batty/build'
+}
+copyArtifactsToDocker.dependsOn shadowJar
+

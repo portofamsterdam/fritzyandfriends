@@ -41,6 +41,7 @@ import com.google.common.base.Preconditions;
 
 import org.slf4j.Logger;
 
+import nl.technolution.Log;
 import nl.technolution.batty.app.BattyConfig;
 import nl.technolution.batty.xstorage.types.BmsData;
 import nl.technolution.batty.xstorage.types.BmsDataJson;
@@ -49,7 +50,6 @@ import nl.technolution.batty.xstorage.types.MachineDataJson;
 import nl.technolution.batty.xstorage.types.MachineInfo;
 import nl.technolution.batty.xstorage.types.MachineInfoJson;
 import nl.technolution.batty.xstorage.types.MeterInfo;
-import nl.technolution.core.Log;
 
 /**
  * Connection to Nissan xStorage device

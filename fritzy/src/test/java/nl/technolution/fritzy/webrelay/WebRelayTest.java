@@ -65,7 +65,7 @@ public class WebRelayTest {
 
     @Test
     public void testConfig() throws JsonProcessingException {
-        FritzyConfig obj = new FritzyConfig("Fritsy", "localhost", 80, "/dev/tty",
+        FritzyConfig obj = new FritzyConfig("Fritzy", "localhost", 80, "/dev/tty",
                 new MarketConfig("https://localhost"));
         System.out.println(
                 new ObjectMapper().writeValueAsString(obj));

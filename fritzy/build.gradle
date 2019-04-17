@@ -32,8 +32,7 @@ task copyArtifactsToDocker(type: Copy) {
         include 'librxtxParallel.so'
         include 'librxtxSerial.so'  
         include 'RXTXcomm.jar'
-        include 'rxtxParallel.dll'  
-        include 'rxtxSerial.dll'
     }
     into '../docker/fritzy/build'
 }
+copyArtifactsToDocker.dependsOn shadowJar

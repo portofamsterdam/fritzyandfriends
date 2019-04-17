@@ -25,9 +25,7 @@ import javax.ws.rs.core.MediaType;
 import com.google.common.base.Preconditions;
 
 import org.glassfish.jersey.client.JerseyClientBuilder;
-import org.slf4j.Logger;
 
-import nl.technolution.core.Log;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.login.LoginParameters;
 import nl.technolution.fritzy.wallet.login.LoginResponse;
@@ -40,7 +38,6 @@ import nl.technolution.fritzy.wallet.register.RegisterParameters;
  */
 public class FritzyApi {
 
-    private final Logger log = Log.getLogger();
     private final String url;
     private Client client = JerseyClientBuilder.newClient();
 
