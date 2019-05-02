@@ -16,9 +16,13 @@
  */
 package nl.technolution.netty.supplylimit;
 
+import static org.junit.Assert.assertEquals;
+
 import java.util.Map;
 
 import com.google.common.collect.Maps;
+
+import org.junit.Test;
 
 import nl.technolution.DeviceId;
 import nl.technolution.netty.app.NettyConfig;
@@ -26,20 +30,23 @@ import nl.technolution.netty.app.NettyConfig;
 /**
  * 
  */
-public class GridConnectionManager implements IGridCapacityManager {
+public class GridConnectionManagerTest {
 
-    private Map<DeviceId, Double> griConnectionLimitRegister = Maps.newHashMap();
+    @Test
+    public void testDeviceLimit() {
+        double defaultGridConnectionLimit = 8.0d;
+        Map<String, Double> deviceLimits = Maps.newHashMap();
+        NettyConfig config = new NettyConfig(defaultGridConnectionLimit, deviceLimits);
+        GridConnectionManager gcm = new GridConnectionManager();
+        gcm.init(config);
+        DeviceId id = new DeviceId("Test");
+        assertEquals(8.0d, gcm.getGridConnectionLimit(id), 0.0001d);
+        deviceLimits.put(id.getDeviceId(), 6.0d);
 
-    private double defaultGridConnectionLimit;
-
-    @Override
-    public void init(NettyConfig config) {
-        defaultGridConnectionLimit = config.getDefaultGridConnectionLimit();
-        config.getDeviceLimits().forEach((k, v) -> griConnectionLimitRegister.put(new DeviceId(k), v));
-    }
-
-    @Override
-    public double getGridConnectionLimit(DeviceId id) {
-        return griConnectionLimitRegister.computeIfAbsent(id, (k) -> defaultGridConnectionLimit);
+        config = new NettyConfig(defaultGridConnectionLimit, deviceLimits);
+        gcm = new GridConnectionManager();
+        gcm.init(config);
+        assertEquals(6.0d, gcm.getGridConnectionLimit(id), 0.0001d);
+        assertEquals(8.0d, gcm.getGridConnectionLimit(new DeviceId("Test2")), 0.0001d);
     }
 }
