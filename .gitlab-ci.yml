@@ -25,7 +25,7 @@ build_fritzy:
   stage: build
   script: 
     - cd gradle
-    - gradle :fritzy:build :fritzy:copyArtifactsToDocker
+    - gradle :fritzy:build :fritzy:copyArtifactsToDocker :fritzy:resolve
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
@@ -40,7 +40,7 @@ build_batty:
   stage: build
   script: 
     - cd gradle
-    - gradle :batty:build :batty:copyArtifactsToDocker
+    - gradle :batty:build :batty:copyArtifactsToDocker :batty:resolve
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
@@ -48,14 +48,14 @@ build_batty:
       - build/
   artifacts:
     paths: 
-      - docker/batty/
+      - docker/build/batty/
 	  
 build_netty:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.4.1
   stage: build
   script: 
     - cd gradle
-    - gradle :netty:build :netty:copyArtifactsToDocker
+    - gradle :netty:build :netty:copyArtifactsToDocker :netty:resolve
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
@@ -63,7 +63,22 @@ build_netty:
       - .gradle
   artifacts:
     paths: 
-      - docker/netty/
+      - docker/build/netty
+      
+build_sunny:
+  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.4.1
+  stage: build
+  script: 
+    - cd gradle
+    - gradle :sunny:build :sunny:copyArtifactsToDocker sunny:resolve
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    paths:
+      - build/
+      - .gradle
+  artifacts:
+    paths: 
+      - docker/build/sunny/
 
 create_images:
   # Use the proxied docker image
@@ -71,12 +86,14 @@ create_images:
   stage: create_images
   script:
     # build and push consumer
-    - cd docker/fritzy
+    - cd docker/build/fritzy
     - docker build -t fritzy2.0/fritzy .
     - cd ../batty
     - docker build -t fritzy2.0/batty .
     - cd ../netty
     - docker build -t fritzy2.0/netty .
+    - cd ../sunny
+    - docker build -t fritzy2.0/sunny .
   only:
     - master
 
