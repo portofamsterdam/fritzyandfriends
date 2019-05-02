@@ -52,9 +52,11 @@ import nl.technolution.batty.xstorage.types.MachineInfoJson;
 import nl.technolution.batty.xstorage.types.MeterInfo;
 
 /**
+ * https://172.30.133.212/Dashboard.php -- wifi https://172.30.133.212/Dashboard.php -- technolan
+ * 
  * Connection to Nissan xStorage device
  */
-public class XStorageConnection implements IXStorageConnection {
+class XStorageConnection implements IXStorageConnection {
 
     private static final String GET_MACHINE_INFO_CMD = "GetMachineInfo";
     private static final String GET_MACHINE_DATA_CMD = "GetMachineData";
@@ -70,13 +72,9 @@ public class XStorageConnection implements IXStorageConnection {
     private SSLSocketFactory sslSF;
 
     /**
-     * https://172.30.133.212/Dashboard.php -- wifi https://172.30.133.212/Dashboard.php -- technolan
+     * @param config init connection
      */
-    public XStorageConnection() {
-    }
-
-    @Override
-    public void init(BattyConfig config) {
+    void init(BattyConfig config) {
         File truststorefile = new File(config.getTruststore());
         Preconditions.checkArgument(truststorefile.exists(), "truststore not found in: " + config.getTruststore());
 
