@@ -37,6 +37,25 @@ public final class BmsData {
     }
 
     /**
+     * @param highestCellVoltage
+     * @param lowestCellVoltage
+     * @param systemMaxTemparature
+     * @param systemAvgTemparature
+     * @param systemMinTemparature
+     * @return
+     */
+    public static BmsData build(double highestCellVoltage, double lowestCellVoltage, double systemMaxTemparature,
+            double systemAvgTemparature, double systemMinTemparature) {
+        BmsData machineData = new BmsData();
+        machineData.highestCellVoltage = highestCellVoltage;
+        machineData.lowestCellVoltage = lowestCellVoltage;
+        machineData.systemMaxTemparature = systemMaxTemparature;
+        machineData.systemAvgTemparature = systemAvgTemparature;
+        machineData.systemMinTemparature = systemMinTemparature;
+        return machineData;
+    }
+
+    /**
      * @param data
      * @return
      */

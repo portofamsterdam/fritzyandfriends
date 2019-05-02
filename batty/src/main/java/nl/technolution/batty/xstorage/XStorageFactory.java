@@ -16,30 +16,30 @@
  */
 package nl.technolution.batty.xstorage;
 
-import nl.technolution.batty.xstorage.types.BmsData;
-import nl.technolution.batty.xstorage.types.MachineData;
-import nl.technolution.batty.xstorage.types.MachineInfo;
-import nl.technolution.batty.xstorage.types.MeterInfo;
+import nl.technolution.batty.app.BattyConfig;
 
 /**
  * 
  */
-public interface IXStorageConnection {
+public class XStorageFactory implements IXStorageFactory {
 
-    MachineInfo getMachineInfo() throws XStorageException;
+    private IXStorageConnection connection;
 
-    MachineData getMachineData() throws XStorageException;
+    @Override
+    public void init(BattyConfig config) {
+        if (config.isUseStub()) {
+            this.connection = new XStorageStub();
+            return;
+        } else {
+            XStorageConnection xStorageConnection = new XStorageConnection();
+            xStorageConnection.init(config);
+            this.connection = xStorageConnection;
+        }
+    }
 
-    BmsData getBmsData() throws XStorageException;
-
-    void charge(int percentage) throws XStorageException;
-
-    void discharge(int percentage) throws XStorageException;
-
-    void powerOn() throws XStorageException;
-
-    void powerOff() throws XStorageException;
-
-    MeterInfo getMeterInfo() throws XStorageException;
+    @Override
+    public IXStorageConnection getConnection() {
+        return connection;
+    }
 
 }

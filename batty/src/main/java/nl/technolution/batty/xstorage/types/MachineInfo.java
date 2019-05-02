@@ -40,8 +40,29 @@ public class MachineInfo {
     // 7 Inverter Nominal Vpv, unit 0.1V
     private String nominalVpv;
 
-    private MachineInfo() {
-        // hide constructor
+    /**
+     * @param communicationCardFirmwareVersion
+     * @param macAddress
+     * @param inverterSerial
+     * @param inverterModelName
+     * @param phase
+     * @param inverterFirmwareVersion
+     * @param inverterVARating
+     * @param nominalVpv
+     */
+    public static MachineInfo build(String communicationCardFirmwareVersion, String macAddress, String inverterSerial,
+            String inverterModelName, String phase, String inverterFirmwareVersion, String inverterVARating,
+            String nominalVpv) {
+        MachineInfo info = new MachineInfo();
+        info.communicationCardFirmwareVersion = communicationCardFirmwareVersion;
+        info.macAddress = macAddress;
+        info.inverterSerial = inverterSerial;
+        info.inverterModelName = inverterModelName;
+        info.phase = phase;
+        info.inverterFirmwareVersion = inverterFirmwareVersion;
+        info.inverterVARating = inverterVARating;
+        info.nominalVpv = nominalVpv;
+        return info;
     }
 
     /**

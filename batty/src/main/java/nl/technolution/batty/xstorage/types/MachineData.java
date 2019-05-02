@@ -24,7 +24,10 @@ import com.google.common.base.Preconditions;
 
 import nl.technolution.IEnumBitset;
 
-public class MachineData {
+/**
+ * Class representing Machine data of XStorage battery
+ */
+public final class MachineData {
     // 0 Time 19 -YYYY-MM-DD hh:mm:ss ASCII code
     private String time;
     // 1 Serial Number 16 - ASCII code
@@ -87,8 +90,78 @@ public class MachineData {
     }
 
     /**
-     * @param data
+     * @param time
+     * @param serial
+     * @param temperature
+     * @param vpv1
+     * @param ipv1
+     * @param vBatSys
+     * @param iBatSys
+     * @param sOC
+     * @param mTF
+     * @param mTE
+     * @param iac
+     * @param vac
+     * @param gVFaultValue
+     * @param tmpFaultValue
+     * @param pV1FaultValue
+     * @param pac
+     * @param eToday
+     * @param fac
+     * @param gFFaultValue
+     * @param gFCIFaultValue
+     * @param eTotal
+     * @param hTotal
+     * @param warning1
+     * @param warning2
+     * @param bMS
+     * @param mode
+     * @param pload
+     * @param eDraw
      * @return
+     */
+    public static MachineData build(String time, String serial, double temperature, double vpv1, double ipv1,
+            double vBatSys,
+            double iBatSys, int sOC, int mTF, int mTE, double iac, double vac, double gVFaultValue,
+            double tmpFaultValue, double pV1FaultValue, double pac, double eToday, double fac, double gFFaultValue,
+            double gFCIFaultValue, double eTotal, int hTotal, Set<EWarningType1> warning1, Set<EWarningType2> warning2,
+            int bMS, Mode mode, double pload, double eDraw) {
+
+        MachineData machineData = new MachineData();
+        machineData.time = time;
+        machineData.serial = serial;
+        machineData.temperature = temperature;
+        machineData.vpv1 = vpv1;
+        machineData.ipv1 = ipv1;
+        machineData.vBatSys = vBatSys;
+        machineData.iBatSys = iBatSys;
+        machineData.sOC = sOC;
+        machineData.mTF = mTF;
+        machineData.mTE = mTE;
+        machineData.iac = iac;
+        machineData.vac = vac;
+        machineData.gVFaultValue = gVFaultValue;
+        machineData.tmpFaultValue = tmpFaultValue;
+        machineData.pV1FaultValue = pV1FaultValue;
+        machineData.pac = pac;
+        machineData.eToday = eToday;
+        machineData.fac = fac;
+        machineData.gFFaultValue = gFFaultValue;
+        machineData.gFCIFaultValue = gFCIFaultValue;
+        machineData.eTotal = eTotal;
+        machineData.hTotal = hTotal;
+        machineData.warning1 = warning1;
+        machineData.warning2 = warning2;
+        machineData.bMS = bMS;
+        machineData.mode = mode;
+        machineData.pload = pload;
+        machineData.eDraw = eDraw;
+        return machineData;
+    }
+
+    /**
+     * @param data to parse
+     * @return instance
      */
     public static MachineData fromData(List<Integer[]> data) {
         MachineData machineData = new MachineData();
@@ -121,7 +194,6 @@ public class MachineData {
         machineData.mode = Mode.getModeByInt(parseInt(data.get(25)));
         machineData.pload = parseInt(data.get(26));
         machineData.eDraw = parseDouble(data.get(27), 0.1d);
-
         return machineData;
     }
 
@@ -172,11 +244,11 @@ public class MachineData {
         return ipv1;
     }
 
-    public double getvBatSys() {
+    public double getVBatSys() {
         return vBatSys;
     }
 
-    public double getiBatSys() {
+    public double getIBatSys() {
         return iBatSys;
     }
 
@@ -184,11 +256,11 @@ public class MachineData {
         return sOC;
     }
 
-    public int getmTF() {
+    public int getMTF() {
         return mTF;
     }
 
-    public int getmTE() {
+    public int getMTE() {
         return mTE;
     }
 
@@ -200,7 +272,7 @@ public class MachineData {
         return vac;
     }
 
-    public double getgVFaultValue() {
+    public double getGVFaultValue() {
         return gVFaultValue;
     }
 
@@ -208,7 +280,7 @@ public class MachineData {
         return tmpFaultValue;
     }
 
-    public double getpV1FaultValue() {
+    public double getPV1FaultValue() {
         return pV1FaultValue;
     }
 
@@ -216,7 +288,7 @@ public class MachineData {
         return pac;
     }
 
-    public double geteToday() {
+    public double getEToday() {
         return eToday;
     }
 
@@ -224,19 +296,19 @@ public class MachineData {
         return fac;
     }
 
-    public double getgFFaultValue() {
+    public double getGFFaultValue() {
         return gFFaultValue;
     }
 
-    public double getgFCIFaultValue() {
+    public double getGFCIFaultValue() {
         return gFCIFaultValue;
     }
 
-    public double geteTotal() {
+    public double getETotal() {
         return eTotal;
     }
 
-    public int gethTotal() {
+    public int getHTotal() {
         return hTotal;
     }
 
@@ -248,7 +320,7 @@ public class MachineData {
         return warning2;
     }
 
-    public int getbMS() {
+    public int getBMS() {
         return bMS;
     }
 
@@ -260,7 +332,7 @@ public class MachineData {
         return pload;
     }
 
-    public double geteDraw() {
+    public double getEDraw() {
         return eDraw;
     }
 

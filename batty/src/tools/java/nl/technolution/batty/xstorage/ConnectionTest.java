@@ -14,7 +14,7 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty;
+package nl.technolution.batty.xstorage;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -26,7 +26,6 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import nl.technolution.batty.app.BattyConfig;
-import nl.technolution.batty.xstorage.XStorageConnection;
 
 /**
  * 
@@ -37,7 +36,7 @@ public class ConnectionTest {
             KeyManagementException, NoSuchAlgorithmException, CertificateException, KeyStoreException {
 
         BattyConfig b = new BattyConfig("", "https://172.30.133.212/assets/inc/server.inc.php", "batty", "batty",
-                "src/main/resource/truststore.jks", "12345678", null);
+                "src/main/resource/truststore.jks", "12345678", null, false);
 
         XStorageConnection conn = new XStorageConnection();
         conn.init(b);

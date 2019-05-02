@@ -51,7 +51,10 @@ public class BattyConfig extends Configuration {
     private final String truststorepass;
 
     @JsonProperty("market")
-    private MarketConfig market;
+    private final MarketConfig market;
+
+    @JsonProperty("useStub")
+    private final boolean useStub;
 
     @JsonCreator
     public BattyConfig(@JsonProperty("deviceId") String deviceId,
@@ -60,7 +63,8 @@ public class BattyConfig extends Configuration {
             @JsonProperty("password") String password,
             @JsonProperty("truststore") String truststore,
             @JsonProperty("truststorepass") String truststorepass,
-            @JsonProperty("market") MarketConfig market) {
+            @JsonProperty("market") MarketConfig market,
+            @JsonProperty("useStub") boolean useStub) {
         this.deviceId = deviceId;
         this.host = host;
         this.username = username;
@@ -68,6 +72,7 @@ public class BattyConfig extends Configuration {
         this.truststore = truststore;
         this.truststorepass = truststorepass;
         this.market = market;
+        this.useStub = useStub;
     }
 
     public String getDeviceId() {
@@ -92,6 +97,10 @@ public class BattyConfig extends Configuration {
 
     public String getTruststorepass() {
         return truststorepass;
+    }
+
+    public boolean isUseStub() {
+        return useStub;
     }
 
     public MarketConfig getMarket() {
