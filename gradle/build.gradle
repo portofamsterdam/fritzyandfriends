@@ -31,14 +31,18 @@ buildscript {
 		classpath 'nl.technolution:techno-jax:0.2.618'
         classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
         classpath "gradle.plugin.org.hidetake:gradle-swagger-generator-plugin:2.17.0"
+        classpath "io.swagger.core.v3:swagger-gradle-plugin:2.0.8"
     }
 }
 
 // Configuration for all subprojects.
-subprojects {
+subprojects {       
     apply plugin: 'java'
-        
+    apply plugin: 'io.swagger.core.v3.swagger-gradle-plugin'
+    apply plugin: 'com.github.johnrengelman.shadow'
+     
     plugins.withType(JavaPlugin) {
+    
 		// JDK version
 		sourceCompatibility = JavaVersion.VERSION_1_8
 		targetCompatibility = JavaVersion.VERSION_1_8
@@ -47,6 +51,38 @@ subprojects {
 			options.encoding = 'UTF-8'
 		}
     }
+    
+    plugins.withType(ApplicationPlugin) {
+        resolve {
+            outputFileName = project.name
+            outputFormat = 'JSONANDYAML'
+            prettyPrint = 'true'
+            classpath = sourceSets.main.runtimeClasspath
+            resourcePackages = ['nl.technolution']
+            outputPath = new java.io.File(project.buildDir, "/api")
+        }
+        
+        def jarName = project.name + '-app'
+        
+        shadowJar {
+            baseName = "${jarName}"
+            classifier = null
+            version = null
+            mergeServiceFiles()
+        }
+        
+        task copyArtifactsToDocker(type: Copy) {
+            from (new java.io.File(project.buildDir, "/libs")) {
+                include "${jarName}.jar"
+            }
+            from ('src/main/dist/') {
+                include '*'
+            }
+            into new java.io.File(project(":docker").buildDir, "/" + project.name)
+        }
+        copyArtifactsToDocker.dependsOn shadowJar
+    }
+    
     // Standard libraries added to all projects
     dependencies {
         testCompile libraries.test_junit

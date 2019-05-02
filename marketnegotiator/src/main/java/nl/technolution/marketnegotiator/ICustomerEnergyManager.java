@@ -26,7 +26,7 @@ import nl.technolution.protocols.efi.Measurement;
 /**
  * 
  */
-public interface ICustomerEnergyManager {
+public interface ICustomerEnergyManager<T extends FlexibilityRegistration, S extends FlexibilityUpdate> {
 
     /**
      * As soon as a resource manager becomes available to the CEM, it will send a message that is derived from this
@@ -34,7 +34,7 @@ public interface ICustomerEnergyManager {
      * 
      * @param flexibilityRegistration registration
      */
-    void flexibilityRegistration(FlexibilityRegistration flexibilityRegistration);
+    void flexibilityRegistration(T flexibilityRegistration);
 
     /**
      * After the registration of the Resource Manager with the CEM, the Resource Manage can now start sending its
@@ -43,7 +43,7 @@ public interface ICustomerEnergyManager {
      * @param update update
      * @return instruction what to do
      */
-    Instruction flexibilityUpdate(FlexibilityUpdate update);
+    Instruction flexibilityUpdate(S update);
 
     /**
      * After a Resource Manager has received an Instruction message, it is good practice to provide feedback to the CEM

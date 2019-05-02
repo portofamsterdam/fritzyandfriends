@@ -14,39 +14,49 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.netty.api;
+package nl.technolution.sunny.solaredge.sunspec;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
+import java.math.BigInteger;
 
-import com.codahale.metrics.annotation.Timed;
+public class UnsignedShort extends Number {
+	private static final BigInteger MASK = new BigInteger("FFFF", 16);
+	
+	private final BigInteger value;
+	
+	public UnsignedShort(short value) {
+		this.value = BigInteger.valueOf(value);
+	}
+	
+	public int getValue() {
+		return value.and(MASK).intValue();
+	}
+	
+	public short getSignedValue() {
+		return value.and(MASK).shortValue();
+	}
 
-import nl.technolution.DeviceId;
-import nl.technolution.Services;
-import nl.technolution.dropwizard.IEndpoint;
-import nl.technolution.netty.supplylimit.IGridCapacityManager;
+	@Override
+	public String toString() {
+		return value.and(MASK).toString();
+	}
 
-/**
- * 
- */
-@Path("/netty")
-@Produces(MediaType.APPLICATION_JSON)
-public class NettyApi implements IEndpoint {
+	@Override
+	public int intValue() {
+		return value.and(MASK).intValue();
+	}
 
-    /**
-     * Determine grid connection limit of device
-     * 
-     * @param deviceId to find limit for
-     * @return limit in amps
-     */
-    @GET
-    @Timed
-    @Path("capacity")
-    @Produces(MediaType.APPLICATION_JSON)
-    public double getCapacity(@QueryParam("deviceId") String deviceId) {
-        return Services.get(IGridCapacityManager.class).getGridConnectionLimit(new DeviceId(deviceId));
-    }
+	@Override
+	public long longValue() {
+		return value.and(MASK).longValue();
+	}
+
+	@Override
+	public float floatValue() {
+		return value.and(MASK).floatValue();
+	}
+
+	@Override
+	public double doubleValue() {
+		return value.and(MASK).doubleValue();
+	}
 }

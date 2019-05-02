@@ -27,7 +27,6 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 
 import nl.technolution.batty.app.BattyConfig;
 import nl.technolution.batty.xstorage.XStorageConnection;
-import nl.technolution.batty.xstorage.types.MachineData;
 
 /**
  * 
@@ -45,16 +44,16 @@ public class ConnectionTest {
 
         // conn.powerOff();
 
+        conn.powerOn();
+
         // MachineInfo machineInfo = conn.getMachineInfo();
         // System.out.println(machineInfo.toString());
-        MachineData machineData = conn.getMachineData();
-        System.out.println(machineData.toString());
 
         // BmsData bmsData = conn.getBmsData();
         // System.out.println(bmsData.toString());
 
-        // conn.powerOn();
         // conn.discharge(0);
-        // conn.charge(100);
+        conn.charge(100);
+        System.out.println(conn.getMachineData().toString().replaceAll(",", "\n"));
     }
 }

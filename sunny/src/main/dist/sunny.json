@@ -1,0 +1,11 @@
+{
+    "deviceId": "batty",
+    "host": "https://172.30.133.212/assets/inc/server.inc.php",
+    "username": "batty",
+    "password": "batty",
+    "truststore":"/opt/batty/truststore.jks",
+    "truststorepass":"12345678",
+    "market": {
+        "marketUrl": "https://localhost"   
+    }
+}

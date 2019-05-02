@@ -14,39 +14,40 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.netty.api;
+package nl.technolution.sunny.solaredge;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
+import com.google.common.base.Preconditions;
 
-import com.codahale.metrics.annotation.Timed;
+public class SolarEdgeValue<T> {
+	
+	private final Class<T> type;
+	private final T value;
+	
+	public SolarEdgeValue(Class<T> type, T value) {
+		Preconditions.checkNotNull(type);
+		Preconditions.checkNotNull(value);
+		this.type = type;
+		this.value = value;
+	}
 
-import nl.technolution.DeviceId;
-import nl.technolution.Services;
-import nl.technolution.dropwizard.IEndpoint;
-import nl.technolution.netty.supplylimit.IGridCapacityManager;
-
-/**
- * 
- */
-@Path("/netty")
-@Produces(MediaType.APPLICATION_JSON)
-public class NettyApi implements IEndpoint {
-
-    /**
-     * Determine grid connection limit of device
-     * 
-     * @param deviceId to find limit for
-     * @return limit in amps
-     */
-    @GET
-    @Timed
-    @Path("capacity")
-    @Produces(MediaType.APPLICATION_JSON)
-    public double getCapacity(@QueryParam("deviceId") String deviceId) {
-        return Services.get(IGridCapacityManager.class).getGridConnectionLimit(new DeviceId(deviceId));
-    }
+	public Class<T> getType() {
+		return type;
+	}
+	
+	public T getValue() {
+		return value;
+	}
+	
+	@Override
+	public String toString() {
+		return value.toString();
+	}
+	
+	public boolean isNumber() {
+		return value instanceof Number;
+	}
+	
+	public boolean isText() {
+		return value instanceof String;
+	}
 }
