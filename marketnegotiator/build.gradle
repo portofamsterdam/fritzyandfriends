@@ -1,4 +1,3 @@
-
 apply plugin: 'java'
 
 dependencies {
@@ -6,4 +5,3 @@ dependencies {
     compile project(':efi')
     compile project(':marketapi')
 }
-

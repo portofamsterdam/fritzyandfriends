@@ -28,6 +28,13 @@ libraries.jackson_annotations = 'com.fasterxml.jackson.core:jackson-annotations:
 libraries.swagger_annotate = 'io.swagger.core.v3:swagger-annotations:2.0.6'
 libraries.swagger_codegen  = 'io.swagger.codegen.v3:swagger-codegen-cli:3.0.0'
 
+versions.swaggercode = '2.2'
+libraries.swagger_core = [ 
+    'io.swagger.core.v3:swagger-jaxrs2:' + versions.swaggercode,
+    'io.swagger.core.v3:swagger-jaxrs2-servlet-initializer:' + versions.swaggercode
+]
+
+
 libraries.org_apache_commons_lang = 'org.apache.commons:commons-lang3:3.7'
 
 libraries.guava = 'com.google.guava:guava:23.0'
@@ -81,5 +88,6 @@ libraries.codegen = [
     'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:' + versions.jackson_codegen,
     'com.fasterxml.jackson.jaxrs:jackson-jaxrs-json-provider:' + versions.jackson_codegen,
     'com.fasterxml.jackson.core:jackson-annotations:' + versions.jackson_codegen,
-    
 ]
+
+libraries.modbus = 'com.ghgande:j2mod:2.5.3'

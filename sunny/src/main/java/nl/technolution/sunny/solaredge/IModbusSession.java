@@ -14,39 +14,30 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.netty.api;
+package nl.technolution.sunny.solaredge;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
+import java.util.EnumSet;
+import java.util.Map;
 
-import com.codahale.metrics.annotation.Timed;
+import com.ghgande.j2mod.modbus.ModbusException;
 
-import nl.technolution.DeviceId;
-import nl.technolution.Services;
-import nl.technolution.dropwizard.IEndpoint;
-import nl.technolution.netty.supplylimit.IGridCapacityManager;
+import nl.technolution.sunny.solaredge.sunspec.ESolarEdgeRegister;
 
-/**
- * 
- */
-@Path("/netty")
-@Produces(MediaType.APPLICATION_JSON)
-public class NettyApi implements IEndpoint {
+public interface IModbusSession {
 
-    /**
-     * Determine grid connection limit of device
-     * 
-     * @param deviceId to find limit for
-     * @return limit in amps
-     */
-    @GET
-    @Timed
-    @Path("capacity")
-    @Produces(MediaType.APPLICATION_JSON)
-    public double getCapacity(@QueryParam("deviceId") String deviceId) {
-        return Services.get(IGridCapacityManager.class).getGridConnectionLimit(new DeviceId(deviceId));
-    }
+	public void open() throws ModbusException;
+	
+	public void close() throws ModbusException;
+	
+	public boolean isOpen();
+
+	public <T> T readRegister(ESolarEdgeRegister register, Class<T> type) throws ModbusException;
+
+    public <T> T readRegister(ESolarEdgeRegister register, Class<T> type, int unitId) throws ModbusException;
+	
+	public Map<ESolarEdgeRegister, SolarEdgeValue<?>> readRegisters(EnumSet<ESolarEdgeRegister> registers) throws ModbusException;
+	
+	public Map<ESolarEdgeRegister, SolarEdgeValue<?>> readMultipleRegisters(EnumSet<ESolarEdgeRegister> registers) throws ModbusException;
+	
+	public void writeRegister(ESolarEdgeRegister register, Object value) throws ModbusException;
 }

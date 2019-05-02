@@ -14,51 +14,43 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.marketnegotiator;
+package nl.technolution.marketnegotiator.shiftable;
 
-import nl.technolution.protocols.efi.FlexibilityRegistration;
+import nl.technolution.marketnegotiator.AbstractCustomerEnergyManager;
 import nl.technolution.protocols.efi.FlexibilityRevoke;
-import nl.technolution.protocols.efi.FlexibilityUpdate;
 import nl.technolution.protocols.efi.Instruction;
 import nl.technolution.protocols.efi.InstructionStatusUpdate;
 import nl.technolution.protocols.efi.Measurement;
+import nl.technolution.protocols.efi.ShiftableRegistration;
+import nl.technolution.protocols.efi.ShiftableUpdate;
 
 /**
  * 
  */
-public class EfiNagotiator implements ICustomerEnergyManager {
+public class ShiftableNegotiator extends AbstractCustomerEnergyManager<ShiftableRegistration, ShiftableUpdate> {
 
-    public EfiNagotiator() {
-        // 
-    }
+    private Double temparature;
 
     @Override
-    public void flexibilityRegistration(FlexibilityRegistration flexibilityRegistration) {
-        // 
-
-    }
-
-    @Override
-    public Instruction flexibilityUpdate(FlexibilityUpdate update) {
-        // 
+    public Instruction flexibilityUpdate(ShiftableUpdate update) {
+        //
         return null;
     }
 
     @Override
     public void instructionStatusUpdate(InstructionStatusUpdate instructionStatusUpdate) {
-        // 
+        //
 
     }
 
     @Override
     public void flexibilityRevoke(FlexibilityRevoke revocation) {
-        // 
+        //
 
     }
 
     @Override
     public void measurement(Measurement measurement) {
-        // 
 
     }
 

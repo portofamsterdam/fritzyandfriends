@@ -34,15 +34,49 @@ build_fritzy:
   artifacts:
     paths: 
       - docker/fritzy/
+	  
+build_batty:
+  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.4.1
+  stage: build
+  script: 
+    - cd gradle
+    - gradle :batty:build :batty:copyArtifactsToDocker
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    paths:
+      - .gradle
+      - build/
+  artifacts:
+    paths: 
+      - docker/batty/
+	  
+build_netty:
+  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.4.1
+  stage: build
+  script: 
+    - cd gradle
+    - gradle :netty:build :netty:copyArtifactsToDocker
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    paths:
+      - build/
+      - .gradle
+  artifacts:
+    paths: 
+      - docker/netty/
 
 create_images:
   # Use the proxied docker image
-  image: docker-proxy.intranet.technolution.nl/edsn/edsn_docker_aws:latest
+  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.4.1
   stage: create_images
   script:
     # build and push consumer
     - cd docker/fritzy
     - docker build -t fritzy2.0/fritzy .
+    - cd ../batty
+    - docker build -t fritzy2.0/batty .
+    - cd ../netty
+    - docker build -t fritzy2.0/netty .
   only:
     - master
 
@@ -56,5 +90,7 @@ sonar_quality_check:
     - gradle --build-cache sonar
   dependencies:
     - build_fritzy
+    - build_batty
+    - build_netty
   only:
     - master

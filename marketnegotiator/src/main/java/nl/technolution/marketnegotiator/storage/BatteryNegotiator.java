@@ -14,39 +14,30 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.netty.api;
+package nl.technolution.marketnegotiator.storage;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.MediaType;
-
-import com.codahale.metrics.annotation.Timed;
-
-import nl.technolution.DeviceId;
-import nl.technolution.Services;
-import nl.technolution.dropwizard.IEndpoint;
-import nl.technolution.netty.supplylimit.IGridCapacityManager;
+import nl.technolution.marketnegotiator.AbstractCustomerEnergyManager;
+import nl.technolution.protocols.efi.Instruction;
+import nl.technolution.protocols.efi.StorageInstruction;
+import nl.technolution.protocols.efi.StorageRegistration;
+import nl.technolution.protocols.efi.StorageStatus;
+import nl.technolution.protocols.efi.util.Efi;
 
 /**
  * 
  */
-@Path("/netty")
-@Produces(MediaType.APPLICATION_JSON)
-public class NettyApi implements IEndpoint {
+public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegistration, StorageStatus> {
 
-    /**
-     * Determine grid connection limit of device
-     * 
-     * @param deviceId to find limit for
-     * @return limit in amps
-     */
-    @GET
-    @Timed
-    @Path("capacity")
-    @Produces(MediaType.APPLICATION_JSON)
-    public double getCapacity(@QueryParam("deviceId") String deviceId) {
-        return Services.get(IGridCapacityManager.class).getGridConnectionLimit(new DeviceId(deviceId));
+
+    private Double fillLevel;
+
+    @Override
+    public Instruction flexibilityUpdate(StorageStatus storageStatus) {
+        fillLevel = storageStatus.getCurrentFillLevel();
+        return Efi.build(StorageInstruction.class, getDeviceId());
     }
+
+
+
+
 }
