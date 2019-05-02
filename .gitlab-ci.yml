@@ -34,7 +34,7 @@ build_fritzy:
   artifacts:
     paths: 
       - docker/fritzy/
-	  
+      
 build_batty:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.4.1
   stage: build
@@ -49,7 +49,7 @@ build_batty:
   artifacts:
     paths: 
       - docker/build/batty/
-	  
+      
 build_netty:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.4.1
   stage: build
