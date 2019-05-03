@@ -21,7 +21,7 @@ stages:
   - quality
 
 build_fritzy:
-  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.4.1
+  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
   stage: build
   script: 
     - cd gradle
@@ -36,7 +36,7 @@ build_fritzy:
       - docker/fritzy/
       
 build_batty:
-  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.4.1
+  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
   stage: build
   script: 
     - cd gradle
@@ -51,7 +51,7 @@ build_batty:
       - docker/build/batty/
       
 build_netty:
-  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.4.1
+  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
   stage: build
   script: 
     - cd gradle
@@ -66,7 +66,7 @@ build_netty:
       - docker/build/netty
       
 build_sunny:
-  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.4.1
+  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
   stage: build
   script: 
     - cd gradle
@@ -82,7 +82,7 @@ build_sunny:
 
 create_images:
   # Use the proxied docker image
-  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.4.1
+  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
   stage: create_images
   script:
     # build and push consumer
