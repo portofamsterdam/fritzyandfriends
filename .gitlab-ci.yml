@@ -86,7 +86,7 @@ create_images:
   stage: create_images
   script:
     # build and push consumer
-    - cd docker/build/fritzy
+    - cd ../docker/build/fritzy
     - docker build -t fritzy2.0/fritzy .
     - cd ../batty
     - docker build -t fritzy2.0/batty .
