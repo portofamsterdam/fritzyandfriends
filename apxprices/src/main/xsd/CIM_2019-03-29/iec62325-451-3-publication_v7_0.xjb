@@ -1,0 +1,12 @@
+<?xml version="1.0"?>
+<jxb:bindings version="1.0"
+  xmlns:jxb="http://java.sun.com/xml/ns/jaxb"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  xmlns:xjc="http://java.sun.com/xml/ns/jaxb/xjc">
+  
+    <jxb:bindings schemaLocation="iec62325-451-3-publication_v7_0.xsd" node="/xs:schema">
+        <jxb:schemaBindings>
+            <jxb:package name="nl.technolution.apxprices.client"/>
+        </jxb:schemaBindings>        
+    </jxb:bindings>
+</jxb:bindings>
