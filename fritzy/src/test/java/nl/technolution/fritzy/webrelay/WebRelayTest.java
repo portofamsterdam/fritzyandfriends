@@ -48,7 +48,7 @@ import nl.technolution.market.MarketConfig;
  */
 public class WebRelayTest {
 
-    private static final int PORT = 80;
+    private static final int PORT = 4567;
 
     private ExecutorService ee;
     private ServerSocket server;
