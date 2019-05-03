@@ -14,15 +14,16 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.dropwizard;
+package nl.technolution.dropwizard.services;
 
 import io.dropwizard.Configuration;
-import io.dropwizard.lifecycle.Managed;
 
 /**
+ * Service to be registered by Fritzy dropwizard app
+ * 
  * @param <T> DropWizard configuration type
  */
-public interface ITask<T extends Configuration> extends Managed {
+public interface IService<T extends Configuration> {
 
     /**
      * init service
@@ -30,5 +31,4 @@ public interface ITask<T extends Configuration> extends Managed {
      * @param config
      */
     void init(T config);
-
 }

@@ -17,7 +17,7 @@
 package nl.technolution.batty.xstorage;
 
 import nl.technolution.batty.app.BattyConfig;
-import nl.technolution.dropwizard.IService;
+import nl.technolution.dropwizard.services.IService;
 
 /**
  * 
