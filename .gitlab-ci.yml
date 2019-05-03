@@ -33,7 +33,7 @@ build_fritzy:
       - .gradle
   artifacts:
     paths: 
-      - docker/fritzy/
+      - docker/build/fritzy/
       
 build_batty:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
