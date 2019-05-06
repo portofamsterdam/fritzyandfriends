@@ -86,7 +86,7 @@ build_sunny:
 
 create_images:
   # Use an image which has docker, for now use EDSN one.
-  image: docker-proxy.intranet.technolution.nl/edsn/edsn_docker_aws:lates
+  image: docker-proxy.intranet.technolution.nl/edsn/edsn_docker_aws:latest
   stage: create_images
   script:
     # build and push consumer
@@ -113,5 +113,6 @@ sonar_quality_check:
     - build_fritzy
     - build_batty
     - build_netty
+    - build_sunny
   only:
     - master
