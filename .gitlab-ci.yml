@@ -102,7 +102,7 @@ create_images:
     - master
 
 sonar_quality_check:
-  image: docker-proxy.intranet.technolution.nl/techno_gradle_4_node_8_stretch:8.12
+  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
   stage: quality
   # When the quality job fails, the entire build should not be marked as failed.
   allow_failure: true
