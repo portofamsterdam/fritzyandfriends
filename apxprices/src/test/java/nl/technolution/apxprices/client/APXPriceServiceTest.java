@@ -34,7 +34,7 @@ import nl.technolution.apxprices.service.APXPricesService.NoPricesAvailableExcep
 import nl.technolution.apxprices.service.IAPXPricesService;
 
 /**
- * Test TransparencyPlatformClient
+ * Tests for APXPriceService
  * 
  */
 public class APXPriceServiceTest {
