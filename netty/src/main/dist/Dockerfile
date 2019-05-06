@@ -1,7 +1,7 @@
 FROM docker-proxy.intranet.technolution.nl/java:openjdk-8-jdk
 
-ADD ./build/netty-app.jar /opt/netty/batty-app.jar
-ADD ./build/netty.json /opt/config/netty.json
+ADD ./netty-app.jar /opt/netty/batty-app.jar
+ADD ./netty.json /opt/config/netty.json
 
 CMD java -jar /opt/netty/netty-app.jar server /opt/config/netty.json
 

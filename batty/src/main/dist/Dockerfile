@@ -1,7 +1,7 @@
 FROM docker-proxy.intranet.technolution.nl/java:openjdk-8-jdk
 
-ADD ./build/batty-app.jar /opt/batty/batty-app.jar
-ADD ./build/trustsore.jks /opt/batty/truststore.jks
+ADD ./batty-app.jar /opt/batty/batty-app.jar
+ADD ./trustsore.jks /opt/batty/truststore.jks
 
 ADD ./build/batty.json /opt/config/batty.json
 
