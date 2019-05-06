@@ -24,15 +24,16 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 
-import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
-
 import com.codahale.metrics.annotation.Timed;
 
-import io.dropwizard.jersey.params.InstantParam;
+import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
+
 import nl.technolution.Services;
 import nl.technolution.apxprices.service.APXPricesService;
 import nl.technolution.apxprices.service.IAPXPricesService;
 import nl.technolution.dropwizard.IEndpoint;
+
+import io.dropwizard.jersey.params.InstantParam;
 
 /**
  * 
@@ -40,7 +41,6 @@ import nl.technolution.dropwizard.IEndpoint;
 @Path("apxprice/")
 @Produces(MediaType.APPLICATION_JSON)
 public class APXPricesApi implements IEndpoint {
-	
 
     /**
      * Get day ahead price in EUR per kWh for the current moment using the cache.
@@ -50,18 +50,17 @@ public class APXPricesApi implements IEndpoint {
     @GET
     @Timed
     @Path("currentPrice")
-    // TODO: now just return the double...
     @Produces(MediaType.TEXT_PLAIN)
     public double getCurrentPrice() {
-    	IAPXPricesService priceService = Services.get(IAPXPricesService.class);
-    	try {
-    		return priceService.getPricePerkWh();
-    	} catch (APXPricesService.NoPricesAvailableException e) {
-    		throw new WebApplicationException(e.getMessage(), e);
-    	}
+        IAPXPricesService priceService = Services.get(IAPXPricesService.class);
+        try {
+            return priceService.getPricePerkWh();
+        } catch (APXPricesService.NoPricesAvailableException e) {
+            throw new WebApplicationException(e.getMessage(), e);
+        }
     }
-    
-	/**
+
+    /**
      * Get day ahead price in EUR per kWh for the requested moment.
      * 
      * NOTE: the cache is bypassed in this case, so this call takes typically some seconds to finish!
@@ -71,13 +70,14 @@ public class APXPricesApi implements IEndpoint {
     @GET
     @Timed
     @Path("price")
-    @Produces({MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON})
-    public double getPrice(@QueryParam(value = "dateTime") @NotNull @UnwrapValidatedValue InstantParam requestedDateTime) {
-    	IAPXPricesService priceService = Services.get(IAPXPricesService.class);
-    	try {
-    		return priceService.getPricePerkWh(requestedDateTime.get());
-    	} catch (APXPricesService.NoPricesAvailableException e) {
-    		throw new WebApplicationException(e.getMessage(), e);
-    	}
+    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
+    public double getPrice(
+            @QueryParam(value = "dateTime") @NotNull @UnwrapValidatedValue InstantParam requestedDateTime) {
+        IAPXPricesService priceService = Services.get(IAPXPricesService.class);
+        try {
+            return priceService.getPricePerkWh(requestedDateTime.get());
+        } catch (APXPricesService.NoPricesAvailableException e) {
+            throw new WebApplicationException(e.getMessage(), e);
+        }
     }
 }

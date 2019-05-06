@@ -31,20 +31,20 @@ public final class APXPriceRetriever extends TimedTaskService {
     private ITransparencyPlatformClient client;
     private PublicationMarketDocument cachedPrices;
 
-	public APXPriceRetriever(ITransparencyPlatformClient client) {
+    public APXPriceRetriever(ITransparencyPlatformClient client) {
         this.client = client;
-	}
-	
+    }
+
     @Override
     public void init(ScheduledExecutorService executor) {
         executor.scheduleAtFixedRate(this::updatePrices, 0, 15, TimeUnit.MINUTES);
     }
 
     private void updatePrices() {
-    	cachedPrices = client.getDayAheadPrices(Instant.now());
+        cachedPrices = client.getDayAheadPrices(Instant.now());
     }
-    
+
     public PublicationMarketDocument getCachedPrices() {
-    	return cachedPrices;
+        return cachedPrices;
     }
 }
