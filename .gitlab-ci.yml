@@ -85,8 +85,8 @@ build_sunny:
       - docker/build/sunny/
 
 create_images:
-  # Use the proxied docker image
-  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
+  # Use an image which has docker, for now use EDSN one.
+  image: docker-proxy.intranet.technolution.nl/edsn/edsn_docker_aws:lates
   stage: create_images
   script:
     # build and push consumer
