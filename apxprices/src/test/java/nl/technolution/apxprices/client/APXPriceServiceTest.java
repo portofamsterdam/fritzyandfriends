@@ -19,6 +19,11 @@ package nl.technolution.apxprices.client;
 import static org.junit.Assert.assertEquals;
 
 import java.time.Instant;
+import java.time.LocalTime;
+import java.time.OffsetDateTime;
+import java.time.temporal.ChronoField;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -38,7 +43,7 @@ public class APXPriceServiceTest {
     @Before
     public void before() {
         APXPricesConfig config = new APXPricesConfig("https://transparency.entsoe.eu/api",
-                "0b1d9ae3-d9a6-4c6b-8dc1-c62a18387ac5");
+                "0b1d9ae3-d9a6-4c6b-8dc1-c62a18387ac5", null, false);
         priceService = new APXPricesService();
         // manually init the service
         priceService.init(config);
@@ -81,4 +86,23 @@ public class APXPriceServiceTest {
         priceService.getPricePerkWh(instant);
     }
 
+    @Test
+    public void fixedPricesTest() throws NoPricesAvailableException {
+        // setup config with fixed prices
+        Map<Integer, Double> fixedPrices = new HashMap<Integer, Double>();
+        for (int i = 0; i < 24; i++) {
+            fixedPrices.put(i, (double)i / 100);
+        }
+        APXPricesConfig config = new APXPricesConfig("", "", null, true);
+        priceService = new APXPricesService();
+        // manually init the service
+        priceService.init(config);
+
+        Instant instant = OffsetDateTime.now().withHour(8).toInstant();
+        double price = priceService.getPricePerkWh(instant);
+        assertEquals(0.08d, price, 0.001);
+
+        price = priceService.getPricePerkWh();
+        assertEquals((double)LocalTime.now().get(ChronoField.HOUR_OF_DAY) / 100, price, 0.001);
+    }
 }

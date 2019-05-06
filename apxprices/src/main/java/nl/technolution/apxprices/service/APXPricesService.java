@@ -18,8 +18,12 @@ package nl.technolution.apxprices.service;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoField;
+import java.util.Map;
 
 import org.slf4j.Logger;
 
@@ -42,6 +46,8 @@ public class APXPricesService implements IAPXPricesService {
             .withZone(ZoneId.of("UTC"));
     private APXPriceRetriever apxPriceRetriever;
     private TransparencyPlatformClient client;
+    private Map<Integer, Double> fixedPrices;
+    private boolean useFixedPrices;
 
     /**
      * Custom exception
@@ -58,10 +64,15 @@ public class APXPricesService implements IAPXPricesService {
     public void init(APXPricesConfig config) {
         client = new TransparencyPlatformClient(config);
         apxPriceRetriever = new APXPriceRetriever(client);
+        fixedPrices = config.getFixedPrices();
+        useFixedPrices = config.isUseFixedPrices();
     }
 
     @Override
     public double getPricePerkWh() throws NoPricesAvailableException {
+        if (useFixedPrices) {
+            return getFixedPrice(Instant.now());
+        }
         PublicationMarketDocument cachedPrices = apxPriceRetriever.getCachedPrices();
         if (apxPriceRetriever.getCachedPrices() == null) {
             throw new NoPricesAvailableException("No prices available yet.");
@@ -71,7 +82,19 @@ public class APXPricesService implements IAPXPricesService {
 
     @Override
     public double getPricePerkWh(Instant requestedDateTime) throws NoPricesAvailableException {
+        if (useFixedPrices) {
+            return getFixedPrice(requestedDateTime);
+        }
         return getSinglePrice(requestedDateTime, client.getDayAheadPrices(requestedDateTime));
+    }
+
+    private double getFixedPrice(Instant requestedDateTime) {
+        int hourOfDay = LocalDateTime.ofInstant(requestedDateTime, ZoneOffset.systemDefault())
+                .toLocalTime()
+                .get(ChronoField.HOUR_OF_DAY);
+        double price = fixedPrices.get(hourOfDay);
+        LOG.info("Using FIXED price {} as set for {}:00", price, hourOfDay);
+        return price;
     }
 
     private double getSinglePrice(Instant requestedDateTime, PublicationMarketDocument prices)
@@ -109,7 +132,7 @@ public class APXPricesService implements IAPXPricesService {
                             resolution.getSeconds();
                     for (Point point : period.getPoint()) {
                         if (point.getPosition() == offset + 1) {
-                            LOG.debug("For requested time {} found pricepoint at position {}: value {} {} per {}",
+                            LOG.info("For requested time {} found pricepoint at position {}: value {} {} per {}",
                                     requestedDateTime, point.getPosition(), point.getPriceAmount().doubleValue(),
                                     timeSeries.getCurrencyUnitName(), unit);
                             return point.getPriceAmount().doubleValue() / factor;

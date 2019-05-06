@@ -16,8 +16,12 @@
  */
 package nl.technolution.apxprices.app;
 
+import java.util.Map;
+
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.google.common.base.Preconditions;
+import com.google.common.base.Strings;
 
 import io.dropwizard.Configuration;
 
@@ -43,12 +47,48 @@ public class APXPricesConfig extends Configuration {
     @JsonProperty("securityToken")
     private final String securityToken;
 
+    /**
+     * Map with fixed prices in EUR per kWh for every hour of the day (local time). Hours > 23 are ignored. When
+     * {@link useFixedPrices} is true these fixed prices are used instead of the live day ahead prices.
+     *
+     */
+    @JsonProperty("fixedPrices")
+    private Map<Integer, Double> fixedPrices;
+
+    /**
+     * When true the prices from {@link fixedPrices} are used instead of the live day ahead prices.
+     *
+     */
+    @JsonProperty("useFixedPrices")
+    private boolean useFixedPrices;
+
     @JsonCreator
-    public APXPricesConfig(@JsonProperty("baseURL") String baseURL,
-            @JsonProperty("securityToken") String securityToken) {
+    public APXPricesConfig(@JsonProperty("baseURL") String baseURL, @JsonProperty("securityToken") String securityToken,
+            @JsonProperty("fixedPrices") Map<Integer, Double> fixedPrices,
+            @JsonProperty("useFixedPrices") boolean useFixedPrices) {
         super();
         this.baseURL = baseURL;
         this.securityToken = securityToken;
+        this.fixedPrices = fixedPrices;
+        this.useFixedPrices = useFixedPrices;
+        validateConfig();
+    }
+
+    /**
+     * 
+     */
+    private void validateConfig() {
+        if (useFixedPrices) {
+            Preconditions.checkArgument((fixedPrices != null), "With useFixedPrices=true fixedPrices should be set");
+            for (int i = 0; i < 24; i++) {
+                if (!fixedPrices.containsKey(i)) {
+                    throw new IllegalArgumentException("Fixed price missing for hour " + i);
+                }
+            }
+        } else {
+            Preconditions.checkArgument(!(Strings.isNullOrEmpty(baseURL)), "baseURL should be set");
+            Preconditions.checkArgument(!(Strings.isNullOrEmpty(securityToken)), "securityToken should be set");
+        }
     }
 
     public String getBaseURL() {
@@ -59,5 +99,12 @@ public class APXPricesConfig extends Configuration {
         return securityToken;
     }
 
-    // TODO WHO: setting voor 'fixed prices' aan/uit + lijst met 24 fixed prijzen voor ieder uur.
+    public Map<Integer, Double> getFixedPrices() {
+        return fixedPrices;
+    }
+
+    public boolean isUseFixedPrices() {
+        return useFixedPrices;
+    }
+
 }
