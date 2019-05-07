@@ -14,21 +14,22 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.dropwizard;
+package nl.technolution.dropwizard.tasks;
 
-import io.dropwizard.Configuration;
+import java.util.concurrent.TimeUnit;
 
 /**
- * Service to be registered by Fritzy dropwizard app
- * 
- * @param <T> DropWizard configuration type
+ * Mark a class as a Timed Task, class MUST also implement Runnable. Periods are rounded to neared unit e.g. Hourly
+ * tasks run at 00:00 and 01:00 etc.
  */
-public interface IService<T extends Configuration> {
+public @interface TimedTask {
 
-    /**
-     * init service
-     * 
-     * @param config
-     */
-    void init(T config);
+    /** number of units */
+    int period();
+
+    /** timeunit */
+    TimeUnit unit();
+
+    /** offset of the given period */
+    int offset() default 0;
 }
