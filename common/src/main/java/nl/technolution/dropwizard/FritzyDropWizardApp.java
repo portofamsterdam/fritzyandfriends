@@ -34,7 +34,7 @@ public class FritzyDropWizardApp<T extends Configuration> extends Application<T>
 
     @Override
     public void run(T configuration, Environment environment) throws Exception {
-        ServiceFinder.setupServices(configuration, environment);
+        ServiceFinder.setupServices(configuration);
         WebserviceFinder.setupWebservices(environment);
         environment.lifecycle().manage(new TimedTaskService());
     }

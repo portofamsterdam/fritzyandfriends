@@ -23,7 +23,6 @@ import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 
 import io.dropwizard.Configuration;
-import io.dropwizard.setup.Environment;
 import nl.technolution.Log;
 import nl.technolution.Services;
 import nl.technolution.core.resources.TypeFinder;
@@ -44,10 +43,9 @@ public final class ServiceFinder {
      * Setup services in a DropWizard app
      * 
      * @param configuration to inject to service
-     * @param environment dropwizard
      */
     @SuppressWarnings({ "unchecked", "rawtypes" })
-    public static <T extends Configuration> void setupServices(T configuration, Environment environment) {
+    public static <T extends Configuration> void setupServices(T configuration) {
         // Register endpoints of device controller
         LOG.info("registering services in package {}", FritzyDropWizardApp.PKG);
         List<Class<? extends IService>> services = TypeFinder
