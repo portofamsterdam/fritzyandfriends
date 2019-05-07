@@ -14,32 +14,31 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.netty.supplylimit;
+package nl.technolution.fritzy.webrelay;
 
-import java.util.Map;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
-import com.google.common.collect.Maps;
+import org.junit.Test;
 
-import nl.technolution.DeviceId;
-import nl.technolution.netty.app.NettyConfig;
+import nl.technolution.fritzy.app.FritzyConfig;
+import nl.technolution.market.MarketConfig;
 
 /**
  * 
  */
-public class GridConnectionManager implements IGridCapacityManager {
+public class WebRelayConfigTest {
 
-    private Map<DeviceId, Double> griConnectionLimitRegister = Maps.newHashMap();
-
-    private double defaultGridConnectionLimit;
-
-    @Override
-    public void init(NettyConfig config) {
-        defaultGridConnectionLimit = config.getDefaultGridConnectionLimit();
-        config.getDeviceLimits().forEach((k, v) -> griConnectionLimitRegister.put(new DeviceId(k), v));
-    }
-
-    @Override
-    public double getGridConnectionLimit(DeviceId id) {
-        return griConnectionLimitRegister.computeIfAbsent(id, (k) -> defaultGridConnectionLimit);
+    /**
+     * Test if object can be written as String
+     * 
+     * @throws JsonProcessingException
+     */
+    @Test
+    public void testConfig() throws JsonProcessingException {
+        FritzyConfig obj = new FritzyConfig("Fritzy", "localhost", 80, "/dev/tty",
+                new MarketConfig("https://localhost"));
+        System.out.println(
+                new ObjectMapper().writeValueAsString(obj));
     }
 }
