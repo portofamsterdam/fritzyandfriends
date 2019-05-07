@@ -80,6 +80,9 @@ build_sunny:
       - build/
       - .gradle
       - docker/build/sunny/
+  artifacts:
+    paths: 
+      - docker/build/sunny/
 
 create_images:
   # Use an image which has docker, for now use EDSN one.
