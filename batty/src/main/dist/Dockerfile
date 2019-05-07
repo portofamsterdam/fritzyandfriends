@@ -1,4 +1,4 @@
-FROM docker-proxy.intranet.technolution.nl/java:openjdk-8-jdk
+FROM docker-proxy.intranet.technolution.nl/openjdk:8-jre-alpine3.9
 
 ADD ./batty-app.jar /opt/batty/batty-app.jar
 ADD ./truststore.jks /opt/batty/truststore.jks

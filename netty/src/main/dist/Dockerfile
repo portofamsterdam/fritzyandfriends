@@ -1,4 +1,4 @@
-FROM docker-proxy.intranet.technolution.nl/java:openjdk-8-jdk
+FROM docker-proxy.intranet.technolution.nl/openjdk:8-jre-alpine3.9
 
 ADD ./netty-app.jar /opt/netty/batty-app.jar
 ADD ./netty.json /opt/config/netty.json
