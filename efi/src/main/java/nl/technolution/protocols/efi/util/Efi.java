@@ -96,4 +96,14 @@ public final class Efi {
         GregorianCalendar calendar = GregorianCalendar.from(ZonedDateTime.ofInstant(instant, UTC_ZONE));
         return DATATYPE_FACTORY.newXMLGregorianCalendar(calendar);
     }
+
+    /**
+     * return deviceId of a given message
+     * 
+     * @param message to find deviceId in
+     * @return deviceId
+     */
+    public static DeviceId getDeviceId(EfiMessage message) {
+        return new DeviceId(message.getHeader().getEfiResourceId());
+    }
 }

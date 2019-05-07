@@ -1,6 +1,18 @@
 
 apply plugin: 'java'
+apply plugin: 'application'
 
 dependencies {
     compile project(':devicecontroller')
+    compile libraries.modbus
+}
+
+mainClassName = 'nl.technolution.sunny.app.SunnyApp'
+
+sourceSets {
+    main {
+        java {
+            srcDirs 'src/tools/java'
+        }
+    }
 }

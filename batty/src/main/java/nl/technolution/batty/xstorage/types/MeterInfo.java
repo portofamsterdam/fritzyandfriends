@@ -49,6 +49,35 @@ public final class MeterInfo {
     }
 
     /**
+     * @param voltage
+     * @param current
+     * @param activePower
+     * @param reactivePower
+     * @param apparentPower
+     * @param powerFactor
+     * @param frequency
+     * @param phase1activePower
+     * @param phase2activePower
+     * @param phase3activePower
+     * @return
+     */
+    public static MeterInfo build(double voltage, double current, int activePower, int reactivePower, int apparentPower,
+            double powerFactor, double frequency, int phase1activePower, int phase2activePower, int phase3activePower) {
+        MeterInfo info = new MeterInfo();
+        info.voltage = voltage;
+        info.current = current;
+        info.activePower = activePower;
+        info.reactivePower = reactivePower;
+        info.apparentPower = apparentPower;
+        info.powerFactor = powerFactor;
+        info.frequency = frequency;
+        info.phase1activePower = phase1activePower;
+        info.phase2activePower = phase2activePower;
+        info.phase3activePower = phase3activePower;
+        return info;
+    }
+
+    /**
      * String of data comma seperated
      * 
      * @param data to parse

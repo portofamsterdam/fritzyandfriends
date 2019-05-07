@@ -21,33 +21,95 @@ stages:
   - quality
 
 build_fritzy:
-  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.4.1
+  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
   stage: build
   script: 
     - cd gradle
-    - gradle :fritzy:build :fritzy:copyArtifactsToDocker
+    - gradle :fritzy:build :fritzy:copyArtifactsToDocker :fritzy:resolve
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
       - build/
       - .gradle
+      - docker/build/fritzy/
   artifacts:
     paths: 
-      - docker/fritzy/
+      - docker/build/fritzy/
+      
+build_batty:
+  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
+  stage: build
+  script: 
+    - cd gradle
+    - gradle :batty:build :batty:copyArtifactsToDocker :batty:resolve
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    paths:
+      - .gradle
+      - build/
+      - docker/build/batty/
+  artifacts:
+    paths: 
+      - docker/build/batty/
+      
+build_netty:
+  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
+  stage: build
+  script: 
+    - cd gradle
+    - gradle :netty:build :netty:copyArtifactsToDocker :netty:resolve
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    paths:
+      - build/
+      - .gradle
+      - docker/build/netty/
+  artifacts:
+    paths: 
+      - docker/build/netty/
+      
+build_sunny:
+  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
+  stage: build
+  script: 
+    - cd gradle
+    - gradle :sunny:build :sunny:copyArtifactsToDocker sunny:resolve
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    paths:
+      - build/
+      - .gradle
+      - docker/build/sunny/
 
 create_images:
-  # Use the proxied docker image
+  # Use an image which has docker, for now use EDSN one.
   image: docker-proxy.intranet.technolution.nl/edsn/edsn_docker_aws:latest
   stage: create_images
   script:
     # build and push consumer
-    - cd docker/fritzy
+    - cd docker/build/fritzy
     - docker build -t fritzy2.0/fritzy .
+    - docker save fritzy2.0/fritzy | gzip > fritzy.tar.gz
+    - cd ../batty
+    - docker build -t fritzy2.0/batty .
+    - docker save fritzy2.0/batty | gzip >  batty.tar.gz
+    - cd ../netty
+    - docker build -t fritzy2.0/netty .
+    - docker save fritzy2.0/netty | gzip >  netty.tar.gz
+    - cd ../sunny
+    - docker build -t fritzy2.0/sunny .
+    - docker save fritzy2.0/sunny | gzip >  sunny.tar.gz
+  artifacts:
+    paths:
+      - docker/build/fritzy/fritzy.tar.gz
+      - docker/build/batty/batty.tar.gz
+      - docker/build/netty/netty.tar.gz
+      - docker/build/sunny/sunny.tar.gz
   only:
     - master
 
 sonar_quality_check:
-  image: docker-proxy.intranet.technolution.nl/techno_gradle_4_node_8_stretch:8.12
+  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
   stage: quality
   # When the quality job fails, the entire build should not be marked as failed.
   allow_failure: true
@@ -56,5 +118,8 @@ sonar_quality_check:
     - gradle --build-cache sonar
   dependencies:
     - build_fritzy
+    - build_batty
+    - build_netty
+    - build_sunny
   only:
     - master

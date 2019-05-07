@@ -25,6 +25,7 @@ import com.codahale.metrics.annotation.Timed;
 
 import nl.technolution.Services;
 import nl.technolution.batty.xstorage.IXStorageConnection;
+import nl.technolution.batty.xstorage.IXStorageFactory;
 import nl.technolution.batty.xstorage.XStorageException;
 import nl.technolution.dropwizard.IEndpoint;
 
@@ -45,7 +46,7 @@ public class BattyApi implements IEndpoint {
     @Path("state")
     @Produces(MediaType.APPLICATION_JSON)
     public BattyState getState() {
-        IXStorageConnection connection = Services.get(IXStorageConnection.class);
+        IXStorageConnection connection = Services.get(IXStorageFactory.class).getConnection();
         try {
             int soc = connection.getMachineData().getSoc();
             return new BattyState("on", soc);

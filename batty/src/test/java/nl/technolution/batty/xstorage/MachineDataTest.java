@@ -83,33 +83,32 @@ public class MachineDataTest {
         assertEquals(35.0d, data.getTemperature(), 0.0001d);
         assertEquals(0, data.getVpv1(), 0.0001d);
         assertEquals(0, data.getIpv1(), 0.0001d);
-        assertEquals(98.4d, data.getvBatSys(), 0.0001d);
-        assertEquals(-10.92d, data.getiBatSys(), 0.0001d);
+        assertEquals(98.4d, data.getVBatSys(), 0.0001d);
+        assertEquals(-10.92d, data.getIBatSys(), 0.0001d);
         assertEquals(100, data.getSoc());
-        assertEquals(65535, data.getmTF());
-        assertEquals(255, data.getmTE());
+        assertEquals(65535, data.getMTF());
+        assertEquals(255, data.getMTE());
         assertEquals(0, data.getIac(), 0.0001d);
         assertEquals(2264d, data.getVac(), 0.0001d);
-        assertEquals(0, data.getgVFaultValue(), 0.0001d);
+        assertEquals(0, data.getGVFaultValue(), 0.0001d);
         assertEquals(0, data.getTmpFaultValue(), 0.0001d);
-        assertEquals(0, data.getpV1FaultValue(), 0.0001d);
+        assertEquals(0, data.getPV1FaultValue(), 0.0001d);
         assertEquals(0, data.getPac(), 0.0001d);
-        assertEquals(0, data.geteToday(), 0.0001d);
+        assertEquals(0, data.getEToday(), 0.0001d);
         assertEquals(50.02, data.getFac(), 0.0001d);
-        assertEquals(0, data.getgFFaultValue(), 0.0001d);
-        assertEquals(0, data.getgFCIFaultValue(), 0.0001d);
-        assertEquals(2.2, data.geteTotal(), 0.0001d);
-        assertEquals(1, data.gethTotal());
+        assertEquals(0, data.getGFFaultValue(), 0.0001d);
+        assertEquals(0, data.getGFCIFaultValue(), 0.0001d);
+        assertEquals(2.2, data.getETotal(), 0.0001d);
+        assertEquals(1, data.getHTotal());
         assertTrue(data.getWarning1().contains(EWarningType1.ErrorCode34));
         assertEquals(1, data.getWarning1().size());
         assertTrue(data.getWarning2().contains(EWarningType2.MSVERSIONFAIL));
         assertTrue(data.getWarning2().contains(EWarningType2.OVERPOWER));
         assertEquals(2, data.getWarning2().size());
-        assertEquals(272, data.getbMS());
+        assertEquals(272, data.getBMS());
         assertEquals(Mode.getModeByInt(1), data.getMode());
         assertEquals(0, data.getPload(), 0.0001d);
-        assertEquals(2.0d, data.geteDraw(), 0.0001d);
-
+        assertEquals(2.0d, data.getEDraw(), 0.0001d);
         assertEquals(1, Mode.getModeByInt(1).hashCode());
     }
 

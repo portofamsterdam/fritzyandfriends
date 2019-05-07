@@ -14,7 +14,7 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty;
+package nl.technolution.batty.xstorage;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -26,8 +26,6 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import nl.technolution.batty.app.BattyConfig;
-import nl.technolution.batty.xstorage.XStorageConnection;
-import nl.technolution.batty.xstorage.types.MachineData;
 
 /**
  * 
@@ -38,23 +36,23 @@ public class ConnectionTest {
             KeyManagementException, NoSuchAlgorithmException, CertificateException, KeyStoreException {
 
         BattyConfig b = new BattyConfig("", "https://172.30.133.212/assets/inc/server.inc.php", "batty", "batty",
-                "src/main/resource/truststore.jks", "12345678", null);
+                "src/main/resource/truststore.jks", "12345678", null, false);
 
         XStorageConnection conn = new XStorageConnection();
         conn.init(b);
 
         // conn.powerOff();
 
+        conn.powerOn();
+
         // MachineInfo machineInfo = conn.getMachineInfo();
         // System.out.println(machineInfo.toString());
-        MachineData machineData = conn.getMachineData();
-        System.out.println(machineData.toString());
 
         // BmsData bmsData = conn.getBmsData();
         // System.out.println(bmsData.toString());
 
-        // conn.powerOn();
         // conn.discharge(0);
-        // conn.charge(100);
+        conn.charge(100);
+        System.out.println(conn.getMachineData().toString().replaceAll(",", "\n"));
     }
 }

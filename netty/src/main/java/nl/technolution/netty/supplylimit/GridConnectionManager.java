@@ -35,6 +35,7 @@ public class GridConnectionManager implements IGridCapacityManager {
     @Override
     public void init(NettyConfig config) {
         defaultGridConnectionLimit = config.getDefaultGridConnectionLimit();
+        config.getDeviceLimits().forEach((k, v) -> griConnectionLimitRegister.put(new DeviceId(k), v));
     }
 
     @Override
