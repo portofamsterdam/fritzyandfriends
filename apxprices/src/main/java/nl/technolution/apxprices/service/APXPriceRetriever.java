@@ -17,34 +17,26 @@
 package nl.technolution.apxprices.service;
 
 import java.time.Instant;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
-import nl.technolution.TimedTaskService;
+import nl.technolution.Services;
 import nl.technolution.apxprices.client.ITransparencyPlatformClient;
 import nl.technolution.apxprices.client.PublicationMarketDocument;
+import nl.technolution.dropwizard.tasks.TimedTask;
 
 /**
  * 
  */
-public final class APXPriceRetriever extends TimedTaskService {
-    private ITransparencyPlatformClient client;
+@TimedTask(period = 15, unit = TimeUnit.MINUTES)
+public final class APXPriceRetriever implements Runnable {
     private PublicationMarketDocument cachedPrices;
-
-    public APXPriceRetriever(ITransparencyPlatformClient client) {
-        this.client = client;
-    }
-
-    @Override
-    public void init(ScheduledExecutorService executor) {
-        executor.scheduleAtFixedRate(this::updatePrices, 0, 15, TimeUnit.MINUTES);
-    }
-
-    private void updatePrices() {
-        cachedPrices = client.getDayAheadPrices(Instant.now());
-    }
 
     public PublicationMarketDocument getCachedPrices() {
         return cachedPrices;
+    }
+
+    @Override
+    public void run() {
+        cachedPrices = Services.get(ITransparencyPlatformClient.class).getDayAheadPrices(Instant.now());
     }
 }

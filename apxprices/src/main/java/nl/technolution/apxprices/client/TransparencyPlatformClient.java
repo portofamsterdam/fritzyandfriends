@@ -43,9 +43,6 @@ public class TransparencyPlatformClient implements ITransparencyPlatformClient {
     private APXPricesConfig config;
     private PublicationMarketDocument cachedPrices = null;
 
-    public TransparencyPlatformClient(APXPricesConfig config) {
-        this.config = config;
-    }
 
     @Override
     public PublicationMarketDocument getDayAheadPrices(Instant requestedDateTime) {
@@ -66,5 +63,10 @@ public class TransparencyPlatformClient implements ITransparencyPlatformClient {
         LOG.debug("received XML:" + output);
         cachedPrices = response.readEntity(PublicationMarketDocument.class);
         return cachedPrices;
+    }
+
+    @Override
+    public void init(APXPricesConfig config) {
+        this.config = config;
     }
 }

@@ -24,6 +24,14 @@ dependencies {
     technoJaxb libraries.jaxb_impl    
 }
 
+sourceSets {
+    main {
+        java {
+            srcDirs 'src/tools/java'
+        }
+    }
+}
+
 // Run the generate tasks before compiling and creating eclipse classpath
 // eclipseClasspath.dependsOn(generateEfiLib)
 compileJava.dependsOn(generateIec62325Lib)

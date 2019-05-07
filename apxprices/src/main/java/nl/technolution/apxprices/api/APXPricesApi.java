@@ -28,12 +28,11 @@ import com.codahale.metrics.annotation.Timed;
 
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
+import io.dropwizard.jersey.params.InstantParam;
 import nl.technolution.Services;
 import nl.technolution.apxprices.service.APXPricesService;
 import nl.technolution.apxprices.service.IAPXPricesService;
-import nl.technolution.dropwizard.IEndpoint;
-
-import io.dropwizard.jersey.params.InstantParam;
+import nl.technolution.dropwizard.webservice.IEndpoint;
 
 /**
  * 

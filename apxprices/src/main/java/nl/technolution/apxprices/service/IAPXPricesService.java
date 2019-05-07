@@ -20,7 +20,7 @@ import java.time.Instant;
 
 import nl.technolution.apxprices.app.APXPricesConfig;
 import nl.technolution.apxprices.service.APXPricesService.NoPricesAvailableException;
-import nl.technolution.dropwizard.IService;
+import nl.technolution.dropwizard.services.IService;
 
 /**
  * Defines TransparencyPlatformClient interface

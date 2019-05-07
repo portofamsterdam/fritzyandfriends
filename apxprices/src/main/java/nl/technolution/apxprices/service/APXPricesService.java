@@ -27,15 +27,15 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 
+import eu.entsoe.wgedi.codelists.StandardUnitOfMeasureTypeList;
+import nl.technolution.Services;
 import nl.technolution.apxprices.app.APXPricesConfig;
+import nl.technolution.apxprices.client.ITransparencyPlatformClient;
 import nl.technolution.apxprices.client.Point;
 import nl.technolution.apxprices.client.PublicationMarketDocument;
 import nl.technolution.apxprices.client.SeriesPeriod;
 import nl.technolution.apxprices.client.TimeSeries;
-import nl.technolution.apxprices.client.TransparencyPlatformClient;
 import nl.technolution.core.Log;
-
-import eu.entsoe.wgedi.codelists.StandardUnitOfMeasureTypeList;
 
 /**
  * APXPricesService
@@ -45,7 +45,6 @@ public class APXPricesService implements IAPXPricesService {
     private static final DateTimeFormatter DATE_TIME_PARSER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'")
             .withZone(ZoneId.of("UTC"));
     private APXPriceRetriever apxPriceRetriever;
-    private TransparencyPlatformClient client;
     private Map<Integer, Double> fixedPrices;
     private boolean useFixedPrices;
 
@@ -62,8 +61,7 @@ public class APXPricesService implements IAPXPricesService {
 
     @Override
     public void init(APXPricesConfig config) {
-        client = new TransparencyPlatformClient(config);
-        apxPriceRetriever = new APXPriceRetriever(client);
+        apxPriceRetriever = new APXPriceRetriever();
         fixedPrices = config.getFixedPrices();
         useFixedPrices = config.isUseFixedPrices();
     }
@@ -85,7 +83,8 @@ public class APXPricesService implements IAPXPricesService {
         if (useFixedPrices) {
             return getFixedPrice(requestedDateTime);
         }
-        return getSinglePrice(requestedDateTime, client.getDayAheadPrices(requestedDateTime));
+        ITransparencyPlatformClient transparencyPlatformClient = Services.get(ITransparencyPlatformClient.class);
+        return getSinglePrice(requestedDateTime, transparencyPlatformClient.getDayAheadPrices(requestedDateTime));
     }
 
     private double getFixedPrice(Instant requestedDateTime) {
