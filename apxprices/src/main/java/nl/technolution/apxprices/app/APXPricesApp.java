@@ -14,28 +14,22 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.dropwizard;
+package nl.technolution.apxprices.app;
 
-import io.dropwizard.Application;
-import io.dropwizard.Configuration;
-import io.dropwizard.setup.Environment;
-import nl.technolution.dropwizard.services.ServiceFinder;
-import nl.technolution.dropwizard.tasks.TimedTaskService;
-import nl.technolution.dropwizard.webservice.WebserviceFinder;
+import nl.technolution.dropwizard.FritzyDropWizardApp;
 
 /**
- * Basic app for Fritzy applications
- * 
- * @param <T> Dropwizard Configuration Type
+ * Application that makes APX prices available.
  */
-public class FritzyDropWizardApp<T extends Configuration> extends Application<T> {
+public final class APXPricesApp extends FritzyDropWizardApp<APXPricesConfig> {
 
-    public static final String PKG = "nl.technolution";
-
-    @Override
-    public void run(T configuration, Environment environment) throws Exception {
-        ServiceFinder.setupServices(configuration);
-        WebserviceFinder.setupWebservices(environment);
-        environment.lifecycle().manage(new TimedTaskService());
+    /**
+     * Run app
+     * 
+     * @param args passed by CLI
+     * @throws Exception
+     */
+    public static void main(String[] args) throws Exception {
+        new APXPricesApp().run(args);
     }
 }

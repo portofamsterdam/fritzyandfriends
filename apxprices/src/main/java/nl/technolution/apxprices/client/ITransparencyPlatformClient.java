@@ -14,28 +14,22 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.dropwizard;
+package nl.technolution.apxprices.client;
 
-import io.dropwizard.Application;
-import io.dropwizard.Configuration;
-import io.dropwizard.setup.Environment;
-import nl.technolution.dropwizard.services.ServiceFinder;
-import nl.technolution.dropwizard.tasks.TimedTaskService;
-import nl.technolution.dropwizard.webservice.WebserviceFinder;
+import java.time.Instant;
+
+import nl.technolution.apxprices.app.APXPricesConfig;
+import nl.technolution.dropwizard.services.IService;
 
 /**
- * Basic app for Fritzy applications
- * 
- * @param <T> Dropwizard Configuration Type
+ * Defines TransparencyPlatformClient interface
  */
-public class FritzyDropWizardApp<T extends Configuration> extends Application<T> {
+public interface ITransparencyPlatformClient extends IService<APXPricesConfig> {
 
-    public static final String PKG = "nl.technolution";
-
-    @Override
-    public void run(T configuration, Environment environment) throws Exception {
-        ServiceFinder.setupServices(configuration);
-        WebserviceFinder.setupWebservices(environment);
-        environment.lifecycle().manage(new TimedTaskService());
-    }
+    /**
+     * Get day ahead prices for next 24 hours
+     * 
+     * @return
+     */
+    PublicationMarketDocument getDayAheadPrices(Instant requestedDateTime);
 }

@@ -14,28 +14,29 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.dropwizard;
+package nl.technolution.apxprices.service;
 
-import io.dropwizard.Application;
-import io.dropwizard.Configuration;
-import io.dropwizard.setup.Environment;
-import nl.technolution.dropwizard.services.ServiceFinder;
-import nl.technolution.dropwizard.tasks.TimedTaskService;
-import nl.technolution.dropwizard.webservice.WebserviceFinder;
+import java.time.Instant;
+import java.util.concurrent.TimeUnit;
+
+import nl.technolution.Services;
+import nl.technolution.apxprices.client.ITransparencyPlatformClient;
+import nl.technolution.apxprices.client.PublicationMarketDocument;
+import nl.technolution.dropwizard.tasks.TimedTask;
 
 /**
- * Basic app for Fritzy applications
  * 
- * @param <T> Dropwizard Configuration Type
  */
-public class FritzyDropWizardApp<T extends Configuration> extends Application<T> {
+@TimedTask(period = 15, unit = TimeUnit.MINUTES)
+public final class APXPriceRetriever implements Runnable {
+    private PublicationMarketDocument cachedPrices;
 
-    public static final String PKG = "nl.technolution";
+    public PublicationMarketDocument getCachedPrices() {
+        return cachedPrices;
+    }
 
     @Override
-    public void run(T configuration, Environment environment) throws Exception {
-        ServiceFinder.setupServices(configuration);
-        WebserviceFinder.setupWebservices(environment);
-        environment.lifecycle().manage(new TimedTaskService());
+    public void run() {
+        cachedPrices = Services.get(ITransparencyPlatformClient.class).getDayAheadPrices(Instant.now());
     }
 }
