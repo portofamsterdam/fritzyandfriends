@@ -17,7 +17,7 @@
 package nl.technolution.netty.supplylimit;
 
 import nl.technolution.DeviceId;
-import nl.technolution.dropwizard.IService;
+import nl.technolution.dropwizard.services.IService;
 import nl.technolution.netty.app.NettyConfig;
 
 /**

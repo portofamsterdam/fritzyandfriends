@@ -26,7 +26,7 @@ import com.codahale.metrics.annotation.Timed;
 
 import nl.technolution.DeviceId;
 import nl.technolution.Services;
-import nl.technolution.dropwizard.IEndpoint;
+import nl.technolution.dropwizard.webservice.IEndpoint;
 import nl.technolution.netty.supplylimit.IGridCapacityManager;
 
 /**

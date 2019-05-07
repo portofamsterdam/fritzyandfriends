@@ -16,7 +16,7 @@
  */
 package nl.technolution.fritzy.io;
 
-import nl.technolution.dropwizard.IService;
+import nl.technolution.dropwizard.services.IService;
 import nl.technolution.fritzy.app.FritzyConfig;
 import nl.technolution.fritzy.io.tempsensor.TemperatureSensor;
 import nl.technolution.fritzy.io.webrelay.WebRelay;

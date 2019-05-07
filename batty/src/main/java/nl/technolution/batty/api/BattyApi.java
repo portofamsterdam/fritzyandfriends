@@ -27,7 +27,7 @@ import nl.technolution.Services;
 import nl.technolution.batty.xstorage.IXStorageConnection;
 import nl.technolution.batty.xstorage.IXStorageFactory;
 import nl.technolution.batty.xstorage.XStorageException;
-import nl.technolution.dropwizard.IEndpoint;
+import nl.technolution.dropwizard.webservice.IEndpoint;
 
 /**
  * 
