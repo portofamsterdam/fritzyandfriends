@@ -14,9 +14,8 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution;
+package nl.technolution.dropwizard.services;
 
-import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.MutableClassToInstanceMap;
 
 /**
@@ -33,7 +32,7 @@ public final class Services {
     /**
      * Clears all registered services.
      */
-    public static void clearCache() {
+    static void clearCache() {
         SERVICES.clear();
     }
 
@@ -45,7 +44,6 @@ public final class Services {
      * @param service the service
      * 
      */
-    @VisibleForTesting
     public static <T> void put(Class<T> serviceClass, T service) {
         SERVICES.putInstance(serviceClass, service);
     }

@@ -32,6 +32,7 @@ import io.dropwizard.lifecycle.Managed;
 import nl.technolution.Log;
 import nl.technolution.core.resources.TypeFinder;
 import nl.technolution.dropwizard.FritzyDropWizardApp;
+import nl.technolution.dropwizard.services.Services;
 
 /**
  * Manages task with @Timed annotation
@@ -43,21 +44,41 @@ public final class TimedTaskService implements Managed {
     private ScheduledExecutorService executor;
 
     @Override
+    @SuppressWarnings({ "unchecked", "rawtypes" })
     public void start() throws Exception {
         Preconditions.checkArgument(executor == null || executor.isTerminated());
         executor = Executors.newSingleThreadScheduledExecutor();
 
-        List<Class<? extends TimedTask>> tasks = TypeFinder
+        List<Class<? extends TimedTask>> timeTaskAnnotationClasses = TypeFinder
                 .findImplementingClasses(FritzyDropWizardApp.PKG, TimedTask.class);
         
-        for (Class<? extends TimedTask> taskClass : tasks) {
-            TimedTask task = taskClass.getAnnotation(TimedTask.class);
-            ChronoUnit unit = convert(task.unit());
+        for (Class<? extends TimedTask> timedTaskAnnotatedClass : timeTaskAnnotationClasses) {
+            // Create parameter to run scheduled task
+            TimedTask timedTaskAnnotation = timedTaskAnnotatedClass.getAnnotation(TimedTask.class);
+            ChronoUnit unit = convert(timedTaskAnnotation.unit());
             long delay = Instant.now().until(LocalDateTime.now().truncatedTo(unit).plus(1, unit), ChronoUnit.SECONDS);
-            Preconditions.checkArgument(Runnable.class.isAssignableFrom(taskClass));
-            Runnable runner = Runnable.class.cast(taskClass.newInstance());
-            executor.scheduleAtFixedRate(runner, delay, task.period() * unit.getDuration().getSeconds(),
-                    TimeUnit.SECONDS);
+            long periodSec = timedTaskAnnotation.period() * unit.getDuration().getSeconds();
+
+            // Build a runnable
+            Preconditions.checkArgument(ITask.class.isAssignableFrom(timedTaskAnnotatedClass));
+
+            // Find the implementation of ITask to run and register
+            Class taskInterface = null;
+            for (Class<?> interfaceClazz : timedTaskAnnotatedClass.getInterfaces()) {
+                if (ITask.class.isAssignableFrom(interfaceClazz)) {
+                    taskInterface = interfaceClazz;
+                    break;
+                }
+            }
+            Preconditions.checkNotNull(taskInterface, "TimedTask does not implement ITask");
+
+            // Build an instance to run in scheduler
+            Class<ITask> typedClazz = (Class<ITask>)timedTaskAnnotatedClass;
+            ITask task = typedClazz.newInstance();
+            executor.scheduleAtFixedRate(() -> task.execute(), delay, periodSec, TimeUnit.SECONDS);
+
+            // Register tasks in Service
+            Services.put(taskInterface, taskInterface.cast(task));
         }
     }
 

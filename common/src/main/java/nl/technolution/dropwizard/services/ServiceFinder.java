@@ -24,7 +24,6 @@ import org.slf4j.Logger;
 
 import io.dropwizard.Configuration;
 import nl.technolution.Log;
-import nl.technolution.Services;
 import nl.technolution.core.resources.TypeFinder;
 import nl.technolution.dropwizard.FritzyDropWizardApp;
 
@@ -61,6 +60,7 @@ public final class ServiceFinder {
                 for (Class<?> interfaceClazz : clazz.getInterfaces()) {
                     if (IService.class.isAssignableFrom(interfaceClazz)) {
                         serviceInterface = interfaceClazz;
+                        break;
                     }
                 }
                 Preconditions.checkNotNull(serviceInterface);
