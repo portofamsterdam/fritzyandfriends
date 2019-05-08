@@ -73,7 +73,7 @@ public final class TimedTaskService implements Managed {
             Preconditions.checkNotNull(taskInterface, "TimedTask does not implement ITask");
 
             // Build an instance to run in scheduler
-            Class<ITask> typedClazz = (Class<ITask>)timedTaskAnnotatedClass;
+            Class<? extends ITask> typedClazz = (Class<? extends ITask>)timedTaskAnnotatedClass;
             ITask task = typedClazz.newInstance();
             executor.scheduleAtFixedRate(() -> task.execute(), delay, periodSec, TimeUnit.SECONDS);
 
