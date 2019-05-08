@@ -21,12 +21,12 @@ import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.technolution.Services;
 import nl.technolution.apxprices.app.APXPricesConfig;
 import nl.technolution.apxprices.service.APXPricesService;
 import nl.technolution.apxprices.service.APXPricesService.NoPricesAvailableException;
 import nl.technolution.apxprices.service.IAPXPricesService;
 import nl.technolution.dropwizard.services.ServiceFinder;
+import nl.technolution.dropwizard.services.Services;
 
 /**
  * Tests for APXPriceService

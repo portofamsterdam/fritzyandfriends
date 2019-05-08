@@ -25,7 +25,7 @@ import javax.ws.rs.core.MediaType;
 
 import com.codahale.metrics.annotation.Timed;
 
-import nl.technolution.Services;
+import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.webservice.IEndpoint;
 import nl.technolution.fritzy.io.IFritzyController;
 

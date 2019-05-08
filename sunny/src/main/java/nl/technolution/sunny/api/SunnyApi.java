@@ -42,6 +42,6 @@ public class SunnyApi implements IEndpoint {
     @Path("state")
     @Produces(MediaType.APPLICATION_JSON)
     public SunnyState getState() {
-        return null;
+        return new SunnyState(1500d);
     }
 }

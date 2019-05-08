@@ -28,7 +28,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 
 import eu.entsoe.wgedi.codelists.StandardUnitOfMeasureTypeList;
-import nl.technolution.Services;
 import nl.technolution.apxprices.app.APXPricesConfig;
 import nl.technolution.apxprices.client.ITransparencyPlatformClient;
 import nl.technolution.apxprices.client.Point;
@@ -36,6 +35,7 @@ import nl.technolution.apxprices.client.PublicationMarketDocument;
 import nl.technolution.apxprices.client.SeriesPeriod;
 import nl.technolution.apxprices.client.TimeSeries;
 import nl.technolution.core.Log;
+import nl.technolution.dropwizard.services.Services;
 
 /**
  * APXPricesService
@@ -44,7 +44,6 @@ public class APXPricesService implements IAPXPricesService {
     private static final Logger LOG = Log.getLogger();
     private static final DateTimeFormatter DATE_TIME_PARSER = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'")
             .withZone(ZoneId.of("UTC"));
-    private APXPriceRetriever apxPriceRetriever;
     private Map<Integer, Double> fixedPrices;
     private boolean useFixedPrices;
 
@@ -61,7 +60,6 @@ public class APXPricesService implements IAPXPricesService {
 
     @Override
     public void init(APXPricesConfig config) {
-        apxPriceRetriever = new APXPriceRetriever();
         fixedPrices = config.getFixedPrices();
         useFixedPrices = config.isUseFixedPrices();
     }
@@ -71,8 +69,9 @@ public class APXPricesService implements IAPXPricesService {
         if (useFixedPrices) {
             return getFixedPrice(Instant.now());
         }
-        PublicationMarketDocument cachedPrices = apxPriceRetriever.getCachedPrices();
-        if (apxPriceRetriever.getCachedPrices() == null) {
+        IPriceReceiver priceReceiver = Services.get(IPriceReceiver.class);
+        PublicationMarketDocument cachedPrices = priceReceiver.getCachedPrices();
+        if (cachedPrices == null) {
             throw new NoPricesAvailableException("No prices available yet.");
         }
         return getSinglePrice(Instant.now(), cachedPrices);

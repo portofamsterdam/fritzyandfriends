@@ -41,11 +41,18 @@ public class TransparencyPlatformClient implements ITransparencyPlatformClient {
 
     private Client client = JerseyClientBuilder.newClient();
     private APXPricesConfig config;
-    private PublicationMarketDocument cachedPrices = null;
 
+    @Override
+    public void init(APXPricesConfig config) {
+        this.config = config;
+    }
 
     @Override
     public PublicationMarketDocument getDayAheadPrices(Instant requestedDateTime) {
+        // NOTE MKE: the returned data isn't accessed if fixed prices are used. dirty fix to prevent getting data anyway
+        if (config.isUseFixedPrices()) {
+            return null;
+        }
         // Request time should be whole hours, otherwise server gives code 999 'Delivered time interval is not valid for
         // this Data item.'
         Instant start = requestedDateTime.truncatedTo(ChronoUnit.HOURS);
@@ -61,12 +68,6 @@ public class TransparencyPlatformClient implements ITransparencyPlatformClient {
         response.bufferEntity();
         String output = response.readEntity(String.class);
         LOG.debug("received XML:" + output);
-        cachedPrices = response.readEntity(PublicationMarketDocument.class);
-        return cachedPrices;
-    }
-
-    @Override
-    public void init(APXPricesConfig config) {
-        this.config = config;
+        return response.readEntity(PublicationMarketDocument.class);
     }
 }

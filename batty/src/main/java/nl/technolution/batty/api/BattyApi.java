@@ -23,10 +23,10 @@ import javax.ws.rs.core.MediaType;
 
 import com.codahale.metrics.annotation.Timed;
 
-import nl.technolution.Services;
 import nl.technolution.batty.xstorage.IXStorageConnection;
 import nl.technolution.batty.xstorage.IXStorageFactory;
 import nl.technolution.batty.xstorage.XStorageException;
+import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.webservice.IEndpoint;
 
 /**
