@@ -14,31 +14,18 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.fritzy.webrelay;
+package nl.technolution.fritzy.io.tempsensor;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.junit.Test;
-
-import nl.technolution.fritzy.app.FritzyConfig;
-import nl.technolution.market.MarketConfig;
+import java.time.LocalDateTime;
 
 /**
- * 
+ * from 0 to 7 deg depending on hour of day
  */
-public class WebRelayConfigTest {
+public class TemparatureStub implements ITemperatureSensor {
 
-    /**
-     * Test if object can be written as String
-     * 
-     * @throws JsonProcessingException
-     */
-    @Test
-    public void testConfig() throws JsonProcessingException {
-        FritzyConfig obj = new FritzyConfig("Fritzy", "localhost", 80, "/dev/tty", false, false,
-                new MarketConfig("https://localhost"));
-        System.out.println(
-                new ObjectMapper().writeValueAsString(obj));
+    @Override
+    public double getTemparature() {
+        int temp = LocalDateTime.now().getHour() % 8;
+        return temp;
     }
 }

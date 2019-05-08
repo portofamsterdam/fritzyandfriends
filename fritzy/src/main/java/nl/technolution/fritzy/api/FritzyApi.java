@@ -27,7 +27,7 @@ import com.codahale.metrics.annotation.Timed;
 
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.webservice.IEndpoint;
-import nl.technolution.fritzy.io.IFritzyController;
+import nl.technolution.fritzy.io.IIoFactory;
 
 /**
  * 
@@ -46,8 +46,7 @@ public class FritzyApi implements IEndpoint {
     @Path("state")
     @Produces(MediaType.APPLICATION_JSON)
     public FritzyState getState() {
-        IFritzyController fritzy = Services.get(IFritzyController.class);
-        
+        IIoFactory fritzy = Services.get(IIoFactory.class);
         boolean isCooling;
         try {
             isCooling = fritzy.getWebRelay().getState().isRelaystate();
@@ -55,7 +54,7 @@ public class FritzyApi implements IEndpoint {
             isCooling = false;
         }
 
-        double temparature = fritzy.getTemperatureSensor().getTemparature();
+        double temparature = fritzy.getTemparatureSensor().getTemparature();
         return new FritzyState(isCooling, temparature);
     }
 }

@@ -14,29 +14,18 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.fritzy.io;
-
-import nl.technolution.dropwizard.services.IService;
-import nl.technolution.fritzy.app.FritzyConfig;
-import nl.technolution.fritzy.io.tempsensor.TemperatureSensor;
-import nl.technolution.fritzy.io.webrelay.WebRelay;
+package nl.technolution.fritzy.io.tempsensor;
 
 /**
- * Defines Fritzy object
+ * 
  */
-public interface IFritzyController extends IService<FritzyConfig> {
+public interface ITemperatureSensor {
 
     /**
-     * Get the webrelay of the fridge to start or end cooling
+     * Read temperature from sensor
      * 
-     * @return webrelay
+     * @return temperature in degree celcius
      */
-    WebRelay getWebRelay();
+    double getTemparature();
 
-    /**
-     * Get the temparature sensor of the fridge
-     * 
-     * @return temparature sensor
-     */
-    TemperatureSensor getTemperatureSensor();
 }
