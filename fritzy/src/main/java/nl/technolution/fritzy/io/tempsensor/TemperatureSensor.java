@@ -32,7 +32,7 @@ import gnu.io.UnsupportedCommOperationException;
 /**
  * Temperature sensor of Fritzy
  */
-public class TemperatureSensor {
+public class TemperatureSensor implements ITemperatureSensor {
 
     private static final int BAUD = 115200;
 
@@ -63,18 +63,6 @@ public class TemperatureSensor {
 
         String path = System.getProperty("java.library.path");
         System.out.println(path);
-        // System.out.println(new File("").getAbsolutePath());
-        //
-        // System.setProperty("java.library.path", path + ":src/main/resource/");
-        // String pth = System.getProperty("java.library.path");
-        // System.out.println(pth);
-        //
-        // File serial = new File("src/main/resource/rxtxSerial.dll");
-        // File parallel = new File("src/main/resource/rxtxParallel.dll");
-        // Preconditions.checkArgument(serial.exists() && parallel.exists());
-        // System.loadLibrary("RXTXcomm.jar");
-        // System.load(serial.getAbsolutePath());
-        // System.load(parallel.getAbsolutePath());
 
         CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(serialPort);
         commPort = (SerialPort)portIdentifier.open("Temparature", 2000);
@@ -118,6 +106,7 @@ public class TemperatureSensor {
         }
     }
 
+    @Override
     public double getTemparature() {
         return temparature;
     }

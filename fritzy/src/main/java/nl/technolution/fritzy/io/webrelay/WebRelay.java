@@ -25,11 +25,10 @@ import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 
 
-
 /**
  * Class representing relay device. Can read it's current state and set the relay to preffered state
  */
-public final class WebRelay {
+public final class WebRelay implements IWebRelay {
 
     private final InetAddress address;
     private final int port;
@@ -50,6 +49,7 @@ public final class WebRelay {
      * @return state information 
      * @throws IOException when device cannot be reached
      */
+    @Override
     public WebRelayState getState() throws IOException {
        return readResponse("GET /state.xml HTTP/1.1 \r\n\r\n");
     }

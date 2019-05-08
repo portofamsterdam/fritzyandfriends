@@ -27,34 +27,44 @@ import nl.technolution.market.MarketConfig;
  */
 public class FritzyConfig extends Configuration {
 
-    @JsonProperty("deviceId")
+    @JsonProperty
     private final String deviceId;
 
     /** host address of webrelay */
-    @JsonProperty("host")
+    @JsonProperty
     private final String host;
 
     /** Port of webrelay (default 80) */
-    @JsonProperty("port")
+    @JsonProperty
     private final int port;
 
     /** Port used to read temp sensor */
-    @JsonProperty("serialPort")
+    @JsonProperty
     private final String serialPort;
 
-    @JsonProperty("market")
+    @JsonProperty
+    private final boolean stubTemparature;
+
+    @JsonProperty
+    private final boolean stubRelay;
+
+    @JsonProperty
     private final MarketConfig market;
 
     @JsonCreator
-    public FritzyConfig(@JsonProperty("deviceId") String deviceId,
-            @JsonProperty("host") String host,
-            @JsonProperty("port") int port,
-            @JsonProperty("serialPort") String serialPort,
-            @JsonProperty("market") MarketConfig market) {
+    public FritzyConfig(@JsonProperty String deviceId,
+            @JsonProperty String host,
+            @JsonProperty int port,
+            @JsonProperty String serialPort,
+            @JsonProperty boolean stubTemparature,
+            @JsonProperty boolean stubRelay,
+            @JsonProperty MarketConfig market) {
         this.deviceId = deviceId;
         this.host = host;
         this.port = port;
         this.serialPort = serialPort;
+        this.stubTemparature = stubTemparature;
+        this.stubRelay = stubRelay;
         this.market = market;
     }
 
@@ -70,12 +80,20 @@ public class FritzyConfig extends Configuration {
         return port;
     }
 
-    public String getSerailPort() {
+    public MarketConfig getMarket() {
+        return market;
+    }
+
+    public String getSerialPort() {
         return serialPort;
     }
 
-    public MarketConfig getMarket() {
-        return market;
+    public boolean isStubTemparature() {
+        return stubTemparature;
+    }
+
+    public boolean isStubRelay() {
+        return stubRelay;
     }
 }
 

@@ -14,31 +14,29 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.fritzy.webrelay;
+package nl.technolution.fritzy.io;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.junit.Test;
-
+import nl.technolution.dropwizard.services.IService;
 import nl.technolution.fritzy.app.FritzyConfig;
-import nl.technolution.market.MarketConfig;
+import nl.technolution.fritzy.io.tempsensor.ITemperatureSensor;
+import nl.technolution.fritzy.io.webrelay.IWebRelay;
 
 /**
  * 
  */
-public class WebRelayConfigTest {
+public interface IIoFactory extends IService<FritzyConfig> {
 
     /**
-     * Test if object can be written as String
+     * Get temparature sensor
      * 
-     * @throws JsonProcessingException
+     * @return instance
      */
-    @Test
-    public void testConfig() throws JsonProcessingException {
-        FritzyConfig obj = new FritzyConfig("Fritzy", "localhost", 80, "/dev/tty", false, false,
-                new MarketConfig("https://localhost"));
-        System.out.println(
-                new ObjectMapper().writeValueAsString(obj));
-    }
+    ITemperatureSensor getTemparatureSensor();
+
+    /**
+     * Get webrelay to switch fridge
+     * 
+     * @return relay
+     */
+    IWebRelay getWebRelay();
 }
