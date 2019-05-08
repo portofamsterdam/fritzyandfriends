@@ -1,3 +1,4 @@
+apply plugin: 'application'
 apply plugin: 'techno-jaxb'
 
 // Convert iec62325-451-3-publication xsd to JAR
@@ -31,6 +32,8 @@ sourceSets {
         }
     }
 }
+
+mainClassName = 'nl.technolution.apxprices.app.APXPricesApp'
 
 // Run the generate tasks before compiling and creating eclipse classpath
 // eclipseClasspath.dependsOn(generateEfiLib)
