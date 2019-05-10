@@ -84,7 +84,7 @@ build_sunny:
     paths: 
       - docker/build/sunny/
       
-build_openapi_docs
+build_openapi_docs:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
   stage: create_images
   script: 
