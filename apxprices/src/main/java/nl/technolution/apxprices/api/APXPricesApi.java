@@ -50,10 +50,10 @@ public class APXPricesApi implements IEndpoint {
     @Timed
     @Path("currentPrice")
     @Produces(MediaType.TEXT_PLAIN)
-    public double getCurrentPrice() {
+    public ApxPrice getCurrentPrice() {
         IAPXPricesService priceService = Services.get(IAPXPricesService.class);
         try {
-            return priceService.getPricePerkWh();
+            return new ApxPrice(priceService.getPricePerkWh());
         } catch (APXPricesService.NoPricesAvailableException e) {
             throw new WebApplicationException(e.getMessage(), e);
         }
@@ -70,11 +70,11 @@ public class APXPricesApi implements IEndpoint {
     @Timed
     @Path("price")
     @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
-    public double getPrice(
+    public ApxPrice getPrice(
             @QueryParam(value = "dateTime") @NotNull @UnwrapValidatedValue InstantParam requestedDateTime) {
         IAPXPricesService priceService = Services.get(IAPXPricesService.class);
         try {
-            return priceService.getPricePerkWh(requestedDateTime.get());
+            return new ApxPrice(priceService.getPricePerkWh(requestedDateTime.get()));
         } catch (APXPricesService.NoPricesAvailableException e) {
             throw new WebApplicationException(e.getMessage(), e);
         }
