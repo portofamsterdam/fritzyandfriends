@@ -19,10 +19,12 @@ package nl.technolution.fritzy.api;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import nl.technolution.IJsonnable;
+
 /**
  * 
  */
-public class FritzyState {
+public class FritzyState implements IJsonnable {
 
     @JsonProperty("isCooling")
     private final boolean isCooling;

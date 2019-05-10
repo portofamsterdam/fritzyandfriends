@@ -14,9 +14,8 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.sunny.api;
+package nl.technolution.netty.api;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import nl.technolution.IJsonnable;
@@ -24,17 +23,12 @@ import nl.technolution.IJsonnable;
 /**
  * 
  */
-public class SunnyState implements IJsonnable {
+public class DeviceCapacity implements IJsonnable {
 
-    @JsonProperty("production")
-    private final double production;
+    @JsonProperty("gridConnectionLimit")
+    private final double gridConnectionLimit;
 
-    @JsonCreator
-    public SunnyState(@JsonProperty("production") double production) {
-        this.production = production;
-    }
-
-    public double getProduction() {
-        return production;
+    public DeviceCapacity(@JsonProperty("gridConnectionLimit") double gridConnectionLimit) {
+        this.gridConnectionLimit = gridConnectionLimit;
     }
 }

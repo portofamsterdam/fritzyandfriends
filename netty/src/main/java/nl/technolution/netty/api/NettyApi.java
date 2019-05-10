@@ -46,7 +46,8 @@ public class NettyApi implements IEndpoint {
     @Timed
     @Path("capacity")
     @Produces(MediaType.APPLICATION_JSON)
-    public double getCapacity(@QueryParam("deviceId") String deviceId) {
-        return Services.get(IGridCapacityManager.class).getGridConnectionLimit(new DeviceId(deviceId));
+    public DeviceCapacity getCapacity(@QueryParam("deviceId") String deviceId) {
+        DeviceId id = new DeviceId(deviceId);
+        return new DeviceCapacity(Services.get(IGridCapacityManager.class).getGridConnectionLimit(id));
     }
 }

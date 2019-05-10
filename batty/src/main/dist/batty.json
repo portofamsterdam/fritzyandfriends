@@ -3,7 +3,7 @@
     "host": "https://172.30.133.212/assets/inc/server.inc.php",
     "username": "batty",
     "password": "batty",
-    "truststore":"/opt/batty/truststore.jks",
+    "truststore":"src/main/dist/truststore.jks",
     "truststorepass":"12345678",
     "useStub": true,
     "market": {
