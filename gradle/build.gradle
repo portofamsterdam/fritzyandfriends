@@ -61,16 +61,21 @@ subprojects {
             resourcePackages = ['nl.technolution']
             outputPath = new java.io.File(project.buildDir, "/api")
         }
+        task copyApiDocs(type: Copy) {
+            from(new java.io.File(project.buildDir, "/api")) {
+                include '*'
+            }
+            into new java.io.File(project(":docker").buildDir, "/api/" + project.name)
+        }
+        copyApiDocs.dependsOn resolve
         
-        def jarName = project.name + '-app'
-        
+        def jarName = project.name + '-app'   
         shadowJar {
             baseName = "${jarName}"
             classifier = null
             version = null
             mergeServiceFiles()
         }
-        
         task copyArtifactsToDocker(type: Copy) {
             from (new java.io.File(project.buildDir, "/libs")) {
                 include "${jarName}.jar"
