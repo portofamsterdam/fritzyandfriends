@@ -34,4 +34,8 @@ public class ApxPrice implements IJsonnable {
     public ApxPrice(@JsonProperty("price") double price)    {
         this.price = price;
     }
+
+    public double getPrice() {
+        return price;
+    }
 }
