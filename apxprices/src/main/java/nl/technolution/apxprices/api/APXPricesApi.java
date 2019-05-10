@@ -49,7 +49,7 @@ public class APXPricesApi implements IEndpoint {
     @GET
     @Timed
     @Path("currentPrice")
-    @Produces(MediaType.TEXT_PLAIN)
+    @Produces(MediaType.APPLICATION_JSON)
     public ApxPrice getCurrentPrice() {
         IAPXPricesService priceService = Services.get(IAPXPricesService.class);
         try {
@@ -69,7 +69,7 @@ public class APXPricesApi implements IEndpoint {
     @GET
     @Timed
     @Path("price")
-    @Produces({ MediaType.TEXT_PLAIN, MediaType.APPLICATION_JSON })
+    @Produces(MediaType.APPLICATION_JSON)
     public ApxPrice getPrice(
             @QueryParam(value = "dateTime") @NotNull @UnwrapValidatedValue InstantParam requestedDateTime) {
         IAPXPricesService priceService = Services.get(IAPXPricesService.class);
