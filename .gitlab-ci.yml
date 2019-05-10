@@ -94,6 +94,18 @@ create_images:
     - cd docker/build/fritzy
     - docker build -t fritzy2/fritzy:fritzy .
     - docker push fritzy2/fritzy:fritzy
+    - cd ../batty
+    - docker build -t fritzy2/fritzy:batty .
+    - docker push fritzy2/fritzy:batty
+    - cd ../netty
+    - docker build -t fritzy2/fritzy:netty .
+    - docker push fritzy2/fritzy:netty
+    - cd ../sunny
+    - docker build -t fritzy2/fritzy:sunny .
+    - docker push fritzy2/fritzy:sunny
+    - cd ../sapxprices
+    - docker build -t fritzy2/fritzy:apxprices .
+    - docker push fritzy2/fritzy:apxprices
   only:
     - /^release\/.*$/
 
