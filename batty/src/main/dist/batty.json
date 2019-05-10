@@ -5,7 +5,7 @@
     "password": "batty",
     "truststore":"/opt/batty/truststore.jks",
     "truststorepass":"12345678",
-    "useStub": false,
+    "useStub": true,
     "market": {
         "marketUrl": "https://localhost"   
     }
