@@ -27,38 +27,38 @@ import nl.technolution.market.MarketConfig;
  */
 public class FritzyConfig extends Configuration {
 
-    @JsonProperty
+    @JsonProperty("deviceId")
     private final String deviceId;
 
     /** host address of webrelay */
-    @JsonProperty
+    @JsonProperty("host")
     private final String host;
 
     /** Port of webrelay (default 80) */
-    @JsonProperty
+    @JsonProperty("port")
     private final int port;
 
     /** Port used to read temp sensor */
-    @JsonProperty
+    @JsonProperty("serialPort")
     private final String serialPort;
 
-    @JsonProperty
+    @JsonProperty("stubTemparature")
     private final boolean stubTemparature;
 
-    @JsonProperty
+    @JsonProperty("stubRelay")
     private final boolean stubRelay;
 
-    @JsonProperty
+    @JsonProperty("market")
     private final MarketConfig market;
 
     @JsonCreator
-    public FritzyConfig(@JsonProperty String deviceId,
-            @JsonProperty String host,
-            @JsonProperty int port,
-            @JsonProperty String serialPort,
-            @JsonProperty boolean stubTemparature,
-            @JsonProperty boolean stubRelay,
-            @JsonProperty MarketConfig market) {
+    public FritzyConfig(@JsonProperty("deviceId") String deviceId,
+            @JsonProperty("host") String host,
+            @JsonProperty("port") int port,
+            @JsonProperty("serialPort") String serialPort,
+            @JsonProperty("stubTemparature") boolean stubTemparature,
+            @JsonProperty("stubRelay") boolean stubRelay,
+            @JsonProperty("market") MarketConfig market) {
         this.deviceId = deviceId;
         this.host = host;
         this.port = port;
