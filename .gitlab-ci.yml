@@ -99,14 +99,13 @@ build_apxprices:
   artifacts:
     paths: 
       - docker/build/apxprices/
-      
 
-build_openapi_docs:
+create_openapi_docs:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
   stage: create_images
   script: 
     - cd gradle
-    - gradle :copyApiDocs
+    - gradle copyApiDocs
   artifacts:
     paths:
       - docker/build/api/
