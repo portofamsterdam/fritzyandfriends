@@ -19,10 +19,12 @@ package nl.technolution.batty.api;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import nl.technolution.IJsonnable;
+
 /**
  * 
  */
-public class BattyState {
+public class BattyState implements IJsonnable {
 
     @JsonProperty("batteryState")
     private final String batteryState;
