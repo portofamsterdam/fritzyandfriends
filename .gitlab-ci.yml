@@ -84,6 +84,23 @@ build_sunny:
     paths: 
       - docker/build/sunny/
       
+build_apxprices:
+  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
+  stage: build
+  script: 
+    - cd gradle
+    - gradle :apxprices:build :apxprices:copyArtifactsToDocker
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    paths:
+      - build/
+      - .gradle
+      - docker/build/apxprices/
+  artifacts:
+    paths: 
+      - docker/build/apxprices/
+      
+
 build_openapi_docs:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
   stage: create_images
