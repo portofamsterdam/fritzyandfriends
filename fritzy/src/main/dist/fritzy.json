@@ -3,6 +3,8 @@
     "host": "172.16.192.17",
     "port": 80,
     "serialPort": "/dev/ttyS3",
+    "stubTemparature": true,
+    "stubRelay": true,
     "market": { "marketUrl": "https://localhost:8080/test" }
     
 }
