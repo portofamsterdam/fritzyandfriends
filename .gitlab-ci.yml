@@ -90,24 +90,10 @@ create_images:
   stage: create_images
   script:
     # build and push consumer
+    - docker login -u fritzy2 -p 1upTNLP04
     - cd docker/build/fritzy
-    - docker build -t fritzy2.0/fritzy .
-    - docker save fritzy2.0/fritzy | gzip > fritzy.tar.gz
-    - cd ../batty
-    - docker build -t fritzy2.0/batty .
-    - docker save fritzy2.0/batty | gzip >  batty.tar.gz
-    - cd ../netty
-    - docker build -t fritzy2.0/netty .
-    - docker save fritzy2.0/netty | gzip >  netty.tar.gz
-    - cd ../sunny
-    - docker build -t fritzy2.0/sunny .
-    - docker save fritzy2.0/sunny | gzip >  sunny.tar.gz
-  artifacts:
-    paths:
-      - docker/build/fritzy/fritzy.tar.gz
-      - docker/build/batty/batty.tar.gz
-      - docker/build/netty/netty.tar.gz
-      - docker/build/sunny/sunny.tar.gz
+    - docker build -t fritzy2/fritzy:fritzy .
+    - docker push fritzy2/fritzy:fritzy
   only:
     - /^release\/.*$/
 
