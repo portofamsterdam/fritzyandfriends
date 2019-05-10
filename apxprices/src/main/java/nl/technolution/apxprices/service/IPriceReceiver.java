@@ -17,12 +17,12 @@
 package nl.technolution.apxprices.service;
 
 import nl.technolution.apxprices.client.PublicationMarketDocument;
-import nl.technolution.dropwizard.tasks.ITask;
+import nl.technolution.dropwizard.tasks.ITaskRunner;
 
 /**
  * 
  */
-public interface IPriceReceiver extends ITask {
+public interface IPriceReceiver extends ITaskRunner {
 
     /**
      * Service method to retrieve result of task
