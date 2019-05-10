@@ -25,6 +25,7 @@ import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Response;
 
+import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.slf4j.Logger;
 
@@ -45,6 +46,8 @@ public class TransparencyPlatformClient implements ITransparencyPlatformClient {
     @Override
     public void init(APXPricesConfig config) {
         this.config = config;
+        client.property(ClientProperties.CONNECT_TIMEOUT, 30000);
+        client.property(ClientProperties.READ_TIMEOUT, 30000);
     }
 
     @Override

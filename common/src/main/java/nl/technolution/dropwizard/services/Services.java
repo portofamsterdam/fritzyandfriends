@@ -18,10 +18,16 @@ package nl.technolution.dropwizard.services;
 
 import com.google.common.collect.MutableClassToInstanceMap;
 
+import org.slf4j.Logger;
+
+import nl.technolution.Log;
+
 /**
  * Helps locating services without having any context.
  */
 public final class Services {
+
+    private static final Logger LOG = Log.getLogger();
 
     private static final MutableClassToInstanceMap<Object> SERVICES = MutableClassToInstanceMap.create();
 
@@ -46,6 +52,7 @@ public final class Services {
      */
     public static <T> void put(Class<T> serviceClass, T service) {
         SERVICES.putInstance(serviceClass, service);
+        LOG.debug("Registered {} as Service {}", service.getClass().getSimpleName(), serviceClass.getSimpleName());
     }
 
     /**
