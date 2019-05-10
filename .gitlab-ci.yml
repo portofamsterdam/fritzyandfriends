@@ -103,7 +103,7 @@ create_images:
     - cd ../sunny
     - docker build -t fritzy2/fritzy:sunny .
     - docker push fritzy2/fritzy:sunny
-    - cd ../sapxprices
+    - cd ../apxprices
     - docker build -t fritzy2/fritzy:apxprices .
     - docker push fritzy2/fritzy:apxprices
   only:
