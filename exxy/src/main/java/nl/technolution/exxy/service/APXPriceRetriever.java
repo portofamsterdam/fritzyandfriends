@@ -19,10 +19,10 @@ package nl.technolution.exxy.service;
 import java.time.Instant;
 import java.util.concurrent.TimeUnit;
 
-import nl.technolution.apxprices.client.PublicationMarketDocument;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.tasks.TimedTask;
 import nl.technolution.exxy.client.ITransparencyPlatformClient;
+import nl.technolution.exxy.client.PublicationMarketDocument;
 
 /**
  * 

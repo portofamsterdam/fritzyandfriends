@@ -28,14 +28,14 @@ import java.util.Map;
 import org.slf4j.Logger;
 
 import eu.entsoe.wgedi.codelists.StandardUnitOfMeasureTypeList;
-import nl.technolution.apxprices.client.Point;
-import nl.technolution.apxprices.client.PublicationMarketDocument;
-import nl.technolution.apxprices.client.SeriesPeriod;
-import nl.technolution.apxprices.client.TimeSeries;
 import nl.technolution.core.Log;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.exxy.app.ExxyConfig;
 import nl.technolution.exxy.client.ITransparencyPlatformClient;
+import nl.technolution.exxy.client.Point;
+import nl.technolution.exxy.client.PublicationMarketDocument;
+import nl.technolution.exxy.client.SeriesPeriod;
+import nl.technolution.exxy.client.TimeSeries;
 
 /**
  * APXPricesService

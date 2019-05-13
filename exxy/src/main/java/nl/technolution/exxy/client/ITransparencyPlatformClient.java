@@ -18,7 +18,6 @@ package nl.technolution.exxy.client;
 
 import java.time.Instant;
 
-import nl.technolution.apxprices.client.PublicationMarketDocument;
 import nl.technolution.dropwizard.services.IService;
 import nl.technolution.exxy.app.ExxyConfig;
 

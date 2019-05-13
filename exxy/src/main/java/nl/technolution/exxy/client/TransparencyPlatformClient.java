@@ -29,7 +29,6 @@ import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.slf4j.Logger;
 
-import nl.technolution.apxprices.client.PublicationMarketDocument;
 import nl.technolution.core.Log;
 import nl.technolution.exxy.app.ExxyConfig;
 

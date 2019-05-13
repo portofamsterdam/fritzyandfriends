@@ -16,8 +16,8 @@
  */
 package nl.technolution.exxy.service;
 
-import nl.technolution.apxprices.client.PublicationMarketDocument;
 import nl.technolution.dropwizard.tasks.ITaskRunner;
+import nl.technolution.exxy.client.PublicationMarketDocument;
 
 /**
  * 
