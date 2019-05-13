@@ -6,7 +6,7 @@
   
     <jxb:bindings schemaLocation="iec62325-451-3-publication_v7_0.xsd" node="/xs:schema">
         <jxb:schemaBindings>
-            <jxb:package name="nl.technolution.apxprices.client"/>
+            <jxb:package name="nl.technolution.exxy.client"/>
         </jxb:schemaBindings>        
     </jxb:bindings>
 </jxb:bindings>

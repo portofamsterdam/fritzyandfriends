@@ -14,17 +14,18 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.apxprices.client;
+package nl.technolution.exxy.client;
 
 import java.time.Instant;
 
-import nl.technolution.apxprices.app.APXPricesConfig;
+import nl.technolution.apxprices.client.PublicationMarketDocument;
 import nl.technolution.dropwizard.services.IService;
+import nl.technolution.exxy.app.ExxyConfig;
 
 /**
  * Defines TransparencyPlatformClient interface
  */
-public interface ITransparencyPlatformClient extends IService<APXPricesConfig> {
+public interface ITransparencyPlatformClient extends IService<ExxyConfig> {
 
     /**
      * Get day ahead prices for next 24 hours

@@ -33,7 +33,7 @@ sourceSets {
     }
 }
 
-mainClassName = 'nl.technolution.apxprices.app.APXPricesApp'
+mainClassName = 'nl.technolution.exxy.app.ExxyApp'
 
 // Run the generate tasks before compiling and creating eclipse classpath
 // eclipseClasspath.dependsOn(generateEfiLib)

@@ -14,7 +14,7 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.apxprices.client;
+package nl.technolution.exxy.client;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -29,8 +29,9 @@ import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.slf4j.Logger;
 
-import nl.technolution.apxprices.app.APXPricesConfig;
+import nl.technolution.apxprices.client.PublicationMarketDocument;
 import nl.technolution.core.Log;
+import nl.technolution.exxy.app.ExxyConfig;
 
 /**
  * Access the ENTSO-E Transparency Platform API
@@ -41,10 +42,10 @@ public class TransparencyPlatformClient implements ITransparencyPlatformClient {
     private static final Logger LOG = Log.getLogger();
 
     private Client client = JerseyClientBuilder.newClient();
-    private APXPricesConfig config;
+    private ExxyConfig config;
 
     @Override
-    public void init(APXPricesConfig config) {
+    public void init(ExxyConfig config) {
         this.config = config;
         client.property(ClientProperties.CONNECT_TIMEOUT, 30000);
         client.property(ClientProperties.READ_TIMEOUT, 30000);

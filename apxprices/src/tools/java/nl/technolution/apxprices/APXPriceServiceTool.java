@@ -21,12 +21,12 @@ import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-import nl.technolution.apxprices.app.APXPricesConfig;
-import nl.technolution.apxprices.service.APXPricesService;
-import nl.technolution.apxprices.service.APXPricesService.NoPricesAvailableException;
-import nl.technolution.apxprices.service.IAPXPricesService;
 import nl.technolution.dropwizard.services.ServiceFinder;
 import nl.technolution.dropwizard.services.Services;
+import nl.technolution.exxy.app.ExxyConfig;
+import nl.technolution.exxy.service.APXPricesService;
+import nl.technolution.exxy.service.IAPXPricesService;
+import nl.technolution.exxy.service.APXPricesService.NoPricesAvailableException;
 
 /**
  * Tests for APXPriceService
@@ -36,7 +36,7 @@ public class APXPriceServiceTool {
 
     public static void main(String[] args) throws NoPricesAvailableException {
 
-        APXPricesConfig config = new APXPricesConfig("https://transparency.entsoe.eu/api",
+        ExxyConfig config = new ExxyConfig("https://transparency.entsoe.eu/api",
                 "0b1d9ae3-d9a6-4c6b-8dc1-c62a18387ac5", null, false);
         ServiceFinder.setupServices(config);
         IAPXPricesService priceService = Services.get(IAPXPricesService.class);
@@ -87,7 +87,7 @@ public class APXPriceServiceTool {
         for (int i = 0; i < 24; i++) {
             fixedPrices.put(i, (double)i / 100);
         }
-        APXPricesConfig config = new APXPricesConfig("", "", null, true);
+        ExxyConfig config = new ExxyConfig("", "", null, true);
         priceService = new APXPricesService();
         // manually init the service
         priceService.init(config);

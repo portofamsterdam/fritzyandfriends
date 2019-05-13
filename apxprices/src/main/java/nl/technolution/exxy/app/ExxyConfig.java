@@ -14,7 +14,7 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.apxprices.app;
+package nl.technolution.exxy.app;
 
 import java.util.Map;
 
@@ -28,7 +28,7 @@ import io.dropwizard.Configuration;
 /**
  * Configuration for APXPrices
  */
-public class APXPricesConfig extends Configuration {
+public class ExxyConfig extends Configuration {
     /**
      * Base URL for the ENTSO-E API: https://transparency.entsoe.eu/api
      * 
@@ -63,7 +63,7 @@ public class APXPricesConfig extends Configuration {
     private boolean useFixedPrices;
 
     @JsonCreator
-    public APXPricesConfig(@JsonProperty("baseURL") String baseURL, @JsonProperty("securityToken") String securityToken,
+    public ExxyConfig(@JsonProperty("baseURL") String baseURL, @JsonProperty("securityToken") String securityToken,
             @JsonProperty("fixedPrices") Map<Integer, Double> fixedPrices,
             @JsonProperty("useFixedPrices") boolean useFixedPrices) {
         super();

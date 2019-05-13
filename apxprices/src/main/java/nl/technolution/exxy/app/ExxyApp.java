@@ -14,18 +14,22 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.apxprices.service;
+package nl.technolution.exxy.app;
 
-import nl.technolution.apxprices.client.PublicationMarketDocument;
-import nl.technolution.dropwizard.tasks.ITaskRunner;
+import nl.technolution.dropwizard.FritzyDropWizardApp;
 
 /**
- * 
+ * Application that makes APX prices available.
  */
-public interface IPriceReceiver extends ITaskRunner {
+public final class ExxyApp extends FritzyDropWizardApp<ExxyConfig> {
 
     /**
-     * Service method to retrieve result of task
+     * Run app
+     * 
+     * @param args passed by CLI
+     * @throws Exception
      */
-    PublicationMarketDocument getCachedPrices();
+    public static void main(String[] args) throws Exception {
+        new ExxyApp().run(args);
+    }
 }

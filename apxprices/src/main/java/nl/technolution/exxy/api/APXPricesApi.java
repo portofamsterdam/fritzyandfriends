@@ -14,7 +14,7 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.apxprices.api;
+package nl.technolution.exxy.api;
 
 import javax.validation.constraints.NotNull;
 import javax.ws.rs.GET;
@@ -29,15 +29,15 @@ import com.codahale.metrics.annotation.Timed;
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
 import io.dropwizard.jersey.params.InstantParam;
-import nl.technolution.apxprices.service.APXPricesService;
-import nl.technolution.apxprices.service.IAPXPricesService;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.webservice.IEndpoint;
+import nl.technolution.exxy.service.APXPricesService;
+import nl.technolution.exxy.service.IAPXPricesService;
 
 /**
  * 
  */
-@Path("apxprice/")
+@Path("exxy/")
 @Produces(MediaType.APPLICATION_JSON)
 public class APXPricesApi implements IEndpoint {
 
