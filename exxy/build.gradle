@@ -1,0 +1,41 @@
+apply plugin: 'application'
+apply plugin: 'techno-jaxb'
+
+// Convert iec62325-451-3-publication xsd to JAR
+task generateIec62325Lib(type: techno.BindXmlLib){
+    xsdFiles = files('src/main/xsd/CIM_2019-03-29/iec62325-451-3-publication_v7_0.xsd')
+    outputLib = file('build/libs/iec62325-451-3-publication_v7_0.jar') 
+}
+
+// Remove generated jar
+task cleanIec62325Lib(type: Delete) {
+    delete fileTree(dir: 'build/libs/', includes: [
+        'iec62325-451-3-publication_*.*'        
+    ])
+}
+
+dependencies {
+    compile libraries.techno_core
+    compile libraries.dropwizard
+	compile files(generateIec62325Lib.outputLib)
+	compile project(':common');
+	
+	// Special entries for techno-jax plugin
+	technoJaxb libraries.jaxb_xjc	  
+    technoJaxb libraries.jaxb_impl    
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs 'src/tools/java'
+        }
+    }
+}
+
+mainClassName = 'nl.technolution.exxy.app.ExxyApp'
+
+// Run the generate tasks before compiling and creating eclipse classpath
+// eclipseClasspath.dependsOn(generateEfiLib)
+compileJava.dependsOn(generateIec62325Lib)
+clean.dependsOn(cleanIec62325Lib)

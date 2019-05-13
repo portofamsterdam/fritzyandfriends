@@ -84,21 +84,21 @@ build_sunny:
     paths: 
       - docker/build/sunny/
       
-build_apxprices:
+build_exxy:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
   stage: build
   script: 
     - cd gradle
-    - gradle :apxprices:build :apxprices:copyArtifactsToDocker
+    - gradle :exxy:build :exxy:copyArtifactsToDocker
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
       - build/
       - .gradle
-      - docker/build/apxprices/
+      - docker/build/exxy/
   artifacts:
     paths: 
-      - docker/build/apxprices/
+      - docker/build/exxy/
 
 create_openapi_docs:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
@@ -131,9 +131,9 @@ create_images:
     - cd ../sunny
     - docker build -t fritzy2/fritzy:sunny .
     - docker push fritzy2/fritzy:sunny
-    - cd ../apxprices
-    - docker build -t fritzy2/fritzy:apxprices .
-    - docker push fritzy2/fritzy:apxprices
+    - cd ../exxy
+    - docker build -t fritzy2/fritzy:exxy .
+    - docker push fritzy2/fritzy:exxy
   only:
     - /^release\/.*$/
 
@@ -150,5 +150,6 @@ sonar_quality_check:
     - build_batty
     - build_netty
     - build_sunny
+    - build_exxy
   only:
     - master
