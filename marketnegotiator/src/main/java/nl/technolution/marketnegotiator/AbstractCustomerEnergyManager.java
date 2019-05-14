@@ -23,6 +23,7 @@ import nl.technolution.protocols.efi.FlexibilityUpdate;
 import nl.technolution.protocols.efi.InstructionStatusUpdate;
 import nl.technolution.protocols.efi.Measurement;
 import nl.technolution.protocols.efi.util.Efi;
+import nl.technolution.protocols.efi.util.ICustomerEnergyManager;
 
 /**
  * @param <T> FlexibilityRegistration

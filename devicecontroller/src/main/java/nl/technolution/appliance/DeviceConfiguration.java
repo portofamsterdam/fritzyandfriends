@@ -14,36 +14,27 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.sunny;
+package nl.technolution.appliance;
 
-import nl.technolution.DeviceId;
-import nl.technolution.protocols.efi.Instruction;
-import nl.technolution.protocols.efi.InstructionRevoke;
-import nl.technolution.protocols.efi.util.IResourceManager;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import io.dropwizard.Configuration;
 
 /**
- * Resource Manager of sunny
+ * 
  */
-public class SunnyResourceManager implements IResourceManager {
+public class DeviceConfiguration extends Configuration {
 
-    private final DeviceId deviceId;
+    @JsonProperty("deviceId")
+    private final String deviceId;
 
-    public SunnyResourceManager(DeviceId deviceId) {
+    @JsonCreator
+    public DeviceConfiguration(@JsonProperty("deviceId") String deviceId) {
         this.deviceId = deviceId;
     }
 
-    @Override
-    public DeviceId getDeviceId() {
+    public String getDeviceId() {
         return deviceId;
-    }
-
-    @Override
-    public void instruct(Instruction instruction) {
-        //
-    }
-
-    @Override
-    public void instructionRevoke(InstructionRevoke instructionRevoke) {
-        // 
     }
 }

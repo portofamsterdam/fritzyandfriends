@@ -14,57 +14,31 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.fritzy.marketnegotiator;
+package nl.technolution.appliance.resourcemanager;
 
 import nl.technolution.DeviceId;
 import nl.technolution.protocols.efi.FlexibilityRegistration;
-import nl.technolution.protocols.efi.FlexibilityRevoke;
 import nl.technolution.protocols.efi.FlexibilityUpdate;
-import nl.technolution.protocols.efi.Instruction;
-import nl.technolution.protocols.efi.InstructionStatusUpdate;
-import nl.technolution.protocols.efi.Measurement;
 import nl.technolution.protocols.efi.util.ICustomerEnergyManager;
 
 /**
  * 
  */
-public class FritzyFlexibilityManager implements ICustomerEnergyManager {
+public class ResourceManagerService implements IResourceManagerService {
 
     private DeviceId deviceId;
+    private IDeviceResourceHandler<?> devieResource;
+    private ICustomerEnergyManager<FlexibilityRegistration, FlexibilityUpdate> cem;
 
-    /**
-     *
-     */
-    public FritzyFlexibilityManager(DeviceId deviceId) {
+    @Override
+    public void init(DeviceId deviceId) {
         this.deviceId = deviceId;
     }
 
-
     @Override
-    public void flexibilityRegistration(FlexibilityRegistration flexibilityRegistration) {
-    }
+    public void update() {
 
-    @Override
-    public Instruction flexibilityUpdate(FlexibilityUpdate update) {
-        return null;
-    }
-
-    @Override
-    public void instructionStatusUpdate(InstructionStatusUpdate instructionStatusUpdate) {
         //
 
     }
-
-    @Override
-    public void measurement(Measurement measurement) {
-        //
-
-    }
-
-    @Override
-    public void flexibilityRevoke(FlexibilityRevoke revocation) {
-        //
-
-    }
-
 }

@@ -14,36 +14,27 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.sunny;
+package nl.technolution.appliance.resourcemanager;
 
-import nl.technolution.DeviceId;
-import nl.technolution.protocols.efi.Instruction;
-import nl.technolution.protocols.efi.InstructionRevoke;
-import nl.technolution.protocols.efi.util.IResourceManager;
+import java.util.concurrent.TimeUnit;
+
+import nl.technolution.dropwizard.services.Services;
+import nl.technolution.dropwizard.tasks.ITaskRunner;
+import nl.technolution.dropwizard.tasks.TimedTask;
 
 /**
- * Resource Manager of sunny
+ * 
  */
-public class SunnyResourceManager implements IResourceManager {
+@TimedTask(period = 1, unit = TimeUnit.MINUTES)
+public class ResourceManagerTask implements ITaskRunner {
 
-    private final DeviceId deviceId;
-
-    public SunnyResourceManager(DeviceId deviceId) {
-        this.deviceId = deviceId;
-    }
+    private IResourceManagerService resourceManagerService;
 
     @Override
-    public DeviceId getDeviceId() {
-        return deviceId;
-    }
-
-    @Override
-    public void instruct(Instruction instruction) {
-        //
-    }
-
-    @Override
-    public void instructionRevoke(InstructionRevoke instructionRevoke) {
-        // 
+    public void execute() {
+        if (resourceManagerService == null) {
+            resourceManagerService = Services.get(IResourceManagerService.class);
+        }
+        resourceManagerService.update();
     }
 }

@@ -19,12 +19,12 @@ package nl.technolution.batty;
 import com.google.common.base.Preconditions;
 
 import nl.technolution.DeviceId;
-import nl.technolution.appliance.IResourceManager;
 import nl.technolution.protocols.efi.ActuatorInstruction;
 import nl.technolution.protocols.efi.ActuatorInstructions;
 import nl.technolution.protocols.efi.Instruction;
 import nl.technolution.protocols.efi.InstructionRevoke;
 import nl.technolution.protocols.efi.StorageInstruction;
+import nl.technolution.protocols.efi.util.IResourceManager;
 
 /**
  * Resource Manager of sunny
@@ -37,7 +37,6 @@ public class BattyResourceManager implements IResourceManager {
         this.deviceId = deviceId;
     }
 
-    @Override
     public DeviceId getDeviceId() {
         return deviceId;
     }

@@ -14,36 +14,14 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.sunny;
+package nl.technolution.batty;
 
-import nl.technolution.DeviceId;
-import nl.technolution.protocols.efi.Instruction;
-import nl.technolution.protocols.efi.InstructionRevoke;
-import nl.technolution.protocols.efi.util.IResourceManager;
+import nl.technolution.batty.app.BattyConfig;
+import nl.technolution.dropwizard.services.IService;
 
 /**
- * Resource Manager of sunny
+ * 
  */
-public class SunnyResourceManager implements IResourceManager {
+public interface IBattyTrader extends IService<BattyConfig> {
 
-    private final DeviceId deviceId;
-
-    public SunnyResourceManager(DeviceId deviceId) {
-        this.deviceId = deviceId;
-    }
-
-    @Override
-    public DeviceId getDeviceId() {
-        return deviceId;
-    }
-
-    @Override
-    public void instruct(Instruction instruction) {
-        //
-    }
-
-    @Override
-    public void instructionRevoke(InstructionRevoke instructionRevoke) {
-        // 
-    }
 }

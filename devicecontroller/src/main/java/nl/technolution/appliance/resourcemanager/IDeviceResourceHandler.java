@@ -16,15 +16,17 @@
  */
 package nl.technolution.appliance.resourcemanager;
 
-import nl.technolution.appliance.IDevice;
+import nl.technolution.dropwizard.services.IService;
 import nl.technolution.protocols.efi.FlexibilityRegistration;
 import nl.technolution.protocols.efi.FlexibilityUpdate;
 import nl.technolution.protocols.efi.Measurement;
 
 /**
  * Handles Efi messages for specific device
+ * 
+ * @param <T> type used to init service
  */
-public interface IDeviceResourceHandler extends IDevice {
+public interface IDeviceResourceHandler<T> extends IService<T> {
 
     /**
      * @return registration

@@ -14,36 +14,27 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.sunny;
+package nl.technolution.batty;
 
 import nl.technolution.DeviceId;
-import nl.technolution.protocols.efi.Instruction;
-import nl.technolution.protocols.efi.InstructionRevoke;
-import nl.technolution.protocols.efi.util.IResourceManager;
+import nl.technolution.batty.app.BattyConfig;
+import nl.technolution.marketnegotiator.storage.BatteryNegotiator;
+import nl.technolution.protocols.efi.StorageRegistration;
+import nl.technolution.protocols.efi.StorageStatus;
+import nl.technolution.protocols.efi.util.ICustomerEnergyManager;
 
 /**
- * Resource Manager of sunny
+ * 
  */
-public class SunnyResourceManager implements IResourceManager {
+public class BattyBangBang implements IBattyTrader {
 
-    private final DeviceId deviceId;
-
-    public SunnyResourceManager(DeviceId deviceId) {
-        this.deviceId = deviceId;
-    }
+    private BattyResourceManager resourceManager;
+    private ICustomerEnergyManager<StorageRegistration, StorageStatus> cem;
 
     @Override
-    public DeviceId getDeviceId() {
-        return deviceId;
+    public void init(BattyConfig config) {
+        resourceManager = new BattyResourceManager(new DeviceId(config.getDeviceId()));
+        cem = new BatteryNegotiator(config.getMarket(), resourceManager);
     }
 
-    @Override
-    public void instruct(Instruction instruction) {
-        //
-    }
-
-    @Override
-    public void instructionRevoke(InstructionRevoke instructionRevoke) {
-        // 
-    }
 }
