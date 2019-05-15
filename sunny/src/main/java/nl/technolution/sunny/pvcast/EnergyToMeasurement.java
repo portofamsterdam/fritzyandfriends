@@ -27,13 +27,16 @@ import nl.technolution.sunny.solaredgemonitoring.model.SiteEnergy;
 import nl.technolution.sunny.solaredgemonitoring.model.Value;
 
 /**
- * TODO wilfred.hoogerbrugge comment this
+ * Helper class for converting entities
  */
-public class EnergyToMeasurement {
+public final class EnergyToMeasurement {
 
-    // NOTE WHO: this info can be obtained from the API using the 'Site List' endpoint (field 'timeZone') but for
-    // simplicity define it here
+    // NOTE WHO: Timezone can be obtained from the API using the 'Site List' endpoint (field 'timeZone') but for
+    // simplicity it is defined here.
     private static final ZoneId SITE_TIME_ZONE = ZoneId.of("Europe/Amsterdam");
+
+    private EnergyToMeasurement() {
+    }
 
     /**
      * Create a PvMeasurement object from a SiteEnergy object from the SolarEdge monitoring portal to a PvMeasurement

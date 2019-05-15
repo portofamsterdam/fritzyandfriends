@@ -33,15 +33,18 @@ import nl.technolution.sunny.solaredgemonitoring.model.SiteEnergy;
 /**
  * Tool for testing with SolarEdge monitoring API
  */
-public class SolarEdgeMonitoring {
+public final class SolarEdgeMonitoring {
     private static final Logger LOG = LoggerFactory.getLogger(SolarEdgeMonitoring.class);
+
+    private SolarEdgeMonitoring() {
+    }
 
     /**
      * @param args
      * @throws Exception
      */
     public static void main(String[] args) throws Exception {
-        // TODO WHO: Needed to see the request logging
+        // NOTE WHO: Needed for request logging (see also nl.technolution.sunny.pvcast.client.PvCastClient.init)
         SLF4JBridgeHandler.install();
 
         SunnyConfig config = new SunnyConfig("deviceId", "host", null,

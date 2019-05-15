@@ -1,14 +1,28 @@
-
+/*
+ (C) COPYRIGHT 2019 TECHNOLUTION BV, GOUDA NL
+| =======          I                   ==          I    =
+|    I             I                    I          I
+|    I   ===   === I ===  I ===   ===   I  I    I ====  I   ===  I ===
+|    I  /   \ I    I/   I I/   I I   I  I  I    I  I    I  I   I I/   I
+|    I  ===== I    I    I I    I I   I  I  I    I  I    I  I   I I    I
+|    I  \     I    I    I I    I I   I  I  I   /I  \    I  I   I I    I
+|    I   ===   === I    I I    I  ===  ===  === I   ==  I   ===  I    I
+|                 +---------------------------------------------------+
++----+            |  +++++++++++++++++++++++++++++++++++++++++++++++++|
+     |            |             ++++++++++++++++++++++++++++++++++++++|
+     +------------+                          +++++++++++++++++++++++++|
+                                                        ++++++++++++++|
+                                                                 +++++|
+ */
 package nl.technolution.sunny.solaredgemonitoring.model;
 
-import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
 
-@JsonInclude(JsonInclude.Include.NON_NULL)
-@JsonPropertyOrder({ "energy" })
+/**
+ * SolarEdge Monitoring portal site energy object
+ */
 public class SiteEnergy {
 
     @JsonProperty("energy")
@@ -28,5 +42,4 @@ public class SiteEnergy {
     public String toString() {
         return new ToStringBuilder(this).append("energy", energy).toString();
     }
-
 }
