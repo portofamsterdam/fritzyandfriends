@@ -14,43 +14,22 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty.api;
+package nl.technolution.batty.xstorage.cache;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
+import java.util.concurrent.TimeUnit;
 
-import com.codahale.metrics.annotation.Timed;
-
-import nl.technolution.batty.xstorage.cache.IMachineDataCacher;
-import nl.technolution.batty.xstorage.types.MachineData;
 import nl.technolution.dropwizard.services.Services;
-import nl.technolution.dropwizard.webservice.IEndpoint;
+import nl.technolution.dropwizard.tasks.ITaskRunner;
+import nl.technolution.dropwizard.tasks.TimedTask;
 
 /**
  * 
+ * 
  */
-@Path("/batty")
-@Produces(MediaType.APPLICATION_JSON)
-public class BattyApi implements IEndpoint {
-
-    /**
-     * Retrieve state of Fritzy
-     * 
-     * @return state of cooler and temparature
-     */
-    @GET
-    @Timed
-    @Path("state")
-    @Produces(MediaType.APPLICATION_JSON)
-    public BattyState getState() {
-        try {
-            MachineData machineData = Services.get(IMachineDataCacher.class).getMachineData();
-            int soc = machineData.getSoc();
-            return new BattyState("on", soc);
-        } catch (RuntimeException ex) {
-            return new BattyState("unreachable", -1);
-        }
+@TimedTask(period = 30, unit = TimeUnit.SECONDS)
+public class GetCurrentSocTask implements ITaskRunner {
+    @Override
+    public void execute() {
+        Services.get(IMachineDataCacher.class).update();
     }
 }

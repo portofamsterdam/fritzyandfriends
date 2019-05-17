@@ -14,32 +14,22 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty.xstorage;
+package nl.technolution.batty.efi;
 
-import nl.technolution.batty.app.BattyConfig;
+import java.util.concurrent.TimeUnit;
+
+import nl.technolution.dropwizard.services.Services;
+import nl.technolution.dropwizard.tasks.ITaskRunner;
+import nl.technolution.dropwizard.tasks.TimedTask;
 
 /**
  * 
  */
-public class XStorageFactory implements IXStorageFactory {
-
-    private IXStorageConnection connection;
-
-    @Override
-    public void init(BattyConfig config) {
-        if (config.isUseStub()) {
-            this.connection = new XStorageStub();
-            return;
-        } else {
-            XStorageConnection xStorageConnection = new XStorageConnection();
-            xStorageConnection.init(config);
-            this.connection = xStorageConnection;
-        }
-    }
+@TimedTask(period = 30, unit = TimeUnit.SECONDS)
+public class BatteryMeasurementTask implements ITaskRunner {
 
     @Override
-    public IXStorageConnection getConnection() {
-        return connection;
+    public void execute() {
+        Services.get(IBattyTrader.class).sendMeasurement();
     }
-
 }

@@ -14,43 +14,32 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty.api;
+package nl.technolution.batty.xstorage.connection;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
-import com.codahale.metrics.annotation.Timed;
-
-import nl.technolution.batty.xstorage.cache.IMachineDataCacher;
+import nl.technolution.batty.xstorage.types.BmsData;
 import nl.technolution.batty.xstorage.types.MachineData;
-import nl.technolution.dropwizard.services.Services;
-import nl.technolution.dropwizard.webservice.IEndpoint;
+import nl.technolution.batty.xstorage.types.MachineInfo;
+import nl.technolution.batty.xstorage.types.MeterInfo;
 
 /**
  * 
  */
-@Path("/batty")
-@Produces(MediaType.APPLICATION_JSON)
-public class BattyApi implements IEndpoint {
+public interface IXStorageConnection {
 
-    /**
-     * Retrieve state of Fritzy
-     * 
-     * @return state of cooler and temparature
-     */
-    @GET
-    @Timed
-    @Path("state")
-    @Produces(MediaType.APPLICATION_JSON)
-    public BattyState getState() {
-        try {
-            MachineData machineData = Services.get(IMachineDataCacher.class).getMachineData();
-            int soc = machineData.getSoc();
-            return new BattyState("on", soc);
-        } catch (RuntimeException ex) {
-            return new BattyState("unreachable", -1);
-        }
-    }
+    MachineInfo getMachineInfo() throws XStorageException;
+
+    MachineData getMachineData() throws XStorageException;
+
+    BmsData getBmsData() throws XStorageException;
+
+    void charge(int percentage) throws XStorageException;
+
+    void discharge(int percentage) throws XStorageException;
+
+    void powerOn() throws XStorageException;
+
+    void powerOff() throws XStorageException;
+
+    MeterInfo getMeterInfo() throws XStorageException;
+
 }

@@ -14,43 +14,42 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty.api;
+package nl.technolution.batty.xstorage.cache;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
-import com.codahale.metrics.annotation.Timed;
-
-import nl.technolution.batty.xstorage.cache.IMachineDataCacher;
+import nl.technolution.batty.app.BattyConfig;
+import nl.technolution.batty.xstorage.connection.IXStorageConnection;
+import nl.technolution.batty.xstorage.connection.IXStorageFactory;
+import nl.technolution.batty.xstorage.connection.XStorageException;
 import nl.technolution.batty.xstorage.types.MachineData;
 import nl.technolution.dropwizard.services.Services;
-import nl.technolution.dropwizard.webservice.IEndpoint;
 
 /**
  * 
  */
-@Path("/batty")
-@Produces(MediaType.APPLICATION_JSON)
-public class BattyApi implements IEndpoint {
+public class MachineDataCache implements IMachineDataCacher {
 
-    /**
-     * Retrieve state of Fritzy
-     * 
-     * @return state of cooler and temparature
-     */
-    @GET
-    @Timed
-    @Path("state")
-    @Produces(MediaType.APPLICATION_JSON)
-    public BattyState getState() {
+    private MachineData cachedSoc;
+
+    @Override
+    public void init(BattyConfig config) {
+        // 
+    }
+
+    @Override
+    public void update() {
+        IXStorageConnection connection = Services.get(IXStorageFactory.class).getConnection();
         try {
-            MachineData machineData = Services.get(IMachineDataCacher.class).getMachineData();
-            int soc = machineData.getSoc();
-            return new BattyState("on", soc);
-        } catch (RuntimeException ex) {
-            return new BattyState("unreachable", -1);
+            cachedSoc = connection.getMachineData();
+        } catch (XStorageException ex) {
+            throw new IllegalStateException("Unable to retrieve state of charge");
         }
+    }
+
+    @Override
+    public MachineData getMachineData() {
+        if (cachedSoc == null) {
+            update();
+        }
+        return cachedSoc;
     }
 }

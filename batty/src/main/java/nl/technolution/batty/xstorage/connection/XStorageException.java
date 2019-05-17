@@ -14,18 +14,14 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty.xstorage;
-
-import nl.technolution.batty.app.BattyConfig;
-import nl.technolution.dropwizard.services.IService;
+package nl.technolution.batty.xstorage.connection;
 
 /**
  * 
  */
-public interface IXStorageFactory extends IService<BattyConfig> {
+public class XStorageException extends RuntimeException {
 
-    /**
-     * @return connection to XStorage device
-     */
-    IXStorageConnection getConnection();
+    XStorageException(String message, Throwable e) {
+        super(message, e);
+    }
 }

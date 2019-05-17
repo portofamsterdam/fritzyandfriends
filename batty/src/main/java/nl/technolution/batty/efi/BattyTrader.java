@@ -14,43 +14,45 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty.api;
+package nl.technolution.batty.efi;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
-
-import com.codahale.metrics.annotation.Timed;
-
+import nl.technolution.DeviceId;
+import nl.technolution.batty.app.BattyConfig;
 import nl.technolution.batty.xstorage.cache.IMachineDataCacher;
-import nl.technolution.batty.xstorage.types.MachineData;
 import nl.technolution.dropwizard.services.Services;
-import nl.technolution.dropwizard.webservice.IEndpoint;
 
 /**
  * 
  */
-@Path("/batty")
-@Produces(MediaType.APPLICATION_JSON)
-public class BattyApi implements IEndpoint {
+public class BattyTrader implements IBattyTrader {
 
-    /**
-     * Retrieve state of Fritzy
-     * 
-     * @return state of cooler and temparature
-     */
-    @GET
-    @Timed
-    @Path("state")
-    @Produces(MediaType.APPLICATION_JSON)
-    public BattyState getState() {
-        try {
-            MachineData machineData = Services.get(IMachineDataCacher.class).getMachineData();
-            int soc = machineData.getSoc();
-            return new BattyState("on", soc);
-        } catch (RuntimeException ex) {
-            return new BattyState("unreachable", -1);
-        }
+    private BattyResourceManager resourceManager;
+    private BatteryNegotiator cem;
+
+    @Override
+    public void init(BattyConfig config) {
+        resourceManager = new BattyResourceManager(new DeviceId(config.getDeviceId()));
+        cem = new BatteryNegotiator(config.getMarket(), resourceManager);
+        resourceManager.registerCustomerEnergyManager(cem);
+    }
+
+    @Override
+    public void evaluateMarket() {
+        cem.evaluate();
+    }
+
+    @Override
+    public void evaluateDevice() {
+        resourceManager.evaluate();
+    }
+
+    @Override
+    public void sendMeasurement() {
+        double eDraw = Services.get(IMachineDataCacher.class).getMachineData().getEDraw();
+        resourceManager.sendMeasurement(eDraw);
+    }
+
+    public BatteryNegotiator getCem() {
+        return cem;
     }
 }

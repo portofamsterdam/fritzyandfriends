@@ -14,14 +14,36 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty.xstorage;
+package nl.technolution.batty.efi;
+
+import nl.technolution.batty.xstorage.connection.IXStorageConnection;
+import nl.technolution.batty.xstorage.connection.IXStorageFactory;
+import nl.technolution.dropwizard.services.Services;
 
 /**
  * 
  */
-public class XStorageException extends RuntimeException {
+class BattyController {
 
-    XStorageException(String message, Throwable e) {
-        super(message, e);
+    void init() {
+        IXStorageConnection connection = Services.get(IXStorageFactory.class).getConnection();
+        connection.powerOff();
+    }
+
+    void charge() {
+        IXStorageConnection connection = Services.get(IXStorageFactory.class).getConnection();
+        connection.powerOn();
+        connection.charge(100);
+    }
+
+    void discharge() {
+        IXStorageConnection connection = Services.get(IXStorageFactory.class).getConnection();
+        connection.powerOn();
+        connection.discharge(0);
+    }
+
+    void stop() {
+        IXStorageConnection connection = Services.get(IXStorageFactory.class).getConnection();
+        connection.powerOff();
     }
 }

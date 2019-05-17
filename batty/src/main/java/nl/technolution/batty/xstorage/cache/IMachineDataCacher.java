@@ -14,32 +14,26 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty.xstorage;
+package nl.technolution.batty.xstorage.cache;
 
-import nl.technolution.batty.xstorage.types.BmsData;
+import nl.technolution.batty.app.BattyConfig;
 import nl.technolution.batty.xstorage.types.MachineData;
-import nl.technolution.batty.xstorage.types.MachineInfo;
-import nl.technolution.batty.xstorage.types.MeterInfo;
+import nl.technolution.dropwizard.services.IService;
 
 /**
  * 
  */
-public interface IXStorageConnection {
+public interface IMachineDataCacher extends IService<BattyConfig> {
 
-    MachineInfo getMachineInfo() throws XStorageException;
+    /**
+     * Update cached value
+     */
+    void update();
 
-    MachineData getMachineData() throws XStorageException;
-
-    BmsData getBmsData() throws XStorageException;
-
-    void charge(int percentage) throws XStorageException;
-
-    void discharge(int percentage) throws XStorageException;
-
-    void powerOn() throws XStorageException;
-
-    void powerOff() throws XStorageException;
-
-    MeterInfo getMeterInfo() throws XStorageException;
-
+    /**
+     * Get cached value
+     * 
+     * @return cached value
+     */
+    MachineData getMachineData();
 }

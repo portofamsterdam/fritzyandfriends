@@ -14,7 +14,7 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty.xstorage;
+package nl.technolution.batty.xstorage.connection;
 
 import java.io.IOException;
 import java.security.KeyManagementException;
@@ -26,6 +26,7 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 
 import nl.technolution.batty.app.BattyConfig;
+import nl.technolution.batty.xstorage.connection.XStorageConnection;
 
 /**
  * 

@@ -14,7 +14,7 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty;
+package nl.technolution.batty.efi;
 
 import nl.technolution.batty.app.BattyConfig;
 import nl.technolution.dropwizard.services.IService;
@@ -24,4 +24,9 @@ import nl.technolution.dropwizard.services.IService;
  */
 public interface IBattyTrader extends IService<BattyConfig> {
 
+    void evaluateMarket();
+
+    void evaluateDevice();
+
+    void sendMeasurement();
 }

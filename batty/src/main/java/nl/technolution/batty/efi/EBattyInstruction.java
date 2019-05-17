@@ -14,30 +14,38 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.marketnegotiator.storage;
+package nl.technolution.batty.efi;
 
-import nl.technolution.marketnegotiator.AbstractCustomerEnergyManager;
-import nl.technolution.protocols.efi.Instruction;
-import nl.technolution.protocols.efi.StorageInstruction;
-import nl.technolution.protocols.efi.StorageRegistration;
-import nl.technolution.protocols.efi.StorageStatus;
-import nl.technolution.protocols.efi.util.Efi;
+import java.util.Arrays;
 
 /**
  * 
  */
-public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegistration, StorageStatus> {
+public enum EBattyInstruction {
 
+    STOP(0),
 
-    private Double fillLevel;
+    CHARGE(1),
 
-    @Override
-    public Instruction flexibilityUpdate(StorageStatus storageStatus) {
-        fillLevel = storageStatus.getCurrentFillLevel();
-        return Efi.build(StorageInstruction.class, getDeviceId());
+    DISCHARGE(2);
+
+    private final int runningModeId;
+
+    EBattyInstruction(int runningModeId) {
+        this.runningModeId = runningModeId;
     }
 
-
-
-
+    /**
+     * Find instruction type based on runningmode Id
+     * 
+     * @param runningModeId to find
+     * @return EBattyInstruction
+     */
+    public static EBattyInstruction fromRunningModeId(int runningModeId) {
+        return Arrays.asList(values())
+                .stream()
+                .filter(e -> e.runningModeId == runningModeId)
+                .findFirst()
+                .orElseThrow(IllegalArgumentException::new);
+    }
 }
