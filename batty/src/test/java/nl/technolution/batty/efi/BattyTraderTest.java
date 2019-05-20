@@ -22,6 +22,8 @@ import static org.junit.Assert.assertNull;
 import org.junit.Test;
 
 import nl.technolution.batty.app.BattyConfig;
+import nl.technolution.batty.trader.BattyTrader;
+import nl.technolution.batty.trader.IBattyTrader;
 import nl.technolution.batty.xstorage.cache.IMachineDataCacher;
 import nl.technolution.batty.xstorage.cache.MachineDataCache;
 import nl.technolution.batty.xstorage.connection.IXStorageFactory;

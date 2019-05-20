@@ -14,7 +14,7 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty.efi;
+package nl.technolution.batty.trader;
 
 import nl.technolution.market.MarketConfig;
 import nl.technolution.marketnegotiator.AbstractCustomerEnergyManager;

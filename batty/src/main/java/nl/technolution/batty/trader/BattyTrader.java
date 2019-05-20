@@ -14,24 +14,45 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty.efi;
+package nl.technolution.batty.trader;
 
-import java.util.concurrent.TimeUnit;
-
+import nl.technolution.DeviceId;
+import nl.technolution.batty.app.BattyConfig;
+import nl.technolution.batty.xstorage.cache.IMachineDataCacher;
 import nl.technolution.dropwizard.services.Services;
-import nl.technolution.dropwizard.tasks.ITaskRunner;
-import nl.technolution.dropwizard.tasks.TimedTask;
 
 /**
  * 
  */
-@TimedTask(period = 1, unit = TimeUnit.MINUTES)
-public class BattyTraderTask implements ITaskRunner {
+public class BattyTrader implements IBattyTrader {
+
+    private BattyResourceManager resourceManager;
+    private BatteryNegotiator cem;
 
     @Override
-    public void execute() {
-        IBattyTrader trader = Services.get(IBattyTrader.class);
-        trader.evaluateDevice();
-        trader.evaluateMarket();
+    public void init(BattyConfig config) {
+        resourceManager = new BattyResourceManager(new DeviceId(config.getDeviceId()));
+        cem = new BatteryNegotiator(config.getMarket(), resourceManager);
+        resourceManager.registerCustomerEnergyManager(cem);
+    }
+
+    @Override
+    public void evaluateMarket() {
+        cem.evaluate();
+    }
+
+    @Override
+    public void evaluateDevice() {
+        resourceManager.evaluate();
+    }
+
+    @Override
+    public void sendMeasurement() {
+        double eDraw = Services.get(IMachineDataCacher.class).getMachineData().getEDraw();
+        resourceManager.sendMeasurement(eDraw);
+    }
+
+    public BatteryNegotiator getCem() {
+        return cem;
     }
 }

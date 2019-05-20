@@ -14,7 +14,7 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty.efi;
+package nl.technolution.batty.trader;
 
 import nl.technolution.batty.app.BattyConfig;
 import nl.technolution.dropwizard.services.IService;
