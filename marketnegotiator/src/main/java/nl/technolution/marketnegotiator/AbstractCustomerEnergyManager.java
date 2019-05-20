@@ -53,7 +53,7 @@ public abstract class AbstractCustomerEnergyManager<T extends FlexibilityRegistr
 
     @Override
     public void measurement(Measurement measurement) {
-        // NOTE MKE: Do nothing with measurement for now
+
     }
 
     public T getRegistration() {
