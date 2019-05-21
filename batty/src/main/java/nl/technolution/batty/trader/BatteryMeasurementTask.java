@@ -14,14 +14,22 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty.xstorage;
+package nl.technolution.batty.trader;
+
+import java.util.concurrent.TimeUnit;
+
+import nl.technolution.dropwizard.services.Services;
+import nl.technolution.dropwizard.tasks.ITaskRunner;
+import nl.technolution.dropwizard.tasks.TimedTask;
 
 /**
  * 
  */
-public class XStorageException extends RuntimeException {
+@TimedTask(period = 30, unit = TimeUnit.SECONDS)
+public class BatteryMeasurementTask implements ITaskRunner {
 
-    XStorageException(String message, Throwable e) {
-        super(message, e);
+    @Override
+    public void execute() {
+        Services.get(IBattyTrader.class).sendMeasurement();
     }
 }

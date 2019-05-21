@@ -14,18 +14,24 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty.xstorage;
+package nl.technolution.batty.trader;
 
-import nl.technolution.batty.app.BattyConfig;
-import nl.technolution.dropwizard.services.IService;
+import java.util.concurrent.TimeUnit;
+
+import nl.technolution.dropwizard.services.Services;
+import nl.technolution.dropwizard.tasks.ITaskRunner;
+import nl.technolution.dropwizard.tasks.TimedTask;
 
 /**
  * 
  */
-public interface IXStorageFactory extends IService<BattyConfig> {
+@TimedTask(period = 1, unit = TimeUnit.MINUTES)
+public class BattyTraderTask implements ITaskRunner {
 
-    /**
-     * @return connection to XStorage device
-     */
-    IXStorageConnection getConnection();
+    @Override
+    public void execute() {
+        IBattyTrader trader = Services.get(IBattyTrader.class);
+        trader.evaluateDevice();
+        trader.evaluateMarket();
+    }
 }

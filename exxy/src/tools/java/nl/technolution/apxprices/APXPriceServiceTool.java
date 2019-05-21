@@ -38,7 +38,7 @@ public class APXPriceServiceTool {
 
         ExxyConfig config = new ExxyConfig("https://transparency.entsoe.eu/api",
                 "0b1d9ae3-d9a6-4c6b-8dc1-c62a18387ac5", null, false);
-        ServiceFinder.setupServices(config);
+        ServiceFinder.setupDropWizardServices(config);
         IAPXPricesService priceService = Services.get(IAPXPricesService.class);
         getPrice(priceService);
     }

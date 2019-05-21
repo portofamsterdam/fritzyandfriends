@@ -14,28 +14,32 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.dropwizard;
+package nl.technolution.batty.xstorage.connection;
 
-import io.dropwizard.Application;
-import io.dropwizard.Configuration;
-import io.dropwizard.setup.Environment;
-import nl.technolution.dropwizard.services.ServiceFinder;
-import nl.technolution.dropwizard.tasks.TimedTaskService;
-import nl.technolution.dropwizard.webservice.WebserviceFinder;
+import nl.technolution.batty.app.BattyConfig;
 
 /**
- * Basic app for Fritzy applications
  * 
- * @param <T> Dropwizard Configuration Type
  */
-public class FritzyDropWizardApp<T extends Configuration> extends Application<T> {
+public class XStorageFactory implements IXStorageFactory {
 
-    public static final String PKG = "nl.technolution";
+    private IXStorageConnection connection;
 
     @Override
-    public void run(T configuration, Environment environment) throws Exception {
-        ServiceFinder.setupDropWizardServices(configuration);
-        WebserviceFinder.setupWebservices(environment);
-        environment.lifecycle().manage(new TimedTaskService());
+    public void init(BattyConfig config) {
+        if (config.isUseStub()) {
+            this.connection = new XStorageStub();
+            return;
+        } else {
+            XStorageConnection xStorageConnection = new XStorageConnection();
+            xStorageConnection.init(config);
+            this.connection = xStorageConnection;
+        }
     }
+
+    @Override
+    public IXStorageConnection getConnection() {
+        return connection;
+    }
+
 }

@@ -23,6 +23,7 @@ import nl.technolution.protocols.efi.FlexibilityUpdate;
 import nl.technolution.protocols.efi.InstructionStatusUpdate;
 import nl.technolution.protocols.efi.Measurement;
 import nl.technolution.protocols.efi.util.Efi;
+import nl.technolution.protocols.efi.util.ICustomerEnergyManager;
 
 /**
  * @param <T> FlexibilityRegistration
@@ -52,7 +53,7 @@ public abstract class AbstractCustomerEnergyManager<T extends FlexibilityRegistr
 
     @Override
     public void measurement(Measurement measurement) {
-        // NOTE MKE: Do nothing with measurement for now
+
     }
 
     public T getRegistration() {

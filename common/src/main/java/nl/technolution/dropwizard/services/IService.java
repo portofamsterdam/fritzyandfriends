@@ -16,14 +16,12 @@
  */
 package nl.technolution.dropwizard.services;
 
-import io.dropwizard.Configuration;
-
 /**
  * Service to be registered by Fritzy dropwizard app
  * 
- * @param <T> DropWizard configuration type
+ * @param <T> Object type used to init serivce
  */
-public interface IService<T extends Configuration> {
+public interface IService<T> {
 
     /**
      * init service

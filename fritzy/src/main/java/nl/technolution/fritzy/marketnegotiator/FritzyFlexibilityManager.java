@@ -17,13 +17,13 @@
 package nl.technolution.fritzy.marketnegotiator;
 
 import nl.technolution.DeviceId;
-import nl.technolution.marketnegotiator.ICustomerEnergyManager;
 import nl.technolution.protocols.efi.FlexibilityRegistration;
 import nl.technolution.protocols.efi.FlexibilityRevoke;
 import nl.technolution.protocols.efi.FlexibilityUpdate;
 import nl.technolution.protocols.efi.Instruction;
 import nl.technolution.protocols.efi.InstructionStatusUpdate;
 import nl.technolution.protocols.efi.Measurement;
+import nl.technolution.protocols.efi.util.ICustomerEnergyManager;
 
 /**
  * 

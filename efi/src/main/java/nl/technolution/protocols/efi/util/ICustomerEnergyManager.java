@@ -14,7 +14,7 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.marketnegotiator;
+package nl.technolution.protocols.efi.util;
 
 import nl.technolution.protocols.efi.FlexibilityRegistration;
 import nl.technolution.protocols.efi.FlexibilityRevoke;

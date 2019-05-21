@@ -14,28 +14,27 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.dropwizard;
+package nl.technolution.appliance;
 
-import io.dropwizard.Application;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import io.dropwizard.Configuration;
-import io.dropwizard.setup.Environment;
-import nl.technolution.dropwizard.services.ServiceFinder;
-import nl.technolution.dropwizard.tasks.TimedTaskService;
-import nl.technolution.dropwizard.webservice.WebserviceFinder;
 
 /**
- * Basic app for Fritzy applications
  * 
- * @param <T> Dropwizard Configuration Type
  */
-public class FritzyDropWizardApp<T extends Configuration> extends Application<T> {
+public class DeviceConfiguration extends Configuration {
 
-    public static final String PKG = "nl.technolution";
+    @JsonProperty("deviceId")
+    private final String deviceId;
 
-    @Override
-    public void run(T configuration, Environment environment) throws Exception {
-        ServiceFinder.setupDropWizardServices(configuration);
-        WebserviceFinder.setupWebservices(environment);
-        environment.lifecycle().manage(new TimedTaskService());
+    @JsonCreator
+    public DeviceConfiguration(@JsonProperty("deviceId") String deviceId) {
+        this.deviceId = deviceId;
+    }
+
+    public String getDeviceId() {
+        return deviceId;
     }
 }

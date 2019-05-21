@@ -14,22 +14,16 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.appliance;
+package nl.technolution.protocols.efi.util;
 
-import nl.technolution.DeviceId;
 import nl.technolution.protocols.efi.Instruction;
 import nl.technolution.protocols.efi.InstructionRevoke;
 
 /**
+ * Handles message received from Central Energy Manager.
  */
 public interface IResourceManager {
 
-    /**
-     * Is used by a device to identify itself
-     * 
-     * @return id of device
-     */
-    DeviceId getDeviceId();
 
     /**
      * @param instruction

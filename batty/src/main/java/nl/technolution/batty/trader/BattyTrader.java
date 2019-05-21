@@ -14,36 +14,45 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.sunny;
+package nl.technolution.batty.trader;
 
 import nl.technolution.DeviceId;
-import nl.technolution.appliance.IResourceManager;
-import nl.technolution.protocols.efi.Instruction;
-import nl.technolution.protocols.efi.InstructionRevoke;
+import nl.technolution.batty.app.BattyConfig;
+import nl.technolution.batty.xstorage.cache.IMachineDataCacher;
+import nl.technolution.dropwizard.services.Services;
 
 /**
- * Resource Manager of sunny
+ * 
  */
-public class SunnyResourceManager implements IResourceManager {
+public class BattyTrader implements IBattyTrader {
 
-    private final DeviceId deviceId;
+    private BattyResourceManager resourceManager;
+    private BatteryNegotiator cem;
 
-    public SunnyResourceManager(DeviceId deviceId) {
-        this.deviceId = deviceId;
+    @Override
+    public void init(BattyConfig config) {
+        resourceManager = new BattyResourceManager(new DeviceId(config.getDeviceId()));
+        cem = new BatteryNegotiator(config.getMarket(), resourceManager);
+        resourceManager.registerCustomerEnergyManager(cem);
     }
 
     @Override
-    public DeviceId getDeviceId() {
-        return deviceId;
+    public void evaluateMarket() {
+        cem.evaluate();
     }
 
     @Override
-    public void instruct(Instruction instruction) {
-        //
+    public void evaluateDevice() {
+        resourceManager.evaluate();
     }
 
     @Override
-    public void instructionRevoke(InstructionRevoke instructionRevoke) {
-        // 
+    public void sendMeasurement() {
+        double eDraw = Services.get(IMachineDataCacher.class).getMachineData().getEDraw();
+        resourceManager.sendMeasurement(eDraw);
+    }
+
+    public BatteryNegotiator getCem() {
+        return cem;
     }
 }

@@ -14,30 +14,28 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.marketnegotiator.storage;
+package nl.technolution.batty.trader;
 
-import nl.technolution.marketnegotiator.AbstractCustomerEnergyManager;
-import nl.technolution.protocols.efi.Instruction;
-import nl.technolution.protocols.efi.StorageInstruction;
-import nl.technolution.protocols.efi.StorageRegistration;
-import nl.technolution.protocols.efi.StorageStatus;
-import nl.technolution.protocols.efi.util.Efi;
+import nl.technolution.batty.app.BattyConfig;
+import nl.technolution.dropwizard.services.IService;
 
 /**
  * 
  */
-public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegistration, StorageStatus> {
+public interface IBattyTrader extends IService<BattyConfig> {
 
+    /**
+     * Evaluate market state. E.g. start en end trades
+     */
+    void evaluateMarket();
 
-    private Double fillLevel;
+    /**
+     * Evaluate device state.
+     */
+    void evaluateDevice();
 
-    @Override
-    public Instruction flexibilityUpdate(StorageStatus storageStatus) {
-        fillLevel = storageStatus.getCurrentFillLevel();
-        return Efi.build(StorageInstruction.class, getDeviceId());
-    }
-
-
-
-
+    /**
+     * Send a measurement to CEM
+     */
+    void sendMeasurement();
 }

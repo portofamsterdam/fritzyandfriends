@@ -14,28 +14,38 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.dropwizard;
+package nl.technolution.batty.trader;
 
-import io.dropwizard.Application;
-import io.dropwizard.Configuration;
-import io.dropwizard.setup.Environment;
-import nl.technolution.dropwizard.services.ServiceFinder;
-import nl.technolution.dropwizard.tasks.TimedTaskService;
-import nl.technolution.dropwizard.webservice.WebserviceFinder;
+import java.util.Arrays;
 
 /**
- * Basic app for Fritzy applications
  * 
- * @param <T> Dropwizard Configuration Type
  */
-public class FritzyDropWizardApp<T extends Configuration> extends Application<T> {
+public enum EBattyInstruction {
 
-    public static final String PKG = "nl.technolution";
+    STOP(0),
 
-    @Override
-    public void run(T configuration, Environment environment) throws Exception {
-        ServiceFinder.setupDropWizardServices(configuration);
-        WebserviceFinder.setupWebservices(environment);
-        environment.lifecycle().manage(new TimedTaskService());
+    CHARGE(1),
+
+    DISCHARGE(2);
+
+    private final int runningModeId;
+
+    EBattyInstruction(int runningModeId) {
+        this.runningModeId = runningModeId;
+    }
+
+    /**
+     * Find instruction type based on runningmode Id
+     * 
+     * @param runningModeId to find
+     * @return EBattyInstruction
+     */
+    public static EBattyInstruction fromRunningModeId(int runningModeId) {
+        return Arrays.asList(values())
+                .stream()
+                .filter(e -> e.runningModeId == runningModeId)
+                .findFirst()
+                .orElseThrow(IllegalArgumentException::new);
     }
 }

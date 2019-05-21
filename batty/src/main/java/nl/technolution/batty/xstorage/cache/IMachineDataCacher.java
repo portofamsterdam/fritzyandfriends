@@ -14,32 +14,26 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty.xstorage;
+package nl.technolution.batty.xstorage.cache;
 
 import nl.technolution.batty.app.BattyConfig;
+import nl.technolution.batty.xstorage.types.MachineData;
+import nl.technolution.dropwizard.services.IService;
 
 /**
  * 
  */
-public class XStorageFactory implements IXStorageFactory {
+public interface IMachineDataCacher extends IService<BattyConfig> {
 
-    private IXStorageConnection connection;
+    /**
+     * Update cached value
+     */
+    void update();
 
-    @Override
-    public void init(BattyConfig config) {
-        if (config.isUseStub()) {
-            this.connection = new XStorageStub();
-            return;
-        } else {
-            XStorageConnection xStorageConnection = new XStorageConnection();
-            xStorageConnection.init(config);
-            this.connection = xStorageConnection;
-        }
-    }
-
-    @Override
-    public IXStorageConnection getConnection() {
-        return connection;
-    }
-
+    /**
+     * Get cached value
+     * 
+     * @return cached value
+     */
+    MachineData getMachineData();
 }

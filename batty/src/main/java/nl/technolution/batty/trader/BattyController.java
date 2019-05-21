@@ -14,28 +14,36 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.dropwizard;
+package nl.technolution.batty.trader;
 
-import io.dropwizard.Application;
-import io.dropwizard.Configuration;
-import io.dropwizard.setup.Environment;
-import nl.technolution.dropwizard.services.ServiceFinder;
-import nl.technolution.dropwizard.tasks.TimedTaskService;
-import nl.technolution.dropwizard.webservice.WebserviceFinder;
+import nl.technolution.batty.xstorage.connection.IXStorageConnection;
+import nl.technolution.batty.xstorage.connection.IXStorageFactory;
+import nl.technolution.dropwizard.services.Services;
 
 /**
- * Basic app for Fritzy applications
  * 
- * @param <T> Dropwizard Configuration Type
  */
-public class FritzyDropWizardApp<T extends Configuration> extends Application<T> {
+class BattyController {
 
-    public static final String PKG = "nl.technolution";
+    void init() {
+        IXStorageConnection connection = Services.get(IXStorageFactory.class).getConnection();
+        connection.powerOff();
+    }
 
-    @Override
-    public void run(T configuration, Environment environment) throws Exception {
-        ServiceFinder.setupDropWizardServices(configuration);
-        WebserviceFinder.setupWebservices(environment);
-        environment.lifecycle().manage(new TimedTaskService());
+    void charge() {
+        IXStorageConnection connection = Services.get(IXStorageFactory.class).getConnection();
+        connection.powerOn();
+        connection.charge(100);
+    }
+
+    void discharge() {
+        IXStorageConnection connection = Services.get(IXStorageFactory.class).getConnection();
+        connection.powerOn();
+        connection.discharge(0);
+    }
+
+    void stop() {
+        IXStorageConnection connection = Services.get(IXStorageFactory.class).getConnection();
+        connection.powerOff();
     }
 }

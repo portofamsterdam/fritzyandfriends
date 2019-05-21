@@ -14,28 +14,22 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.dropwizard;
+package nl.technolution.batty.xstorage.cache;
 
-import io.dropwizard.Application;
-import io.dropwizard.Configuration;
-import io.dropwizard.setup.Environment;
-import nl.technolution.dropwizard.services.ServiceFinder;
-import nl.technolution.dropwizard.tasks.TimedTaskService;
-import nl.technolution.dropwizard.webservice.WebserviceFinder;
+import java.util.concurrent.TimeUnit;
+
+import nl.technolution.dropwizard.services.Services;
+import nl.technolution.dropwizard.tasks.ITaskRunner;
+import nl.technolution.dropwizard.tasks.TimedTask;
 
 /**
- * Basic app for Fritzy applications
  * 
- * @param <T> Dropwizard Configuration Type
+ * 
  */
-public class FritzyDropWizardApp<T extends Configuration> extends Application<T> {
-
-    public static final String PKG = "nl.technolution";
-
+@TimedTask(period = 30, unit = TimeUnit.SECONDS)
+public class GetCurrentSocTask implements ITaskRunner {
     @Override
-    public void run(T configuration, Environment environment) throws Exception {
-        ServiceFinder.setupDropWizardServices(configuration);
-        WebserviceFinder.setupWebservices(environment);
-        environment.lifecycle().manage(new TimedTaskService());
+    public void execute() {
+        Services.get(IMachineDataCacher.class).update();
     }
 }

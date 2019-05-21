@@ -14,30 +14,14 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.appliance.resourcemanager;
-
-import nl.technolution.appliance.IDevice;
-import nl.technolution.protocols.efi.FlexibilityRegistration;
-import nl.technolution.protocols.efi.FlexibilityUpdate;
-import nl.technolution.protocols.efi.Measurement;
+package nl.technolution.batty.xstorage.connection;
 
 /**
- * Handles Efi messages for specific device
+ * 
  */
-public interface IDeviceResourceHandler extends IDevice {
+public class XStorageException extends RuntimeException {
 
-    /**
-     * @return registration
-     */
-    FlexibilityRegistration getRegistration();
-
-    /**
-     * @return flexibility
-     */
-    FlexibilityUpdate getFlexibility();
-
-    /**
-     * @return measurement
-     */
-    Measurement getMeasurement();
+    XStorageException(String message, Throwable e) {
+        super(message, e);
+    }
 }

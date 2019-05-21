@@ -14,7 +14,7 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty.xstorage;
+package nl.technolution.batty.xstorage.connection;
 
 import java.io.File;
 import java.io.FileInputStream;

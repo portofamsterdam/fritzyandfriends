@@ -19,7 +19,6 @@ package nl.technolution.sunny;
 import java.time.Instant;
 
 import nl.technolution.DeviceId;
-import nl.technolution.appliance.resourcemanager.IDeviceResourceHandler;
 import nl.technolution.protocols.efi.CommodityEnum;
 import nl.technolution.protocols.efi.DeviceClass;
 import nl.technolution.protocols.efi.DeviceDescription;
@@ -37,7 +36,7 @@ import nl.technolution.protocols.efi.util.Efi;
 /**
  * Manages Sunny
  */
-public class Sunny implements IDeviceResourceHandler {
+public class Sunny {
 
     private final DeviceId deviceId;
 
@@ -50,7 +49,6 @@ public class Sunny implements IDeviceResourceHandler {
         return 1000d;
     }
 
-    @Override
     public FlexibilityRegistration getRegistration() {
         InflexibleRegistration reg = Efi.build(InflexibleRegistration.class, deviceId);
         SupportedCommodities commodity = new SupportedCommodities();
@@ -64,7 +62,6 @@ public class Sunny implements IDeviceResourceHandler {
         return reg;
     }
 
-    @Override
     public FlexibilityUpdate getFlexibility() {
         InflexibleForecast update = Efi.build(InflexibleForecast.class, deviceId);
         ElectricityProfile profile = new ElectricityProfile();
@@ -78,7 +75,6 @@ public class Sunny implements IDeviceResourceHandler {
         return update;
     }
 
-    @Override
     public Measurement getMeasurement() {
         Measurement measurement = Efi.build(Measurement.class, deviceId);
         measurement.setMeasurementTimestamp(Efi.calendarOfInstant(Instant.now()));
@@ -86,10 +82,5 @@ public class Sunny implements IDeviceResourceHandler {
         value.setPower(getCurrentUsage());
         measurement.setElectricityMeasurement(value);
         return measurement;
-    }
-
-    @Override
-    public DeviceId getDeviceId() {
-        return deviceId;
     }
 }

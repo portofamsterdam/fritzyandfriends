@@ -14,28 +14,32 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.dropwizard;
+package nl.technolution.batty.xstorage.connection;
 
-import io.dropwizard.Application;
-import io.dropwizard.Configuration;
-import io.dropwizard.setup.Environment;
-import nl.technolution.dropwizard.services.ServiceFinder;
-import nl.technolution.dropwizard.tasks.TimedTaskService;
-import nl.technolution.dropwizard.webservice.WebserviceFinder;
+import nl.technolution.batty.xstorage.types.BmsData;
+import nl.technolution.batty.xstorage.types.MachineData;
+import nl.technolution.batty.xstorage.types.MachineInfo;
+import nl.technolution.batty.xstorage.types.MeterInfo;
 
 /**
- * Basic app for Fritzy applications
  * 
- * @param <T> Dropwizard Configuration Type
  */
-public class FritzyDropWizardApp<T extends Configuration> extends Application<T> {
+public interface IXStorageConnection {
 
-    public static final String PKG = "nl.technolution";
+    MachineInfo getMachineInfo() throws XStorageException;
 
-    @Override
-    public void run(T configuration, Environment environment) throws Exception {
-        ServiceFinder.setupDropWizardServices(configuration);
-        WebserviceFinder.setupWebservices(environment);
-        environment.lifecycle().manage(new TimedTaskService());
-    }
+    MachineData getMachineData() throws XStorageException;
+
+    BmsData getBmsData() throws XStorageException;
+
+    void charge(int percentage) throws XStorageException;
+
+    void discharge(int percentage) throws XStorageException;
+
+    void powerOn() throws XStorageException;
+
+    void powerOff() throws XStorageException;
+
+    MeterInfo getMeterInfo() throws XStorageException;
+
 }
