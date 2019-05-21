@@ -24,9 +24,18 @@ import nl.technolution.dropwizard.services.IService;
  */
 public interface IBattyTrader extends IService<BattyConfig> {
 
+    /**
+     * Evaluate market state. E.g. start en end trades
+     */
     void evaluateMarket();
 
+    /**
+     * Evaluate device state.
+     */
     void evaluateDevice();
 
+    /**
+     * Send a measurement to CEM
+     */
     void sendMeasurement();
 }

@@ -24,6 +24,7 @@ import org.junit.Test;
 import nl.technolution.batty.app.BattyConfig;
 import nl.technolution.batty.trader.BattyTrader;
 import nl.technolution.batty.trader.IBattyTrader;
+import nl.technolution.batty.xstorage.cache.GetCurrentSocTask;
 import nl.technolution.batty.xstorage.cache.IMachineDataCacher;
 import nl.technolution.batty.xstorage.cache.MachineDataCache;
 import nl.technolution.batty.xstorage.connection.IXStorageFactory;
@@ -58,6 +59,7 @@ public class BattyTraderTest {
         assertEquals((double)soc, trader.getCem().getFillLevel().doubleValue(), 0.0001d);
         soc = 80;
         service.getConnection().charge(soc);
+        new GetCurrentSocTask().execute();
         trader.evaluateDevice();
         assertEquals((double)soc, trader.getCem().getFillLevel().doubleValue(), 0.0001d);
         trader.sendMeasurement();
