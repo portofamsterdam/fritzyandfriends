@@ -32,8 +32,8 @@ import nl.technolution.exxy.client.PublicationMarketDocument;
  */
 @TimedTask(period = 15, unit = TimeUnit.MINUTES)
 public final class APXPriceRetriever implements IPriceReceiver {
-    private PublicationMarketDocument cachedPrices;
     private static final Logger LOG = Log.getLogger();
+    private PublicationMarketDocument cachedPrices;
 
     @Override
     public PublicationMarketDocument getCachedPrices() {
@@ -43,7 +43,9 @@ public final class APXPriceRetriever implements IPriceReceiver {
     @Override
     public void execute() {
         cachedPrices = Services.get(ITransparencyPlatformClient.class).getDayAheadPrices(Instant.now());
-        LOG.info("New prices retrived, cache now conatains prices from {} till {}",
-                cachedPrices.getPeriodTimeInterval().getStart(), cachedPrices.getPeriodTimeInterval().getEnd());
+        if (cachedPrices != null) {
+            LOG.info("New prices retrived, cache now conatains prices from {} till {}",
+                    cachedPrices.getPeriodTimeInterval().getStart(), cachedPrices.getPeriodTimeInterval().getEnd());
+        }
     }
 }
