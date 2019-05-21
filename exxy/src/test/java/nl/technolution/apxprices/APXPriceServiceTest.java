@@ -16,33 +16,40 @@
  */
 package nl.technolution.apxprices;
 
+import static org.junit.Assert.assertEquals;
+
 import java.time.Instant;
+import java.time.LocalTime;
 import java.time.OffsetDateTime;
+import java.time.temporal.ChronoField;
 import java.util.HashMap;
 import java.util.Map;
+
+import org.junit.Before;
+import org.junit.Test;
 
 import nl.technolution.dropwizard.services.ServiceFinder;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.exxy.app.ExxyConfig;
 import nl.technolution.exxy.service.APXPricesService;
-import nl.technolution.exxy.service.IAPXPricesService;
 import nl.technolution.exxy.service.APXPricesService.NoPricesAvailableException;
+import nl.technolution.exxy.service.IAPXPricesService;
 
 /**
  * Tests for APXPriceService
  * 
  */
-public class APXPriceServiceTool {
+public class APXPriceServiceTest {
 
-    public static void main(String[] args) throws NoPricesAvailableException {
+    private IAPXPricesService priceService;
 
-        ExxyConfig config = new ExxyConfig("https://transparency.entsoe.eu/api",
-                "0b1d9ae3-d9a6-4c6b-8dc1-c62a18387ac5", null, false);
+    @Before
+    public void before() {
+        ExxyConfig config = new ExxyConfig("https://transparency.entsoe.eu/api", "0b1d9ae3-d9a6-4c6b-8dc1-c62a18387ac5",
+                null, false);
         ServiceFinder.setupDropWizardServices(config);
-        IAPXPricesService priceService = Services.get(IAPXPricesService.class);
-        getPrice(priceService);
+        priceService = Services.get(IAPXPricesService.class);
     }
-
 
     /**
      * Test getPrice method using the real entsoe server. The data seems to be available for the past 5 years so this
@@ -57,7 +64,8 @@ public class APXPriceServiceTool {
      * 
      * @throws NoPricesAvailableException
      */
-    private static void getPrice(IAPXPricesService priceService) throws NoPricesAvailableException {
+    @Test
+    public void getPrice() throws NoPricesAvailableException {
         // next should give the price at midnight(UTC) at 1-1-2019 (which is 64,98 EUR per MWH)
         Instant instant = Instant.parse("2019-01-01T00:00:00.00Z");
         double price = priceService.getPricePerkWh(instant);
@@ -75,28 +83,30 @@ public class APXPriceServiceTool {
         // assertEquals(31.6d / 1000, price, 0.001);
     }
 
-    private static void noPricesAvailableTest(IAPXPricesService priceService) throws NoPricesAvailableException {
+    @Test(expected = NoPricesAvailableException.class)
+    public void noPricesAvailableTest() throws NoPricesAvailableException {
         // next should fail with an exception
         Instant instant = Instant.parse("1919-01-01T00:00:00.00Z");
         priceService.getPricePerkWh(instant);
     }
 
-    private static void fixedPricesTest(IAPXPricesService priceService) throws NoPricesAvailableException {
+    @Test
+    public void fixedPricesTest() throws NoPricesAvailableException {
         // setup config with fixed prices
         Map<Integer, Double> fixedPrices = new HashMap<Integer, Double>();
         for (int i = 0; i < 24; i++) {
             fixedPrices.put(i, (double)i / 100);
         }
-        ExxyConfig config = new ExxyConfig("", "", null, true);
+        ExxyConfig config = new ExxyConfig("", "", fixedPrices, true);
         priceService = new APXPricesService();
-        // manually init the service
+        // manually re-init the service so fixed prices are used
         priceService.init(config);
 
         Instant instant = OffsetDateTime.now().withHour(8).toInstant();
         double price = priceService.getPricePerkWh(instant);
-        // assertEquals(0.08d, price, 0.001);
+        assertEquals(0.08d, price, 0.001);
 
         price = priceService.getPricePerkWh();
-        // assertEquals((double)LocalTime.now().get(ChronoField.HOUR_OF_DAY) / 100, price, 0.001);
+        assertEquals((double)LocalTime.now().get(ChronoField.HOUR_OF_DAY) / 100, price, 0.001);
     }
 }
