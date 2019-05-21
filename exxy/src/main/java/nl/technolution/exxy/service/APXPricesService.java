@@ -23,11 +23,11 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoField;
+import java.time.temporal.ChronoUnit;
 import java.util.Map;
 
 import org.slf4j.Logger;
 
-import eu.entsoe.wgedi.codelists.StandardUnitOfMeasureTypeList;
 import nl.technolution.core.Log;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.exxy.app.ExxyConfig;
@@ -36,6 +36,8 @@ import nl.technolution.exxy.client.Point;
 import nl.technolution.exxy.client.PublicationMarketDocument;
 import nl.technolution.exxy.client.SeriesPeriod;
 import nl.technolution.exxy.client.TimeSeries;
+
+import eu.entsoe.wgedi.codelists.StandardUnitOfMeasureTypeList;
 
 /**
  * APXPricesService
@@ -66,15 +68,24 @@ public class APXPricesService implements IAPXPricesService {
 
     @Override
     public double getPricePerkWh() throws NoPricesAvailableException {
+        return getPriceFromCache(Instant.now());
+    }
+
+    @Override
+    public double getPricePerkWhNextQuarter() throws NoPricesAvailableException {
+        return getPriceFromCache(Instant.now().plus(15, ChronoUnit.MINUTES));
+    }
+
+    private double getPriceFromCache(Instant instant) throws NoPricesAvailableException {
         if (useFixedPrices) {
-            return getFixedPrice(Instant.now());
+            return getFixedPrice(instant);
         }
         IPriceReceiver priceReceiver = Services.get(IPriceReceiver.class);
         PublicationMarketDocument cachedPrices = priceReceiver.getCachedPrices();
         if (cachedPrices == null) {
             throw new NoPricesAvailableException("No prices available yet.");
         }
-        return getSinglePrice(Instant.now(), cachedPrices);
+        return getSinglePrice(instant, cachedPrices);
     }
 
     @Override
