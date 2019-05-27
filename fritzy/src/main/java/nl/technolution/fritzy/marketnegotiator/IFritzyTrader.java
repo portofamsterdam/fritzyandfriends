@@ -14,42 +14,28 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty.trader;
+package nl.technolution.fritzy.marketnegotiator;
 
-import java.util.Arrays;
+import nl.technolution.dropwizard.services.IService;
+import nl.technolution.fritzy.app.FritzyConfig;
 
 /**
  * 
  */
-public enum EBattyInstruction {
-
-    IDLE(0),
-
-    CHARGE(1),
-
-    DISCHARGE(2);
-
-    private final int runningModeId;
-
-    EBattyInstruction(int runningModeId) {
-        this.runningModeId = runningModeId;
-    }
+public interface IFritzyTrader extends IService<FritzyConfig> {
 
     /**
-     * Find instruction type based on runningmode Id
-     * 
-     * @param runningModeId to find
-     * @return EBattyInstruction
+     * Evaluate market state. E.g. start en end trades
      */
-    public static EBattyInstruction fromRunningModeId(int runningModeId) {
-        return Arrays.asList(values())
-                .stream()
-                .filter(e -> e.runningModeId == runningModeId)
-                .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
-    }
+    void evaluateMarket();
 
-    public int getRunningModeId() {
-        return runningModeId;
-    }
+    /**
+     * Evaluate device state.
+     */
+    void evaluateDevice();
+
+    /**
+     * Send a measurement to CEM
+     */
+    void sendMeasurement();
 }

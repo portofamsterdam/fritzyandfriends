@@ -14,42 +14,20 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty.trader;
-
-import java.util.Arrays;
+package nl.technolution.fritzy.marketnegotiator;
 
 /**
  * 
  */
-public enum EBattyInstruction {
+public class FritzyController {
 
-    IDLE(0),
-
-    CHARGE(1),
-
-    DISCHARGE(2);
-
-    private final int runningModeId;
-
-    EBattyInstruction(int runningModeId) {
-        this.runningModeId = runningModeId;
+    public FritzyController() {
+        // 
     }
 
-    /**
-     * Find instruction type based on runningmode Id
-     * 
-     * @param runningModeId to find
-     * @return EBattyInstruction
-     */
-    public static EBattyInstruction fromRunningModeId(int runningModeId) {
-        return Arrays.asList(values())
-                .stream()
-                .filter(e -> e.runningModeId == runningModeId)
-                .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
+    public void stop() {
+        //
+
     }
 
-    public int getRunningModeId() {
-        return runningModeId;
-    }
 }

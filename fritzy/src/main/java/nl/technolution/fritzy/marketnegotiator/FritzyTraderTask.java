@@ -14,42 +14,24 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty.trader;
+package nl.technolution.fritzy.marketnegotiator;
 
-import java.util.Arrays;
+import java.util.concurrent.TimeUnit;
+
+import nl.technolution.dropwizard.services.Services;
+import nl.technolution.dropwizard.tasks.ITaskRunner;
+import nl.technolution.dropwizard.tasks.TimedTask;
 
 /**
  * 
  */
-public enum EBattyInstruction {
+@TimedTask(period = 1, unit = TimeUnit.MINUTES)
+public class FritzyTraderTask implements ITaskRunner {
 
-    IDLE(0),
-
-    CHARGE(1),
-
-    DISCHARGE(2);
-
-    private final int runningModeId;
-
-    EBattyInstruction(int runningModeId) {
-        this.runningModeId = runningModeId;
-    }
-
-    /**
-     * Find instruction type based on runningmode Id
-     * 
-     * @param runningModeId to find
-     * @return EBattyInstruction
-     */
-    public static EBattyInstruction fromRunningModeId(int runningModeId) {
-        return Arrays.asList(values())
-                .stream()
-                .filter(e -> e.runningModeId == runningModeId)
-                .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
-    }
-
-    public int getRunningModeId() {
-        return runningModeId;
+    @Override
+    public void execute() {
+        IFritzyTrader trader = Services.get(IFritzyTrader.class);
+        trader.evaluateDevice();
+        trader.evaluateMarket();
     }
 }

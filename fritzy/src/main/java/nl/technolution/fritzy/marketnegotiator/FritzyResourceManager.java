@@ -14,22 +14,22 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty.trader;
+package nl.technolution.fritzy.marketnegotiator;
 
 import java.time.Instant;
 
 import com.google.common.base.Preconditions;
 
 import nl.technolution.DeviceId;
-import nl.technolution.protocols.efi.ActuatorInstruction;
-import nl.technolution.protocols.efi.ActuatorInstructions;
 import nl.technolution.protocols.efi.Instruction;
 import nl.technolution.protocols.efi.InstructionRevoke;
 import nl.technolution.protocols.efi.Measurement;
 import nl.technolution.protocols.efi.Measurement.ElectricityMeasurement;
-import nl.technolution.protocols.efi.StorageInstruction;
-import nl.technolution.protocols.efi.StorageRegistration;
-import nl.technolution.protocols.efi.StorageUpdate;
+import nl.technolution.protocols.efi.SequentialProfileInstruction;
+import nl.technolution.protocols.efi.SequentialProfileInstructions;
+import nl.technolution.protocols.efi.ShiftableInstruction;
+import nl.technolution.protocols.efi.ShiftableRegistration;
+import nl.technolution.protocols.efi.ShiftableUpdate;
 import nl.technolution.protocols.efi.util.Efi;
 import nl.technolution.protocols.efi.util.ICustomerEnergyManager;
 import nl.technolution.protocols.efi.util.IResourceManager;
@@ -37,26 +37,26 @@ import nl.technolution.protocols.efi.util.IResourceManager;
 /**
  * Resource Manager of sunny
  */
-public class BattyResourceManager implements IResourceManager {
+public class FritzyResourceManager implements IResourceManager {
 
     private final DeviceId deviceId;
-    private final BattyResourceHelper helper;
-    private final BattyController controller;
+    private final FritzyResourceHelper helper;
+    private final FritzyController controller;
 
-    private ICustomerEnergyManager<StorageRegistration, StorageUpdate> cem;
+    private ICustomerEnergyManager<ShiftableRegistration, ShiftableUpdate> cem;
 
-    public BattyResourceManager(DeviceId deviceId) {
+    public FritzyResourceManager(DeviceId deviceId) {
         this.deviceId = deviceId;
-        this.helper = new BattyResourceHelper(deviceId);
-        this.controller = new BattyController();
+        this.helper = new FritzyResourceHelper(deviceId);
+        this.controller = new FritzyController();
     }
 
     @Override
     public void instruct(Instruction instruction) {
-        Preconditions.checkArgument(instruction instanceof StorageInstruction, "Expected storage instruction");
-        StorageInstruction storageInstruction = StorageInstruction.class.cast(instruction);
-        ActuatorInstructions actuatorInstructions = storageInstruction.getActuatorInstructions();
-        actuatorInstructions.getActuatorInstruction().forEach(this::handleActuatorInstruction);
+        Preconditions.checkArgument(instruction instanceof ShiftableInstruction, "Expected storage instruction");
+        ShiftableInstruction shiftableInstruction = ShiftableInstruction.class.cast(instruction);
+        SequentialProfileInstructions actuatorInstructions = shiftableInstruction.getSequentialProfileInstructions();
+        actuatorInstructions.getSequentialProfileInstruction().forEach(this::handleActuatorInstruction);
     }
 
     @Override
@@ -64,22 +64,8 @@ public class BattyResourceManager implements IResourceManager {
         controller.stop();
     }
 
-    private void handleActuatorInstruction(ActuatorInstruction instruction) {
-        // NOTE assume one actuatorId exists
-        EBattyInstruction battyInstruction = EBattyInstruction.fromRunningModeId(instruction.getRunningModeId());
-        switch (battyInstruction) {
-        case IDLE:
-            controller.stop();
-            break;
-        case CHARGE:
-            controller.charge();
-            break;
-        case DISCHARGE:
-            controller.discharge();
-            break;
-        default:
-            throw new IllegalStateException("Unknown instruction " + battyInstruction);
-        }
+    private void handleActuatorInstruction(SequentialProfileInstruction instruction) {
+
     }
 
     /**
@@ -94,10 +80,9 @@ public class BattyResourceManager implements IResourceManager {
      * 
      * @param cem to register to
      */
-    public void registerCustomerEnergyManager(BatteryNegotiator cem) {
+    public void registerCustomerEnergyManager(FritzyNegotiator cem) {
         this.cem = cem;
         cem.flexibilityRegistration(helper.getRegistration());
-        cem.flexibilityUpdate(helper.getStorageSystemDescription());
     }
 
     /**

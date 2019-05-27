@@ -14,42 +14,27 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.batty.trader;
+package nl.technolution.fritzy.marketnegotiator;
 
-import java.util.Arrays;
+import nl.technolution.market.MarketConfig;
+import nl.technolution.marketnegotiator.AbstractCustomerEnergyManager;
+import nl.technolution.protocols.efi.Instruction;
+import nl.technolution.protocols.efi.ShiftableRegistration;
+import nl.technolution.protocols.efi.ShiftableUpdate;
 
 /**
  * 
  */
-public enum EBattyInstruction {
+public class FritzyNegotiator extends AbstractCustomerEnergyManager<ShiftableRegistration, ShiftableUpdate> {
 
-    IDLE(0),
-
-    CHARGE(1),
-
-    DISCHARGE(2);
-
-    private final int runningModeId;
-
-    EBattyInstruction(int runningModeId) {
-        this.runningModeId = runningModeId;
+    public FritzyNegotiator(MarketConfig market, FritzyResourceManager resourceManager) {
+        // 
     }
 
-    /**
-     * Find instruction type based on runningmode Id
-     * 
-     * @param runningModeId to find
-     * @return EBattyInstruction
-     */
-    public static EBattyInstruction fromRunningModeId(int runningModeId) {
-        return Arrays.asList(values())
-                .stream()
-                .filter(e -> e.runningModeId == runningModeId)
-                .findFirst()
-                .orElseThrow(IllegalArgumentException::new);
+    @Override
+    public Instruction flexibilityUpdate(ShiftableUpdate update) {
+        //
+        return null;
     }
 
-    public int getRunningModeId() {
-        return runningModeId;
-    }
 }
