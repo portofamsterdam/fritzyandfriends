@@ -34,15 +34,21 @@ public class SunnyConfig extends Configuration {
     @JsonProperty("host")
     private final String host;
 
+    /** Maximum margin used by Fritzy */
+    @JsonProperty("maxMargin")
+    private final int maxMargin;
+
     @JsonProperty("market")
     private MarketConfig market;
 
     @JsonCreator
     public SunnyConfig(@JsonProperty("deviceId") String deviceId,
             @JsonProperty("host") String host,
+            @JsonProperty("maxMargin") int maxMargin,
             @JsonProperty("market") MarketConfig market) {
         this.deviceId = deviceId;
         this.host = host;
+        this.maxMargin = maxMargin;
         this.market = market;
     }
 

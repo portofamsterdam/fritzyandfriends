@@ -24,6 +24,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
 import io.dropwizard.Configuration;
+import nl.technolution.market.MarketConfig;
 
 /**
  * Configuration for APXPrices
@@ -48,6 +49,12 @@ public class ExxyConfig extends Configuration {
     private final String securityToken;
 
     /**
+     * How much kWh can exxy sell in a trade period
+     */
+    @JsonProperty("capacity")
+    private final int capacity;
+
+    /**
      * Map with fixed prices in EUR per kWh for every hour of the day (local time). Hours > 23 are ignored. When
      * {@link useFixedPrices} is true these fixed prices are used instead of the live day ahead prices.
      *
@@ -62,15 +69,25 @@ public class ExxyConfig extends Configuration {
     @JsonProperty("useFixedPrices")
     private boolean useFixedPrices;
 
+    /**
+     * MArket properties
+     */
+    @JsonProperty("market")
+    private final MarketConfig market;
+
     @JsonCreator
-    public ExxyConfig(@JsonProperty("baseURL") String baseURL, @JsonProperty("securityToken") String securityToken,
+    public ExxyConfig(@JsonProperty("baseURL") String baseURL, 
+            @JsonProperty("securityToken") String securityToken,
+            @JsonProperty("capacity") int capacity,
             @JsonProperty("fixedPrices") Map<Integer, Double> fixedPrices,
-            @JsonProperty("useFixedPrices") boolean useFixedPrices) {
-        super();
+            @JsonProperty("useFixedPrices") boolean useFixedPrices,
+            @JsonProperty("market") MarketConfig market) {
         this.baseURL = baseURL;
         this.securityToken = securityToken;
+        this.capacity = capacity;
         this.fixedPrices = fixedPrices;
         this.useFixedPrices = useFixedPrices;
+        this.market = market;
         validateConfig();
     }
 

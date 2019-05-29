@@ -16,40 +16,19 @@
  */
 package nl.technolution.market;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import nl.technolution.fritzy.wallet.FritzyApi;
 
 /**
- * Config needed to use api
+ * 
  */
-public class MarketConfig {
+public class MarketService implements IMarket {
 
-    @JsonProperty("marketUrl")
-    private final String marketUrl;
+    private FritzyApi api;
 
-    @JsonProperty("email")
-    private final String email;
-
-    @JsonProperty("password")
-    private final String password;
-
-    @JsonCreator
-    public MarketConfig(@JsonProperty("marketUrl") String marketUrl, @JsonProperty("email") String email,
-            @JsonProperty("password") String password) {
-        this.marketUrl = marketUrl;
-        this.email = email;
-        this.password = password;
+    @Override
+    public void init(MarketConfig config) {
+        api = new FritzyApi(config.getMarketUrl());
+        api.login(config.getEmail(), config.getPassword());
     }
 
-    public String getMarketUrl() {
-        return marketUrl;
-    }
-
-    public String getEmail() {
-        return email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
 }

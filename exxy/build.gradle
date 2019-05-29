@@ -19,7 +19,8 @@ dependencies {
     compile libraries.techno_core
     compile libraries.dropwizard
 	compile files(generateIec62325Lib.outputLib)
-	compile project(':common');
+    compile project(':common');
+    compile project(':marketnegotiator');
 	
 	// Special entries for techno-jax plugin
 	technoJaxb libraries.jaxb_xjc	  

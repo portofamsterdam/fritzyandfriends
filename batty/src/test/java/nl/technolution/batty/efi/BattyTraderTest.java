@@ -44,7 +44,7 @@ public class BattyTraderTest {
     @Test
     public void testTrading() {
         XStorageFactory service = new XStorageFactory();
-        BattyConfig testConfig = new BattyConfig("Test", "", "", "", "", "", null, true);
+        BattyConfig testConfig = new BattyConfig("Test", "", "", "", "", "", 0, 0, null, true);
         service.init(testConfig);
         Services.put(IXStorageFactory.class, service);
         Services.put(IMachineDataCacher.class, new MachineDataCache());
