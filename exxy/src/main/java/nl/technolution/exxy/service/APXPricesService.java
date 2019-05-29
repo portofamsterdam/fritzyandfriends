@@ -93,8 +93,11 @@ public class APXPricesService implements IAPXPricesService {
         if (useFixedPrices) {
             return getFixedPrice(requestedDateTime);
         }
-        ITransparencyPlatformClient transparencyPlatformClient = Services.get(ITransparencyPlatformClient.class);
-        return getSinglePrice(requestedDateTime, transparencyPlatformClient.getDayAheadPrices(requestedDateTime));
+        PublicationMarketDocument prices = Services.get(ITransparencyPlatformClient.class).getDayAheadPrices(requestedDateTime);
+        if (prices == null) {
+            throw new NoPricesAvailableException("No prices available.");
+        }
+        return getSinglePrice(requestedDateTime, prices);
     }
 
     private double getFixedPrice(Instant requestedDateTime) {
