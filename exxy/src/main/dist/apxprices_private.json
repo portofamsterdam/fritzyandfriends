@@ -1,7 +1,7 @@
 {
   "baseURL": "https://transparency.entsoe.eu/api",
-  "securityToken": "INSERT_SECURITY_TOKEN_HERE",
-  "useFixedPrices": true,
+  "securityToken": "0b1d9ae3-d9a6-4c6b-8dc1-c62a18387ac5",
+  "useFixedPrices": false,
   "fixedPrices": {
     "0": 0.01,
     "1": 0.02,

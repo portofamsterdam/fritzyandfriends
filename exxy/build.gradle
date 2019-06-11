@@ -21,6 +21,8 @@ dependencies {
 	compile files(generateIec62325Lib.outputLib)
 	compile project(':common');
 	
+	testImplementation libraries.mockserver_netty
+	
 	// Special entries for techno-jax plugin
 	technoJaxb libraries.jaxb_xjc	  
     technoJaxb libraries.jaxb_impl    

@@ -37,6 +37,8 @@ libraries.guava = 'com.google.guava:guava:23.0'
 // Testing
 libraries.test_junit = 'junit:junit:4.12'
 
+libraries.mockserver_netty = 'org.mock-server:mockserver-netty:5.5.4'
+
 // Technolution core
 libraries.techno_core = 'nl.technolution:techno-core:1.5.906'
 

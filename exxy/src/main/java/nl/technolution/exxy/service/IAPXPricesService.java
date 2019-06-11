@@ -44,4 +44,12 @@ public interface IAPXPricesService extends IService<ExxyConfig> {
      * @throws NoPricesAvailableException
      */
     double getPricePerkWh() throws NoPricesAvailableException;
+
+    /**
+     * Get day ahead price in EUR per kWh for the NEXT quarter hour using the cached data.
+     * 
+     * @return day ahead price per kWh for the next quarter hour
+     * @throws NoPricesAvailableException
+     */
+    double getPricePerkWhNextQuarter() throws NoPricesAvailableException;
 }

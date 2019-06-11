@@ -28,11 +28,12 @@ import com.codahale.metrics.annotation.Timed;
 
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
-import io.dropwizard.jersey.params.InstantParam;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.webservice.IEndpoint;
 import nl.technolution.exxy.service.APXPricesService;
 import nl.technolution.exxy.service.IAPXPricesService;
+
+import io.dropwizard.jersey.params.InstantParam;
 
 /**
  * 
@@ -51,6 +52,24 @@ public class APXPricesApi implements IEndpoint {
     @Path("currentPrice")
     @Produces(MediaType.APPLICATION_JSON)
     public ApxPrice getCurrentPrice() {
+        IAPXPricesService priceService = Services.get(IAPXPricesService.class);
+        try {
+            return new ApxPrice(priceService.getPricePerkWh());
+        } catch (APXPricesService.NoPricesAvailableException e) {
+            throw new WebApplicationException(e.getMessage(), e);
+        }
+    }
+
+    /**
+     * Get day ahead price in EUR per kWh for the NEXT quarter hour using the cache.
+     * 
+     * @return day ahead price for the next quarter hour (request at 12:01 gives price for 12:15).
+     */
+    @GET
+    @Timed
+    @Path("nextQuarterPrice")
+    @Produces(MediaType.APPLICATION_JSON)
+    public ApxPrice getNextQuarterHourPrice() {
         IAPXPricesService priceService = Services.get(IAPXPricesService.class);
         try {
             return new ApxPrice(priceService.getPricePerkWh());
