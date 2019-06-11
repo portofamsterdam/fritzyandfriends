@@ -4,6 +4,7 @@ apply plugin: 'application'
 dependencies {
     compile project(':devicecontroller')
     compile libraries.modbus
+	compile libraries.org_apache_commons_lang    
 }
 
 mainClassName = 'nl.technolution.sunny.app.SunnyApp'
