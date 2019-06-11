@@ -46,7 +46,9 @@ import nl.technolution.protocols.efi.util.Efi;
 public class BattyResourceHelper {
 
     public static final int ACTUATOR_ID = 1;
-    private static final double CAPACITY = 10000;
+
+    static final double CAPACITY = 10000;
+
     private final DeviceId deviceId;
 
     public BattyResourceHelper(DeviceId devieId) {
