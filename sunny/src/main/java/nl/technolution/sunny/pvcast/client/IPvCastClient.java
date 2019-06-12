@@ -16,6 +16,8 @@
  */
 package nl.technolution.sunny.pvcast.client;
 
+import java.io.IOException;
+
 import nl.technolution.dropwizard.services.IService;
 import nl.technolution.sunny.app.SunnyConfig;
 import nl.technolution.sunny.pvcast.model.Forecasts;
@@ -34,6 +36,7 @@ public interface IPvCastClient extends IService<SunnyConfig> {
     /**
      * @param forecasts
      * @return
+     * @throws IOException
      */
-    Forecasts getPvForecasts();
+    Forecasts getPvForecasts() throws IOException;
 }
