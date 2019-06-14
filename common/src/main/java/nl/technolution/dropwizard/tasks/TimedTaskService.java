@@ -27,11 +27,12 @@ import com.google.common.base.Preconditions;
 
 import org.slf4j.Logger;
 
-import io.dropwizard.lifecycle.Managed;
 import nl.technolution.Log;
 import nl.technolution.core.resources.TypeFinder;
 import nl.technolution.dropwizard.FritzyDropWizardApp;
 import nl.technolution.dropwizard.services.Services;
+
+import io.dropwizard.lifecycle.Managed;
 
 /**
  * Manages task with @Timed annotation
@@ -52,7 +53,7 @@ public final class TimedTaskService implements Managed {
                 .findImplementingClasses(FritzyDropWizardApp.PKG, ITaskRunner.class);
 
         LOG.info("Found {} tasks", timeTaskAnnotationClasses.size());
-        
+
         for (Class<? extends ITaskRunner> timedTaskAnnotatedClass : timeTaskAnnotationClasses) {
             LOG.info("Found task: {}", timedTaskAnnotatedClass);
             // Create parameter to run scheduled task
@@ -60,10 +61,13 @@ public final class TimedTaskService implements Managed {
             Preconditions.checkNotNull(timedTaskAnnotation, "Annotation @TimedTask not found");
 
             ChronoUnit unit = convert(timedTaskAnnotation.unit());
-            long delay = LocalDateTime.now().until(LocalDateTime.now().truncatedTo(unit).plus(1, unit),
-                    ChronoUnit.SECONDS);
+            long delay = LocalDateTime.now()
+                    .until(LocalDateTime.now()
+                            .truncatedTo(unit)
+                            .plus(1, unit)
+                            .plus(timedTaskAnnotation.offset(), convert(timedTaskAnnotation.offsetUnit())),
+                            ChronoUnit.SECONDS);
             long periodSec = timedTaskAnnotation.period() * unit.getDuration().getSeconds();
-
 
             // Find the implementation of ITask to run and register
             Class taskInterface = null;
@@ -132,8 +136,8 @@ public final class TimedTaskService implements Managed {
                 task.execute();
             } catch (Throwable e) {
                 LOG.error("task encountered error {}", e.getMessage(), e);
+                // TODO WHO: schedule retry?
             }
         }
-
     }
 }
