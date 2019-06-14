@@ -36,7 +36,7 @@ public class ConnectionTest {
             KeyManagementException, NoSuchAlgorithmException, CertificateException, KeyStoreException {
 
         BattyConfig b = new BattyConfig("", "https://172.30.133.212/assets/inc/server.inc.php", "batty", "batty",
-                "src/main/resource/truststore.jks", "12345678", 0, 0, null, false);
+                "src/main/dist/truststore.jks", "12345678", 0, 0, null, false);
 
         XStorageConnection conn = new XStorageConnection();
         conn.init(b);
@@ -52,7 +52,7 @@ public class ConnectionTest {
         // System.out.println(bmsData.toString());
 
         // conn.discharge(0);
-        conn.charge(100);
+        // conn.charge(100);
         System.out.println(conn.getMachineData().toString().replaceAll(",", "\n"));
     }
 }

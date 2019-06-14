@@ -61,6 +61,7 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
      */
     public void evaluate() {
 
+
         // Sample charge instruction
         StorageInstruction instruction = Efi.build(StorageInstruction.class, getDeviceId());
         ActuatorInstructions actInstuctions = new ActuatorInstructions();

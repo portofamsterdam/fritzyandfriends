@@ -25,21 +25,43 @@ import nl.technolution.dropwizard.services.Services;
  */
 class BattyController {
 
+    private double maxChargeRate;
+    private double maxDischargeRate;
+
+    /**
+     * Constructor for {@link BattyController} objects
+     *
+     * @param maxChargeRate
+     * @param maxDischargeRate
+     */
+    BattyController(double maxChargeRate, double maxDischargeRate) {
+        this.maxChargeRate = maxChargeRate;
+        this.maxDischargeRate = maxDischargeRate;
+    }
+
     void init() {
         IXStorageConnection connection = Services.get(IXStorageFactory.class).getConnection();
         connection.powerOff();
     }
 
-    void charge() {
+    /**
+     * @param chargeRate Wh charge.
+     */
+    void charge(double chargeRate) {
         IXStorageConnection connection = Services.get(IXStorageFactory.class).getConnection();
         connection.powerOn();
-        connection.charge(100);
+        double chargeRatePercentage = chargeRate / maxChargeRate * 100d;
+        connection.charge((int)chargeRatePercentage);
     }
 
-    void discharge() {
+    /**
+     * @param dischargeRate Wh charge.
+     */
+    void discharge(double dischargeRate) {
         IXStorageConnection connection = Services.get(IXStorageFactory.class).getConnection();
         connection.powerOn();
-        connection.discharge(0);
+        double dischargeRatePercentage = dischargeRate / maxDischargeRate * 100d;
+        connection.discharge((int)dischargeRatePercentage);
     }
 
     void stop() {

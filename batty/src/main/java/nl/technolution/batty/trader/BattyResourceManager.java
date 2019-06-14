@@ -48,7 +48,7 @@ public class BattyResourceManager implements IResourceManager {
     public BattyResourceManager(DeviceId deviceId) {
         this.deviceId = deviceId;
         this.helper = new BattyResourceHelper(deviceId);
-        this.controller = new BattyController();
+        this.controller = new BattyController(5000d, 5000d); // TODO MKE configurable max chargerate
     }
 
     @Override
@@ -72,10 +72,10 @@ public class BattyResourceManager implements IResourceManager {
             controller.stop();
             break;
         case CHARGE:
-            controller.charge();
+            controller.charge(1000d); // TODO MKE dynamic charge rate
             break;
         case DISCHARGE:
-            controller.discharge();
+            controller.discharge(1000d); // TODO MKE dynamic discharge rate
             break;
         default:
             throw new IllegalStateException("Unknown instruction " + battyInstruction);
