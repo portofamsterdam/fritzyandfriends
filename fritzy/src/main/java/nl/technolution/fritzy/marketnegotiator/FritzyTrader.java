@@ -16,38 +16,40 @@
  */
 package nl.technolution.fritzy.marketnegotiator;
 
-import java.util.concurrent.TimeUnit;
-
 import nl.technolution.DeviceId;
-import nl.technolution.dropwizard.tasks.TimedTask;
-import nl.technolution.market.ISupplierMarket;
+import nl.technolution.fritzy.app.FritzyConfig;
 
 /**
  * 
  */
-@TimedTask(period = 1, unit = TimeUnit.MINUTES)
-public final class FritzyTrader implements Runnable {
+public final class FritzyTrader implements IFritzyTrader {
 
-    private static final double MAX_PRICE = 25.1d;
-    private final ISupplierMarket market;
-    private final DeviceId deviceId;
+    private FritzyResourceManager resourceManager;
+    private FritzyNegotiator cem;
 
-    public FritzyTrader() {
-        this.market = null;
-        this.deviceId = null;
-    }
+    @Override
+    public void init(FritzyConfig config) {
+        resourceManager = new FritzyResourceManager(new DeviceId(config.getDeviceId()));
+        cem = new FritzyNegotiator(config.getMarket(), resourceManager);
+        resourceManager.registerCustomerEnergyManager(cem);
 
-    public FritzyTrader(ISupplierMarket market, DeviceId deviceId) {
-        this.market = market;
-        this.deviceId = deviceId;
     }
 
     @Override
-    public void run() {
-        // TODO MKE use service to get prices, no logic here
-        // Instant startTradingQuarter = Instant.now().minusSeconds(1);
-        // double minutes = (double)Duration.between(startTradingQuarter, Instant.now()).toMinutes();
-        // double tradePrice = minutes / 15 * MAX_PRICE;
-        // market.consumeOrder(deviceId.getDeviceId(), 1000, tradePrice);
+    public void evaluateMarket() {
+        //
+
+    }
+
+    @Override
+    public void evaluateDevice() {
+        //
+
+    }
+
+    @Override
+    public void sendMeasurement() {
+        //
+
     }
 }

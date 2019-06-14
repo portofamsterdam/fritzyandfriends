@@ -14,31 +14,28 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.fritzy.webrelay;
+package nl.technolution.fritzy.marketnegotiator;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.junit.Test;
-
+import nl.technolution.dropwizard.services.IService;
 import nl.technolution.fritzy.app.FritzyConfig;
-import nl.technolution.market.MarketConfig;
 
 /**
  * 
  */
-public class WebRelayConfigTest {
+public interface IFritzyTrader extends IService<FritzyConfig> {
 
     /**
-     * Test if object can be written as String
-     * 
-     * @throws JsonProcessingException
+     * Evaluate market state. E.g. start en end trades
      */
-    @Test
-    public void testConfig() throws JsonProcessingException {
-        FritzyConfig obj = new FritzyConfig("Fritzy", "localhost", 80, "/dev/tty", false, false, 0d, 0d, 0,
-                new MarketConfig("https://localhost", "", ""));
-        System.out.println(
-                new ObjectMapper().writeValueAsString(obj));
-    }
+    void evaluateMarket();
+
+    /**
+     * Evaluate device state.
+     */
+    void evaluateDevice();
+
+    /**
+     * Send a measurement to CEM
+     */
+    void sendMeasurement();
 }

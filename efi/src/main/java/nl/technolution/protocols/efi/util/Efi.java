@@ -17,8 +17,10 @@
 package nl.technolution.protocols.efi.util;
 
 import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.UUID;
 
@@ -39,7 +41,7 @@ public final class Efi {
     // Cache DataTypeFactory because it is expensive to create and thread safe
     public static final DatatypeFactory DATATYPE_FACTORY;
 
-    private static final ZoneId UTC_ZONE = ZoneId.of("UTC");
+    private static final ZoneId LOCAL_ZONE = ZoneId.systemDefault();
 
     private static final String EFI_VERSION = "2.0";
 
@@ -93,8 +95,32 @@ public final class Efi {
      * @return calendar
      */
     public static XMLGregorianCalendar calendarOfInstant(Instant instant) {
-        GregorianCalendar calendar = GregorianCalendar.from(ZonedDateTime.ofInstant(instant, UTC_ZONE));
+        GregorianCalendar calendar = GregorianCalendar.from(ZonedDateTime.ofInstant(instant, LOCAL_ZONE));
         return DATATYPE_FACTORY.newXMLGregorianCalendar(calendar);
+    }
+
+    /**
+     * Create a timestamp for XML messages.
+     * 
+     * @return calendar
+     */
+    public static XMLGregorianCalendar calendarOfInstant(LocalDateTime localDateTime) {
+        GregorianCalendar calendar = GregorianCalendar.from(ZonedDateTime.of(localDateTime, LOCAL_ZONE));
+        return DATATYPE_FACTORY.newXMLGregorianCalendar(calendar);
+    }
+
+    /**
+     * Get Instant of next quarter
+     * 
+     * @return Instant
+     */
+    public static Instant getNextQuarter() {
+        Calendar instance = Calendar.getInstance();
+        instance.set(Calendar.SECOND, 0);
+        instance.set(Calendar.MILLISECOND, 0);
+        int minutesTillNextQuerter = 15 - (instance.get(Calendar.MINUTE) % 15);
+        instance.add(Calendar.MINUTE, minutesTillNextQuerter);
+        return instance.toInstant();
     }
 
     /**

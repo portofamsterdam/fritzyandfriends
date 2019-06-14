@@ -23,7 +23,7 @@ import java.util.Arrays;
  */
 public enum EBattyInstruction {
 
-    STOP(0),
+    IDLE(0),
 
     CHARGE(1),
 
@@ -47,5 +47,9 @@ public enum EBattyInstruction {
                 .filter(e -> e.runningModeId == runningModeId)
                 .findFirst()
                 .orElseThrow(IllegalArgumentException::new);
+    }
+
+    public int getRunningModeId() {
+        return runningModeId;
     }
 }

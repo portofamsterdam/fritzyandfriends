@@ -5,6 +5,9 @@
     "serialPort": "/dev/ttyS3",
     "stubTemparature": true,
     "stubRelay": true,
+    "minTemp": 2,
+    "maxTemp": 7,
+    "maxMargin" : 5,
     "market": { "marketUrl": "https://localhost:8080/test" }
     
 }

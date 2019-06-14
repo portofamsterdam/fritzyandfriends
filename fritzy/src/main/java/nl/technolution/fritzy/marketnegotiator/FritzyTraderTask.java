@@ -14,31 +14,24 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.fritzy.webrelay;
+package nl.technolution.fritzy.marketnegotiator;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.util.concurrent.TimeUnit;
 
-import org.junit.Test;
-
-import nl.technolution.fritzy.app.FritzyConfig;
-import nl.technolution.market.MarketConfig;
+import nl.technolution.dropwizard.services.Services;
+import nl.technolution.dropwizard.tasks.ITaskRunner;
+import nl.technolution.dropwizard.tasks.TimedTask;
 
 /**
  * 
  */
-public class WebRelayConfigTest {
+@TimedTask(period = 1, unit = TimeUnit.MINUTES)
+public class FritzyTraderTask implements ITaskRunner {
 
-    /**
-     * Test if object can be written as String
-     * 
-     * @throws JsonProcessingException
-     */
-    @Test
-    public void testConfig() throws JsonProcessingException {
-        FritzyConfig obj = new FritzyConfig("Fritzy", "localhost", 80, "/dev/tty", false, false, 0d, 0d, 0,
-                new MarketConfig("https://localhost", "", ""));
-        System.out.println(
-                new ObjectMapper().writeValueAsString(obj));
+    @Override
+    public void execute() {
+        IFritzyTrader trader = Services.get(IFritzyTrader.class);
+        trader.evaluateDevice();
+        trader.evaluateMarket();
     }
 }

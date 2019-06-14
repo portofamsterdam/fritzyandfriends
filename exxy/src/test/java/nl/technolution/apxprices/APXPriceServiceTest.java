@@ -204,7 +204,7 @@ public class APXPriceServiceTest {
     public void before() throws IOException {
         mockServer = ClientAndServer.startClientAndServer(0);
         ExxyConfig config = new ExxyConfig("http://localhost:" + mockServer.getLocalPort() + "/api", SECURITY_TOKEN,
-                null, false);
+                0, null, false, null);
         ServiceFinder.setupDropWizardServices(config);
         priceService = Services.get(IAPXPricesService.class);
     }
@@ -346,7 +346,7 @@ public class APXPriceServiceTest {
         for (int i = 0; i < 24; i++) {
             fixedPrices.put(i, (double)i / 100);
         }
-        ExxyConfig config = new ExxyConfig("", "", fixedPrices, true);
+        ExxyConfig config = new ExxyConfig("", "", 0, fixedPrices, true, null);
         priceService = new APXPricesService();
         // manually re-init the service with the new config so fixed prices are used
         priceService.init(config);

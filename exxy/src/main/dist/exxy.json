@@ -1,7 +1,7 @@
-
 {
   "baseURL": "https://transparency.entsoe.eu/api",
-  "securityToken": "INSERT_SECURITY_TOKEN_HERE",
+  "securityToken": "0b1d9ae3-d9a6-4c6b-8dc1-c62a18387ac5",
+  "capacity": 100,
   "useFixedPrices": true,
   "fixedPrices": {
     "0": 0.01,
@@ -28,5 +28,8 @@
     "21": 0.22,
     "22": 0.23,
     "23": 0.24
-  }
+  },
+  "market": {
+        "marketUrl": "https://localhost"   
+    }
 }

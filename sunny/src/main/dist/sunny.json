@@ -1,6 +1,7 @@
 {
     "deviceId": "sunny",
     "host": "https://localhost/",
+    "maxMargin" : 10,
     "market": {
         "marketUrl": "https://localhost"   
     },

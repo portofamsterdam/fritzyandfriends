@@ -176,8 +176,8 @@ public final class MachineData {
         machineData.sOC = parseInt(data.get(7));
         machineData.mTF = parseInt(data.get(8));
         machineData.mTE = parseInt(data.get(9));
-        machineData.iac = parseInt(data.get(10));
-        machineData.vac = parseInt(data.get(11));
+        machineData.iac = parseDouble(data.get(10), 0.1d);
+        machineData.vac = parseDouble(data.get(11), 0.1d);
         machineData.gVFaultValue = parseDouble(data.get(12), 0.1d);
         machineData.tmpFaultValue = parseDouble(data.get(13), 0.1d);
         machineData.pV1FaultValue = parseDouble(data.get(14), 0.1d);

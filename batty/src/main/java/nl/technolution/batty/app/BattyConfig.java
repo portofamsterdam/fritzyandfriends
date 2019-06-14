@@ -50,6 +50,12 @@ public class BattyConfig extends Configuration {
     @JsonProperty("truststorepass")
     private final String truststorepass;
 
+    @JsonProperty("buyMargin")
+    private final int buyMargin;
+
+    @JsonProperty("sellMargin")
+    private final int sellMargin;
+
     @JsonProperty("market")
     private final MarketConfig market;
 
@@ -63,6 +69,8 @@ public class BattyConfig extends Configuration {
             @JsonProperty("password") String password,
             @JsonProperty("truststore") String truststore,
             @JsonProperty("truststorepass") String truststorepass,
+            @JsonProperty("buyMargin") int buyMargin,
+            @JsonProperty("sellMargin") int sellMargin,
             @JsonProperty("market") MarketConfig market,
             @JsonProperty("useStub") boolean useStub) {
         this.deviceId = deviceId;
@@ -71,6 +79,8 @@ public class BattyConfig extends Configuration {
         this.password = password;
         this.truststore = truststore;
         this.truststorepass = truststorepass;
+        this.buyMargin = buyMargin;
+        this.sellMargin = sellMargin;
         this.market = market;
         this.useStub = useStub;
     }

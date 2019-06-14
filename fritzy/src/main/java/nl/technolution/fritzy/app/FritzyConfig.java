@@ -48,6 +48,15 @@ public class FritzyConfig extends Configuration {
     @JsonProperty("stubRelay")
     private final boolean stubRelay;
 
+    @JsonProperty("minTemp")
+    private final double minTemp;
+
+    @JsonProperty("maxTemp")
+    private final double maxTemp;
+
+    @JsonProperty("maxMargin")
+    private final int maxMargin;
+
     @JsonProperty("market")
     private final MarketConfig market;
 
@@ -58,6 +67,9 @@ public class FritzyConfig extends Configuration {
             @JsonProperty("serialPort") String serialPort,
             @JsonProperty("stubTemparature") boolean stubTemparature,
             @JsonProperty("stubRelay") boolean stubRelay,
+            @JsonProperty("minTemp") double minTemp,
+            @JsonProperty("maxTemp") double maxTemp,
+            @JsonProperty("maxMargin") int maxMargin,
             @JsonProperty("market") MarketConfig market) {
         this.deviceId = deviceId;
         this.host = host;
@@ -65,6 +77,9 @@ public class FritzyConfig extends Configuration {
         this.serialPort = serialPort;
         this.stubTemparature = stubTemparature;
         this.stubRelay = stubRelay;
+        this.minTemp = minTemp;
+        this.maxTemp = maxTemp;
+        this.maxMargin = maxMargin;
         this.market = market;
     }
 

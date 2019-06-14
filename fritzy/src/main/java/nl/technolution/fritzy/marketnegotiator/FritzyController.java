@@ -14,31 +14,20 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.fritzy.webrelay;
-
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.junit.Test;
-
-import nl.technolution.fritzy.app.FritzyConfig;
-import nl.technolution.market.MarketConfig;
+package nl.technolution.fritzy.marketnegotiator;
 
 /**
  * 
  */
-public class WebRelayConfigTest {
+public class FritzyController {
 
-    /**
-     * Test if object can be written as String
-     * 
-     * @throws JsonProcessingException
-     */
-    @Test
-    public void testConfig() throws JsonProcessingException {
-        FritzyConfig obj = new FritzyConfig("Fritzy", "localhost", 80, "/dev/tty", false, false, 0d, 0d, 0,
-                new MarketConfig("https://localhost", "", ""));
-        System.out.println(
-                new ObjectMapper().writeValueAsString(obj));
+    public FritzyController() {
+        // 
     }
+
+    public void stop() {
+        //
+
+    }
+
 }

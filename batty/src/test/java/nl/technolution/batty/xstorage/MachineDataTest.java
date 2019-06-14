@@ -89,7 +89,7 @@ public class MachineDataTest {
         assertEquals(65535, data.getMTF());
         assertEquals(255, data.getMTE());
         assertEquals(0, data.getIac(), 0.0001d);
-        assertEquals(2264d, data.getVac(), 0.0001d);
+        assertEquals(226.4d, data.getVac(), 0.0001d);
         assertEquals(0, data.getGVFaultValue(), 0.0001d);
         assertEquals(0, data.getTmpFaultValue(), 0.0001d);
         assertEquals(0, data.getPV1FaultValue(), 0.0001d);

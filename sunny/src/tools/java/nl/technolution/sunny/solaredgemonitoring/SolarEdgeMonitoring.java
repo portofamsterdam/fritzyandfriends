@@ -48,7 +48,7 @@ public final class SolarEdgeMonitoring {
         SLF4JBridgeHandler.install();
 
         SunnyConfig config = new SunnyConfig("deviceId", "host", null,
-                "https://monitoringapi.solaredge.com/site/529405", "JRK97634IPJD9ABBG4MFACJVZGLK4NUN",
+                0, "https://monitoringapi.solaredge.com/site/529405", "JRK97634IPJD9ABBG4MFACJVZGLK4NUN",
                 "https://api.pvcast.de/plants/908", "cxDhZtryzwyGHG2yMzqy");
         ISolarEdgeMonitoringClient client = new SolarEdgeMonitoringClient();
         client.init(config);
