@@ -63,6 +63,7 @@ public class SunnyConfig extends Configuration {
         this.deviceId = deviceId;
         this.host = host;
         this.market = market;
+        this.maxMargin = maxMargin;
         this.solarEdgeMonitoringBaseURL = solarEdgeMonitoringBaseURL;
         this.solarEdgeMonitoringApikey = solarEdgeMonitoringApikey;
         this.pvCastBaseURL = pvCastBaseURL;
