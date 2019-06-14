@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.util.Map;
 import java.util.logging.Level;
 
-import javax.ws.rs.ProcessingException;
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
 import javax.ws.rs.client.Entity;
@@ -76,30 +75,24 @@ public class PvCastClient implements IPvCastClient {
 
         Response response = request.post(entity);
         // TODO WHO: handle error status
-        LOG.debug("Measurements sent to PvCast, result:" + response.getStatus() + " " +
+        LOG.info("Measurements sent to PvCast, result:" + response.getStatus() + " " +
                 response.readEntity(String.class));
     }
 
     @Override
-    public Forecasts getPvForecasts() {
+    public Forecasts getPvForecasts() throws IOException {
         WebTarget target = client.target(config.getPvCastBaseURL()).path("forecast.json");
         Builder request = target.request().header("X-API-KEY", config.getPvCastApiKey());
         Response response = request.get();
         response.bufferEntity();
         String output = response.readEntity(String.class);
-        // TODO WHO: handle error status
         ObjectMapper mapper = new ObjectMapper();
         Forecasts forecasts = new Forecasts();
         Map<Long, Forecast> forecastMap = forecasts.getForecasts();
-        try {
-            forecastMap = mapper.readValue(output, new TypeReference<Map<Long, Forecast>>() {
-            });
-        } catch (IOException e) {
-            throw new ProcessingException(e.getMessage(), e);
-        }
+        forecastMap = mapper.readValue(output, new TypeReference<Map<Long, Forecast>>() {
+        });
         forecasts.setForecasts(forecastMap);
-        LOG.debug("Forecasts requested from PvCast, result:" + response.getStatus() + ", data:\n" + output);
-
+        LOG.info("Forecasts requested from PvCast, result:" + response.getStatus() + ", data:\n" + output);
         return forecasts;
     }
 }

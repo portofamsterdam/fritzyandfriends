@@ -14,28 +14,27 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.dropwizard.tasks;
+package nl.technolution.sunny.pvcast.cache;
 
-import java.lang.annotation.Retention;
-import java.lang.annotation.RetentionPolicy;
+import java.io.IOException;
 import java.util.concurrent.TimeUnit;
 
+import nl.technolution.dropwizard.services.Services;
+import nl.technolution.dropwizard.tasks.ITaskRunner;
+import nl.technolution.dropwizard.tasks.TimedTask;
+
 /**
- * Mark a class as a Timed Task, class MUST also implement Runnable. Periods are rounded to neared unit e.g. Hourly
- * tasks run at 00:00 and 01:00 etc.
+ * 
+ * 
  */
-@Retention(RetentionPolicy.RUNTIME)
-public @interface TimedTask {
-
-    /** number of units */
-    int period();
-
-    /** timeunit */
-    TimeUnit unit();
-
-    /** offset of the given period */
-    int offset() default 0;
-
-    /** timeunit for offset */
-    TimeUnit offsetUnit() default TimeUnit.SECONDS;
+@TimedTask(period = 30, unit = TimeUnit.MINUTES)
+public class GetPvForecastTask implements ITaskRunner {
+    @Override
+    public void execute() {
+        try {
+            Services.get(IPvForecastsCacher.class).update();
+        } catch (IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
+        }
+    }
 }

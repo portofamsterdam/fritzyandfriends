@@ -14,29 +14,45 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.sunny.pvcast.client;
+package nl.technolution.sunny.pvcast.cache;
 
 import java.io.IOException;
 
-import nl.technolution.dropwizard.services.IService;
+import org.slf4j.Logger;
+
+import nl.technolution.core.Log;
+import nl.technolution.dropwizard.services.Services;
 import nl.technolution.sunny.app.SunnyConfig;
+import nl.technolution.sunny.pvcast.client.IPvCastClient;
 import nl.technolution.sunny.pvcast.model.Forecasts;
-import nl.technolution.sunny.pvcast.model.PvMeasurements;
 
 /**
- * Defines SolarEdgeMonitoringClient interface
+ * 
  */
-public interface IPvCastClient extends IService<SunnyConfig> {
+public class PvForecastCache implements IPvForecastsCacher {
+    private static final Logger LOG = Log.getLogger();
 
-    /**
-     * @param pvMeasurements
-     */
-    void postPvMeasurements(PvMeasurements pvMeasurements);
+    private Forecasts forecasts;
 
-    /**
-     * @param forecasts
-     * @return
-     * @throws IOException
-     */
-    Forecasts getPvForecasts() throws IOException;
+    @Override
+    public void init(SunnyConfig config) {
+    }
+
+    @Override
+    public void update() throws IOException {
+        forecasts = Services.get(IPvCastClient.class).getPvForecasts();
+        LOG.info("PvForecastCache updated.");
+    }
+
+    @Override
+    public Forecasts getPvForecasts() {
+        if (forecasts == null) {
+            try {
+                update();
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return forecasts;
+    }
 }

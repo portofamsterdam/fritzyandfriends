@@ -25,7 +25,7 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
  * Forecasts object. The keys of the forecasts object are unix timestamps.
  */
 public class Forecasts {
-    // NOTE: a Treemap is used to entries are sorted, this to ease debugging
+    // NOTE: a tree map is used so entries are sorted, some code depends on this!
     private Map<Long, Forecast> forecasts = new TreeMap<Long, Forecast>();
 
     public Map<Long, Forecast> getForecasts() {

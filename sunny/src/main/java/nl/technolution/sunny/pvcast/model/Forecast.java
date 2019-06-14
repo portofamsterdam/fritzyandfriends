@@ -18,6 +18,7 @@ package nl.technolution.sunny.pvcast.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonPropertyDescription;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 
 import org.apache.commons.lang3.builder.ToStringBuilder;
@@ -28,28 +29,26 @@ import org.apache.commons.lang3.builder.ToStringBuilder;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 @JsonPropertyOrder({ "power", "globalradiation", "temperature", "precipitation", "globalradiation_clearsky" })
 public class Forecast {
-    // power
-    // Integer: power in watts. If there is no forecast available yet, the power key and its value are missing.
-    @JsonProperty("power")
     private Integer power;
-    // globalradiation
-    // Integer: globalradiation in watts
-    @JsonProperty("globalradiation")
     private Integer globalradiation;
-    // temperature
-    // Real Number: temperature in °C
-    @JsonProperty("temperature")
     private Double temperature;
-    // precipitation
-    // Real Number: precipitation in mm
-    @JsonProperty("precipitation")
     private Integer precipitation;
-    // globalradiation_clearsky
-    // Integer: globalradiation under clear sky in watts
-    @JsonProperty("globalradiation_clearsky")
     private Integer globalradiationClearsky;
 
+    @JsonProperty("power")
+    @JsonPropertyDescription("power in watts. If there is no forecast available yet, the power key and its value are " +
+            "missing.")
+    public Integer getPower() {
+        return power;
+    }
+
+    @JsonProperty("power")
+    public void setPower(Integer power) {
+        this.power = power;
+    }
+
     @JsonProperty("globalradiation")
+    @JsonPropertyDescription("globalradiation in watts")
     public Integer getGlobalradiation() {
         return globalradiation;
     }
@@ -60,6 +59,7 @@ public class Forecast {
     }
 
     @JsonProperty("temperature")
+    @JsonPropertyDescription("Real Number: temperature in °C")
     public Double getTemperature() {
         return temperature;
     }
@@ -70,6 +70,7 @@ public class Forecast {
     }
 
     @JsonProperty("precipitation")
+    @JsonPropertyDescription("precipitation in mm")
     public Integer getPrecipitation() {
         return precipitation;
     }
@@ -80,6 +81,7 @@ public class Forecast {
     }
 
     @JsonProperty("globalradiation_clearsky")
+    @JsonPropertyDescription("globalradiation under clear sky in watts")
     public Integer getGlobalradiationClearsky() {
         return globalradiationClearsky;
     }

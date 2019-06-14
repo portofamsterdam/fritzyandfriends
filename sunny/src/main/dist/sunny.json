@@ -4,5 +4,9 @@
     "maxMargin" : 10,
     "market": {
         "marketUrl": "https://localhost"   
-    }
+    },
+    "solarEdgeMonitoringBaseURL": "https://monitoringapi.solaredge.com/site/<PUT_SIDE_ID_HERE>",
+    "solarEdgeMonitoringApikey": "<PUT_API_KEY_HERE>",
+    "pvCastBaseURL": "https://api.pvcast.de/plants/<PUT_PLANT_ID_HERE>",
+    "pvCastApiKey": "<PUT_API_KEY_HERE>"
 }
