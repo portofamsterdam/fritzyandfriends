@@ -22,6 +22,8 @@ dependencies {
     compile project(':common');
     compile project(':marketnegotiator');
 	
+	testImplementation libraries.mockserver_netty
+	
 	// Special entries for techno-jax plugin
 	technoJaxb libraries.jaxb_xjc	  
     technoJaxb libraries.jaxb_impl    

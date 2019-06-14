@@ -70,7 +70,11 @@ public class TransparencyPlatformClient implements ITransparencyPlatformClient {
         Response response = request.get();
         response.bufferEntity();
         String output = response.readEntity(String.class);
-        LOG.debug("received XML:" + output);
-        return response.readEntity(PublicationMarketDocument.class);
+        if (response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
+            LOG.debug("received XML:" + output);
+            return response.readEntity(PublicationMarketDocument.class);
+        }
+        LOG.error("Error retriving day ahead pricing data: " + response);
+        return null;
     }
 }
