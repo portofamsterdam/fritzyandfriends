@@ -56,6 +56,9 @@ public class Sunny {
         return 1000d;
     }
 
+    /**
+     * @return EFI registration message for Sunny
+     */
     public FlexibilityRegistration getRegistration() {
         InflexibleRegistration reg = Efi.build(InflexibleRegistration.class, deviceId);
         SupportedCommodities commodity = new SupportedCommodities();
@@ -69,6 +72,9 @@ public class Sunny {
         return reg;
     }
 
+    /**
+     * @return EFI update message for Sunny based on PVCast forecasts
+     */
     public FlexibilityUpdate getFlexibility() {
         InflexibleForecast update = Efi.build(InflexibleForecast.class, deviceId);
         // NOTE: pvcast provides no probability info so ElectricityProfile is used instead of
@@ -97,6 +103,9 @@ public class Sunny {
         return update;
     }
 
+    /**
+     * @return EFI measurement message for Sunny based on actual production.
+     */
     public Measurement getMeasurement() {
         Measurement measurement = Efi.build(Measurement.class, deviceId);
         measurement.setMeasurementTimestamp(Efi.calendarOfInstant(Instant.now()));
