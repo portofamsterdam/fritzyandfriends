@@ -34,8 +34,7 @@ public interface IPvCastClient extends IService<SunnyConfig> {
     void postPvMeasurements(PvMeasurements pvMeasurements);
 
     /**
-     * @param forecasts
-     * @return
+     * @return forecasts
      * @throws IOException
      */
     Forecasts getPvForecasts() throws IOException;
