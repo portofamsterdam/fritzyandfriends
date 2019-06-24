@@ -41,13 +41,15 @@ import nl.technolution.sunny.pvcast.model.Forecast;
 import nl.technolution.sunny.pvcast.model.Forecasts;
 
 /**
- * Manages Sunny
+ * Helper for creating the required EFI messages for a Inflexible device.
+ * 
+ * NOTE: as the inverter has no possibilities for curtailment no InflexibleCurtailmentOptions message is prepared.
  */
-public class Sunny {
+public class SunnyResourceHelper {
 
     private final DeviceId deviceId;
 
-    public Sunny(DeviceId devieId) {
+    public SunnyResourceHelper(DeviceId devieId) {
         this.deviceId = devieId;
     }
 
