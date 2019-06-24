@@ -14,7 +14,7 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.sunny;
+package nl.technolution.sunny.trader;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -77,7 +77,7 @@ public class SunnyResourceHelper {
     /**
      * @return EFI update message for Sunny based on PVCast forecasts
      */
-    public FlexibilityUpdate getFlexibility() {
+    public FlexibilityUpdate getFlexibilityUpdate() {
         InflexibleForecast update = Efi.build(InflexibleForecast.class, deviceId);
         // NOTE: pvcast provides no probability info so ElectricityProfile is used instead of
         // electricityProbabilityProfile
