@@ -14,27 +14,46 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.fritzy.tools;
+package nl.technolution.fritzy.wallet.model;
 
-import nl.technolution.fritzy.wallet.FritzyApi;
+import java.math.BigDecimal;
 
-public class FritzyApiTool {
+import com.fasterxml.jackson.annotation.JsonProperty;
 
-    public static void main(String[] args) {
+/**
+ * 
+ */
+public class FritzyBalance {
 
-        String url = "http://82.196.13.251/api/";
-        FritzyApi api = new FritzyApi(url);
-        api.login("test@fiets.be", "qazqaz");
-        // Arrays.asList(api.orders().getOrders().getRecords()).forEach(o -> System.out.println(o));
-        //
-        // Order order = new Order();
-        // order.setMakerToken("kwh");
-        // order.setTakerToken("eur");
-        // order.setMakerAmount("1000000000000000000");
-        // order.setTakerAmount("1000000000000000000");
-        // String createOrder = api.createOrder(order);
-        // System.out.println(createOrder);
-        // System.out.println(api.balance());
+    @JsonProperty("ETH")
+    BigDecimal eth;
+    @JsonProperty("EUR")
+    BigDecimal eur;
+    @JsonProperty("KWH")
+    BigDecimal kwh;
 
+    public BigDecimal getEth() {
+        return eth;
+    }
+
+    public void setEth(BigDecimal eth) {
+        this.eth = eth;
+    }
+
+    public BigDecimal getEur() {
+        return eur;
+    }
+
+    public void setEur(BigDecimal eur) {
+        this.eur = eur;
+    }
+
+    public BigDecimal getKwh() {
+        return kwh;
+    }
+
+    public void setKwh(BigDecimal kwh) {
+        this.kwh = kwh;
     }
 }
+

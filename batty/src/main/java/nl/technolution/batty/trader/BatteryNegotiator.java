@@ -16,7 +16,9 @@
  */
 package nl.technolution.batty.trader;
 
-import nl.technolution.market.MarketConfig;
+import java.math.BigDecimal;
+
+import nl.technolution.fritzy.wallet.FritzyApi;
 import nl.technolution.marketnegotiator.AbstractCustomerEnergyManager;
 import nl.technolution.protocols.efi.ActuatorInstruction;
 import nl.technolution.protocols.efi.ActuatorInstructions;
@@ -32,8 +34,8 @@ import nl.technolution.protocols.efi.util.Efi;
  */
 public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegistration, StorageUpdate> {
 
-    private final MarketConfig config;
     private final BattyResourceManager resourceManager;
+    private final FritzyApi market;
 
     private Double fillLevel;
 
@@ -42,9 +44,9 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
      * @param config config used for trading
      * @param resourceManager to control devices
      */
-    public BatteryNegotiator(MarketConfig config, BattyResourceManager resourceManager) {
-        this.config = config;
+    public BatteryNegotiator(FritzyApi market, BattyResourceManager resourceManager) {
         this.resourceManager = resourceManager;
+        this.market = market;
     }
 
     @Override
@@ -60,7 +62,8 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
      * Call periodicly to evaluate market changes
      */
     public void evaluate() {
-
+        BigDecimal balance = market.balance();
+        // market.
 
         // Sample charge instruction
         StorageInstruction instruction = Efi.build(StorageInstruction.class, getDeviceId());

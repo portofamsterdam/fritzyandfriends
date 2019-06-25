@@ -17,7 +17,6 @@
 package nl.technolution.fritzy.wallet;
 
 import java.math.BigDecimal;
-import java.util.List;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
@@ -29,10 +28,10 @@ import com.google.common.base.Preconditions;
 
 import org.glassfish.jersey.client.JerseyClientBuilder;
 
-import nl.technolution.fritzy.gen.model.WebBalance;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.login.LoginParameters;
 import nl.technolution.fritzy.wallet.login.LoginResponse;
+import nl.technolution.fritzy.wallet.model.Balance;
 import nl.technolution.fritzy.wallet.order.GetOrdersResponse;
 import nl.technolution.fritzy.wallet.order.Order;
 import nl.technolution.fritzy.wallet.register.RegisterParameters;
@@ -149,7 +148,6 @@ public class FritzyApi {
         WebTarget target = client.target(url + "/me/balance");
         Builder request = target.request();
         request.header("Authorization", "Bearer " + accessToken);
-        List<WebBalance> orderResponse = (List<WebBalance>)request.get(List.class);
-        return orderResponse.get(0).getBalance();
+        return request.get(Balance.class).getBalance().getEur();
     }
 }
