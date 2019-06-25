@@ -17,6 +17,8 @@
 package nl.technolution.sunny.solaredgemonitoring.client;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.ClientBuilder;
@@ -29,7 +31,9 @@ import org.slf4j.Logger;
 
 import nl.technolution.core.Log;
 import nl.technolution.sunny.app.SunnyConfig;
+import nl.technolution.sunny.solaredgemonitoring.model.Power;
 import nl.technolution.sunny.solaredgemonitoring.model.SiteEnergy;
+import nl.technolution.sunny.solaredgemonitoring.model.SitePower;
 
 /**
  * Access the SolarEdge Monitoring API
@@ -70,5 +74,31 @@ public class SolarEdgeMonitoringClient implements ISolarEdgeMonitoringClient {
         LOG.debug("Received Json:" + output);
 
         return response.readEntity(SiteEnergy.class);
+    }
+
+    @Override
+    public Power getPower() {
+        final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+
+        LocalDateTime endTime = LocalDateTime.now();
+        LocalDateTime startTime = endTime.minusMinutes(15);
+
+        // TODO WHO: better use the currentPower data from 'site overview' ??
+
+        WebTarget target = client.target(config.getSolarEdgeMonitoringBaseURL())
+                .path("power")
+                .queryParam("api_key", config.getSolarEdgeMonitoringApikey())
+                .queryParam("startTime", dateTimeFormatter.format(startTime))
+                .queryParam("endTime", dateTimeFormatter.format(endTime));
+
+        Builder request = target.request();
+        LOG.debug("Composed URL: " + target.getUri());
+
+        Response response = request.get();
+        response.bufferEntity();
+        String output = response.readEntity(String.class);
+        LOG.debug("Received Json:" + output);
+
+        return response.readEntity(SitePower.class).getPower();
     }
 }

@@ -18,6 +18,7 @@ package nl.technolution.sunny.solaredgemonitoring.client;
 
 import nl.technolution.dropwizard.services.IService;
 import nl.technolution.sunny.app.SunnyConfig;
+import nl.technolution.sunny.solaredgemonitoring.model.Power;
 import nl.technolution.sunny.solaredgemonitoring.model.SiteEnergy;
 
 /**
@@ -31,4 +32,11 @@ public interface ISolarEdgeMonitoringClient extends IService<SunnyConfig> {
      * @return
      */
     SiteEnergy getHourlyEnergy(int nrOfDays);
+
+    /**
+     * Get quarter hour energy values for the last quarter hour
+     * 
+     * @return
+     */
+    Power getPower();
 }
