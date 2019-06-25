@@ -59,7 +59,7 @@ public class Forecast {
     }
 
     @JsonProperty("temperature")
-    @JsonPropertyDescription("Real Number: temperature in °C")
+    @JsonPropertyDescription("Real Number: temperature in degrees C")
     public Double getTemperature() {
         return temperature;
     }
