@@ -20,6 +20,10 @@ import java.time.Duration;
 import java.time.Instant;
 import java.util.Iterator;
 import java.util.Map.Entry;
+import java.util.Objects;
+import java.util.Optional;
+
+import com.google.common.base.Preconditions;
 
 import nl.technolution.DeviceId;
 import nl.technolution.dropwizard.services.Services;
@@ -28,10 +32,9 @@ import nl.technolution.protocols.efi.DeviceClass;
 import nl.technolution.protocols.efi.DeviceDescription;
 import nl.technolution.protocols.efi.ElectricityProfile;
 import nl.technolution.protocols.efi.ElectricityProfile.Element;
-import nl.technolution.protocols.efi.FlexibilityRegistration;
-import nl.technolution.protocols.efi.FlexibilityUpdate;
 import nl.technolution.protocols.efi.InflexibleForecast;
 import nl.technolution.protocols.efi.InflexibleRegistration;
+import nl.technolution.protocols.efi.InflexibleUpdate;
 import nl.technolution.protocols.efi.Measurement;
 import nl.technolution.protocols.efi.Measurement.ElectricityMeasurement;
 import nl.technolution.protocols.efi.SupportedCommodities;
@@ -39,6 +42,9 @@ import nl.technolution.protocols.efi.util.Efi;
 import nl.technolution.sunny.pvcast.cache.IPvForecastsCacher;
 import nl.technolution.sunny.pvcast.model.Forecast;
 import nl.technolution.sunny.pvcast.model.Forecasts;
+import nl.technolution.sunny.solaredgemonitoring.client.ISolarEdgeMonitoringClient;
+import nl.technolution.sunny.solaredgemonitoring.model.Power;
+import nl.technolution.sunny.solaredgemonitoring.model.Value;
 
 /**
  * Helper for creating the required EFI messages for a Inflexible device.
@@ -53,15 +59,28 @@ public class SunnyResourceHelper {
         this.deviceId = devieId;
     }
 
-    private double getCurrentUsage() {
-        // TODO MKE read actual value in watt
-        return 1000d;
+    private double getGenerationPower() {
+        // TODO MKE read actual value in watt directly from the inverter using modbus connection
+        return getMostRecentPower(Services.get(ISolarEdgeMonitoringClient.class).getPower());
+    }
+
+    public static double getMostRecentPower(Power power) {
+        // some sanity checks on the received data
+        Preconditions.checkArgument(power.getTimeUnit().compareTo("QUARTER_OF_AN_HOUR") == 0);
+        Preconditions.checkArgument(power.getUnit().compareTo("W") == 0);
+
+        // get the last non-null value from the result
+        Optional<Value> mostRecentPower = power.getValues().stream().filter(Objects::nonNull).reduce((a, b) -> b);
+        if (!mostRecentPower.isPresent()) {
+            throw new Error("No power value available.");
+        }
+        return mostRecentPower.get().getValue();
     }
 
     /**
      * @return EFI registration message for Sunny
      */
-    public FlexibilityRegistration getRegistration() {
+    public InflexibleRegistration getRegistration() {
         InflexibleRegistration reg = Efi.build(InflexibleRegistration.class, deviceId);
         SupportedCommodities commodity = new SupportedCommodities();
 
@@ -77,7 +96,7 @@ public class SunnyResourceHelper {
     /**
      * @return EFI update message for Sunny based on PVCast forecasts
      */
-    public FlexibilityUpdate getFlexibilityUpdate() {
+    public InflexibleUpdate getFlexibilityUpdate() {
         InflexibleForecast update = Efi.build(InflexibleForecast.class, deviceId);
         // NOTE: pvcast provides no probability info so ElectricityProfile is used instead of
         // electricityProbabilityProfile
@@ -112,7 +131,7 @@ public class SunnyResourceHelper {
         Measurement measurement = Efi.build(Measurement.class, deviceId);
         measurement.setMeasurementTimestamp(Efi.calendarOfInstant(Instant.now()));
         ElectricityMeasurement value = new ElectricityMeasurement();
-        value.setPower(getCurrentUsage());
+        value.setPower(getGenerationPower());
         measurement.setElectricityMeasurement(value);
         return measurement;
     }
