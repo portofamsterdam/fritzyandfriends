@@ -136,14 +136,13 @@ public class SolarEdgeSession {
         InetAddress address = InetAddress.getByName("192.168.8.240");
 		int port = 502;
 
-		ModbusSession modbusSession = new ModbusSession(address, port);
+        ModbusSession modbusSession = new ModbusSession(address, port, 2);
 		SolarEdgeSession session = new SolarEdgeSession(modbusSession);
 
 		try {
 			modbusSession.open();
 //			short addr = ESolarEdgeRegister.I_STATUS.getAddress();
 			int addr = 40052;
-			System.out.println("" + addr + ":" + modbusSession.convertType(modbusSession.readRegister((short) addr, 32, 1), String.class));
             System.out.println("" + addr + ":" +
                     modbusSession.convertType(modbusSession.readSlave(addr, 32), String.class));
 		} finally {
