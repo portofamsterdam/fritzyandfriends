@@ -28,9 +28,7 @@ import nl.technolution.sunny.pvcast.model.Forecasts;
 import nl.technolution.sunny.pvcast.model.PvMeasurements;
 import nl.technolution.sunny.solaredgemonitoring.client.ISolarEdgeMonitoringClient;
 import nl.technolution.sunny.solaredgemonitoring.client.SolarEdgeMonitoringClient;
-import nl.technolution.sunny.solaredgemonitoring.model.Power;
 import nl.technolution.sunny.solaredgemonitoring.model.SiteEnergy;
-import nl.technolution.sunny.trader.SunnyResourceHelper;
 
 /**
  * Tool for testing with SolarEdge monitoring API
@@ -57,10 +55,6 @@ public final class SolarEdgeMonitoring {
 
         SiteEnergy siteEnergy = client.getHourlyEnergy(21);
         LOG.info("Received object:\n" + siteEnergy);
-
-        Power power = client.getPower();
-        LOG.info("Received power object:\n" + power);
-        LOG.info("power : " + SunnyResourceHelper.getMostRecentPower(power));
 
         PvMeasurements pvMeasurements = EnergyToMeasurement.energyToMeasurements(siteEnergy);
         LOG.info("Converted object:\n" + pvMeasurements);
