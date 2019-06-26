@@ -23,21 +23,51 @@ import com.ghgande.j2mod.modbus.ModbusException;
 
 import nl.technolution.sunny.solaredge.sunspec.ESolarEdgeRegister;
 
+/**
+ * 
+ */
 public interface IModbusSession {
+    /**
+     * @throws ModbusException
+     */
+    void open() throws ModbusException;
 
-	public void open() throws ModbusException;
-	
-	public void close() throws ModbusException;
-	
-	public boolean isOpen();
+    /**
+     * @throws ModbusException
+     */
+    void close() throws ModbusException;
 
-	public <T> T readRegister(ESolarEdgeRegister register, Class<T> type) throws ModbusException;
+    /**
+     * @return
+     */
+    boolean isOpen();
 
-    public <T> T readRegister(ESolarEdgeRegister register, Class<T> type, int unitId) throws ModbusException;
-	
-	public Map<ESolarEdgeRegister, SolarEdgeValue<?>> readRegisters(EnumSet<ESolarEdgeRegister> registers) throws ModbusException;
-	
-	public Map<ESolarEdgeRegister, SolarEdgeValue<?>> readMultipleRegisters(EnumSet<ESolarEdgeRegister> registers) throws ModbusException;
-	
-	public void writeRegister(ESolarEdgeRegister register, Object value) throws ModbusException;
+    /**
+     * @param register
+     * @param type
+     * @return
+     * @throws ModbusException
+     */
+    <T> T readRegister(ESolarEdgeRegister register, Class<T> type) throws ModbusException;
+
+    /**
+     * @param registers
+     * @return
+     */
+    Map<ESolarEdgeRegister, SolarEdgeValue<?>> readRegisters(EnumSet<ESolarEdgeRegister> registers)
+            throws ModbusException;
+
+    /**
+     * @param registers
+     * @return
+     */
+    Map<ESolarEdgeRegister, SolarEdgeValue<?>> readMultipleRegisters(EnumSet<ESolarEdgeRegister> registers)
+            throws ModbusException;
+
+    /**
+     * @param register
+     * @param value
+     * @throws ModbusException
+     */
+    void writeRegister(ESolarEdgeRegister register, Object value) throws ModbusException;
 }

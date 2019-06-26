@@ -40,8 +40,8 @@ public enum EModbusDataType {
     public int getSize() {
         return this.size;
     }
-    
+
     public Class<?> getType() {
-    	return this.type;
+        return this.type;
     }
 }
