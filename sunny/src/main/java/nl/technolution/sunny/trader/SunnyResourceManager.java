@@ -51,7 +51,8 @@ public class SunnyResourceManager implements IResourceManager {
     public void registerCustomerEnergyManager(SunnyNegotiator cem) {
         this.cem = cem;
         cem.flexibilityRegistration(helper.getRegistration());
-        cem.flexibilityUpdate(helper.getFlexibilityUpdate());
+        // TODO WHO: Next causes a race condition because the PvCastClient service is not started yet...
+        // cem.flexibilityUpdate(helper.getFlexibilityUpdate());
     }
 
     /**

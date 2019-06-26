@@ -40,6 +40,9 @@ import nl.technolution.sunny.solaredge.sunspec.UnsignedLong;
 public final class SolarEdgeUtils {
     private static final Logger LOG = LoggerFactory.getLogger(SolarEdgeUtils.class);
 
+    private SolarEdgeUtils() {
+    }
+
     /**
      * @param bytes
      * @return

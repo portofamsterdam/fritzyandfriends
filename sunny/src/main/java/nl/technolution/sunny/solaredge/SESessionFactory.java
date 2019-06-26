@@ -16,44 +16,37 @@
  */
 package nl.technolution.sunny.solaredge;
 
-import java.util.EnumSet;
-import java.util.Map;
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 
-import com.ghgande.j2mod.modbus.ModbusException;
-
-import nl.technolution.sunny.solaredge.sunspec.ESolarEdgeRegister;
+import nl.technolution.sunny.app.SunnyConfig;
 
 /**
  * 
  */
-public interface IModbusSession {
-    /**
-     * @throws ModbusException
-     */
-    void open() throws ModbusException;
+public class SESessionFactory implements ISESessionFactory {
 
-    /**
-     * @throws ModbusException
-     */
-    void close() throws ModbusException;
+    private ISolarEdgeSession solarEdgeSession;
 
-    /**
-     * @return
-     */
-    boolean isOpen();
+    @Override
+    public void init(SunnyConfig config) {
+        if (config.isUseStub()) {
+            solarEdgeSession = new SolarEdgeSessionStub();
+            return;
+        } else {
+            SolarEdgeSession session = new SolarEdgeSession();
+            try {
+                session.init(InetAddress.getByName(config.getSolarEdgeModbusIpAddress()),
+                        config.getSolarEdgeModbusPort(), config.getSolarEdgeModbusDeviceId());
+            } catch (UnknownHostException e) {
+                throw new RuntimeException(e.getMessage(), e);
+            }
+            solarEdgeSession = session;
+        }
+    }
 
-    /**
-     * @param register
-     * @param type
-     * @return
-     * @throws ModbusException
-     */
-    <T> T readRegister(ESolarEdgeRegister register, Class<T> type) throws ModbusException;
-
-    /**
-     * @param registers
-     * @return
-     */
-    Map<ESolarEdgeRegister, SolarEdgeValue<?>> readMultipleRegisters(EnumSet<ESolarEdgeRegister> registers)
-            throws ModbusException;
+    @Override
+    public ISolarEdgeSession getSESession() {
+        return solarEdgeSession;
+    }
 }
