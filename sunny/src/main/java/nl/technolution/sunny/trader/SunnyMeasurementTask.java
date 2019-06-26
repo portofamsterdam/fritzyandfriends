@@ -14,28 +14,24 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.sunny.pvcast.client;
+package nl.technolution.sunny.trader;
 
-import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
-import nl.technolution.dropwizard.services.IService;
-import nl.technolution.sunny.app.SunnyConfig;
-import nl.technolution.sunny.pvcast.model.Forecasts;
-import nl.technolution.sunny.pvcast.model.PvMeasurements;
+import nl.technolution.dropwizard.services.Services;
+import nl.technolution.dropwizard.tasks.ITaskRunner;
+import nl.technolution.dropwizard.tasks.TimedTask;
 
 /**
- * Defines SolarEdgeMonitoringClient interface
+ * NOTE: don't run this more than once every 15 minutes because there is a usage limitation on the SolarEdge monitoring
+ * API. An offset is used to give the server some time to receive and calculate the average for the past quarter.
+ * 
  */
-public interface IPvCastClient extends IService<SunnyConfig> {
+@TimedTask(period = 15, unit = TimeUnit.MINUTES, offset = 60, offsetUnit = TimeUnit.SECONDS)
+public class SunnyMeasurementTask implements ITaskRunner {
 
-    /**
-     * @param pvMeasurements
-     */
-    void postPvMeasurements(PvMeasurements pvMeasurements);
-
-    /**
-     * @return forecasts
-     * @throws IOException
-     */
-    Forecasts getPvForecasts() throws IOException;
+    @Override
+    public void execute() {
+        Services.get(ISunnyTrader.class).sendMeasurement();
+    }
 }

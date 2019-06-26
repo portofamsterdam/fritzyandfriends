@@ -14,28 +14,42 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.sunny.pvcast.client;
+package nl.technolution.sunny.trader;
 
-import java.io.IOException;
-
-import nl.technolution.dropwizard.services.IService;
+import nl.technolution.DeviceId;
 import nl.technolution.sunny.app.SunnyConfig;
-import nl.technolution.sunny.pvcast.model.Forecasts;
-import nl.technolution.sunny.pvcast.model.PvMeasurements;
 
 /**
- * Defines SolarEdgeMonitoringClient interface
+ * 
  */
-public interface IPvCastClient extends IService<SunnyConfig> {
+public class SunnyTrader implements ISunnyTrader {
 
-    /**
-     * @param pvMeasurements
-     */
-    void postPvMeasurements(PvMeasurements pvMeasurements);
+    private SunnyResourceManager resourceManager;
+    private SunnyNegotiator cem;
 
-    /**
-     * @return forecasts
-     * @throws IOException
-     */
-    Forecasts getPvForecasts() throws IOException;
+    @Override
+    public void init(SunnyConfig config) {
+        resourceManager = new SunnyResourceManager(new DeviceId(config.getDeviceId()));
+        cem = new SunnyNegotiator(config.getMarket(), resourceManager);
+        resourceManager.registerCustomerEnergyManager(cem);
+    }
+
+    @Override
+    public void evaluateMarket() {
+        cem.evaluate();
+    }
+
+    @Override
+    public void evaluateDevice() {
+        resourceManager.evaluate();
+    }
+
+    @Override
+    public void sendMeasurement() {
+        resourceManager.sendMeasurement();
+    }
+
+    public SunnyNegotiator getCem() {
+        return cem;
+    }
 }
