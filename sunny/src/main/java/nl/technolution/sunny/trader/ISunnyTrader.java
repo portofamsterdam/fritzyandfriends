@@ -14,28 +14,28 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.sunny.pvcast.client;
-
-import java.io.IOException;
+package nl.technolution.sunny.trader;
 
 import nl.technolution.dropwizard.services.IService;
 import nl.technolution.sunny.app.SunnyConfig;
-import nl.technolution.sunny.pvcast.model.Forecasts;
-import nl.technolution.sunny.pvcast.model.PvMeasurements;
 
 /**
- * Defines SolarEdgeMonitoringClient interface
+ * 
  */
-public interface IPvCastClient extends IService<SunnyConfig> {
+public interface ISunnyTrader extends IService<SunnyConfig> {
 
     /**
-     * @param pvMeasurements
+     * Evaluate market state. E.g. start en end trades
      */
-    void postPvMeasurements(PvMeasurements pvMeasurements);
+    void evaluateMarket();
 
     /**
-     * @return forecasts
-     * @throws IOException
+     * Evaluate device state.
      */
-    Forecasts getPvForecasts() throws IOException;
+    void evaluateDevice();
+
+    /**
+     * Send a measurement to CEM
+     */
+    void sendMeasurement();
 }

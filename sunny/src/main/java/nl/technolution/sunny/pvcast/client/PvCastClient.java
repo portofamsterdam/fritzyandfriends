@@ -74,9 +74,11 @@ public class PvCastClient implements IPvCastClient {
         Entity<PvMeasurements> entity = Entity.entity(pvMeasurements, MediaType.APPLICATION_JSON);
 
         Response response = request.post(entity);
-        // TODO WHO: handle error status
-        LOG.info("Measurements sent to PvCast, result:" + response.getStatus() + " " +
-                response.readEntity(String.class));
+        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
+            throw new Error("Failed sending measurements to PvCast: " + response);
+        }
+        LOG.info("Measurements sent to PvCast.");
+
     }
 
     @Override
@@ -92,7 +94,7 @@ public class PvCastClient implements IPvCastClient {
         forecastMap = mapper.readValue(output, new TypeReference<Map<Long, Forecast>>() {
         });
         forecasts.setForecasts(forecastMap);
-        LOG.info("Forecasts requested from PvCast, result:" + response.getStatus() + ", data:\n" + output);
+        LOG.info("Forecasts requested from PvCast, status:" + response.getStatus() + ", data:\n" + output);
         return forecasts;
     }
 }

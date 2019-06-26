@@ -14,7 +14,7 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.sunny;
+package nl.technolution.sunny.trader;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -28,10 +28,9 @@ import nl.technolution.protocols.efi.DeviceClass;
 import nl.technolution.protocols.efi.DeviceDescription;
 import nl.technolution.protocols.efi.ElectricityProfile;
 import nl.technolution.protocols.efi.ElectricityProfile.Element;
-import nl.technolution.protocols.efi.FlexibilityRegistration;
-import nl.technolution.protocols.efi.FlexibilityUpdate;
 import nl.technolution.protocols.efi.InflexibleForecast;
 import nl.technolution.protocols.efi.InflexibleRegistration;
+import nl.technolution.protocols.efi.InflexibleUpdate;
 import nl.technolution.protocols.efi.Measurement;
 import nl.technolution.protocols.efi.Measurement.ElectricityMeasurement;
 import nl.technolution.protocols.efi.SupportedCommodities;
@@ -41,22 +40,27 @@ import nl.technolution.sunny.pvcast.model.Forecast;
 import nl.technolution.sunny.pvcast.model.Forecasts;
 
 /**
- * Manages Sunny
+ * Helper for creating the required EFI messages for a Inflexible device.
+ * 
+ * NOTE: as the inverter has no possibilities for curtailment no InflexibleCurtailmentOptions message is prepared.
  */
-public class Sunny {
+public class SunnyResourceHelper {
 
     private final DeviceId deviceId;
 
-    public Sunny(DeviceId devieId) {
+    public SunnyResourceHelper(DeviceId devieId) {
         this.deviceId = devieId;
     }
 
-    private double getCurrentUsage() {
-        // TODO MKE read actual value in watt
-        return 1000d;
+    private double getGenerationPower() {
+        // TODO MKE read actual value in watt directly from the inverter using modbus connection
+        return -1d;
     }
 
-    public FlexibilityRegistration getRegistration() {
+    /**
+     * @return EFI registration message for Sunny
+     */
+    public InflexibleRegistration getRegistration() {
         InflexibleRegistration reg = Efi.build(InflexibleRegistration.class, deviceId);
         SupportedCommodities commodity = new SupportedCommodities();
 
@@ -69,7 +73,10 @@ public class Sunny {
         return reg;
     }
 
-    public FlexibilityUpdate getFlexibility() {
+    /**
+     * @return EFI update message for Sunny based on PVCast forecasts
+     */
+    public InflexibleUpdate getFlexibilityUpdate() {
         InflexibleForecast update = Efi.build(InflexibleForecast.class, deviceId);
         // NOTE: pvcast provides no probability info so ElectricityProfile is used instead of
         // electricityProbabilityProfile
@@ -97,11 +104,14 @@ public class Sunny {
         return update;
     }
 
+    /**
+     * @return EFI measurement message for Sunny based on actual production.
+     */
     public Measurement getMeasurement() {
         Measurement measurement = Efi.build(Measurement.class, deviceId);
         measurement.setMeasurementTimestamp(Efi.calendarOfInstant(Instant.now()));
         ElectricityMeasurement value = new ElectricityMeasurement();
-        value.setPower(getCurrentUsage());
+        value.setPower(getGenerationPower());
         measurement.setElectricityMeasurement(value);
         return measurement;
     }
