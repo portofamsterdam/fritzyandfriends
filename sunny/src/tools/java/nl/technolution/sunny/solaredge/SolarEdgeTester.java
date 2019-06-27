@@ -16,44 +16,32 @@
  */
 package nl.technolution.sunny.solaredge;
 
-import java.util.EnumSet;
-import java.util.Map;
-
-import com.ghgande.j2mod.modbus.ModbusException;
-
-import nl.technolution.sunny.solaredge.sunspec.ESolarEdgeRegister;
+import java.net.InetAddress;
 
 /**
- * 
+ * Tool for testing SolarEdge modbus connection
  */
-public interface IModbusSession {
-    /**
-     * @throws ModbusException
-     */
-    void open() throws ModbusException;
+public final class SolarEdgeTester {
+
+    private SolarEdgeTester() {
+    }
 
     /**
-     * @throws ModbusException
+     * @param args
+     * @throws Exception
      */
-    void close() throws ModbusException;
+    public static void main(String[] args) throws Exception {
+        InetAddress address = InetAddress.getByName("192.168.8.240");
+        int port = 502;
+        int deviceId = 2;
 
-    /**
-     * @return
-     */
-    boolean isOpen();
+        SolarEdgeSession session = new SolarEdgeSession();
+        session.init(address, port, deviceId);
 
-    /**
-     * @param register
-     * @param type
-     * @return
-     * @throws ModbusException
-     */
-    <T> T readRegister(ESolarEdgeRegister register, Class<T> type) throws ModbusException;
-
-    /**
-     * @param registers
-     * @return
-     */
-    Map<ESolarEdgeRegister, SolarEdgeValue<?>> readMultipleRegisters(EnumSet<ESolarEdgeRegister> registers)
-            throws ModbusException;
+        try {
+            System.out.println("Power: " + session.getInverterPower());
+        } finally {
+            session.stop();
+        }
+    }
 }

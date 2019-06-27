@@ -53,7 +53,9 @@ public abstract class AbstractCustomerEnergyManager<T extends FlexibilityRegistr
 
     @Override
     public void measurement(Measurement measurement) {
-
+        // TODO WHO: implement this or remove here and force subclass to implement it
+        System.out.println("TODO: Received measuremen but nothing is done with it: " +
+                measurement.getElectricityMeasurement().getPower());
     }
 
     public T getRegistration() {

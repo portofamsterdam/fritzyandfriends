@@ -33,7 +33,7 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
     private final MarketConfig config;
     private final SunnyResourceManager resourceManager;
 
-    InflexibleForecast forecast;
+    private InflexibleForecast forecast;
 
     /**
      *

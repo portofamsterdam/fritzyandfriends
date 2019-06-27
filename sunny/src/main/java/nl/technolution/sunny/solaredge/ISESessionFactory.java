@@ -16,44 +16,16 @@
  */
 package nl.technolution.sunny.solaredge;
 
-import java.util.EnumSet;
-import java.util.Map;
-
-import com.ghgande.j2mod.modbus.ModbusException;
-
-import nl.technolution.sunny.solaredge.sunspec.ESolarEdgeRegister;
+import nl.technolution.dropwizard.services.IService;
+import nl.technolution.sunny.app.SunnyConfig;
 
 /**
  * 
  */
-public interface IModbusSession {
-    /**
-     * @throws ModbusException
-     */
-    void open() throws ModbusException;
+public interface ISESessionFactory extends IService<SunnyConfig> {
 
     /**
-     * @throws ModbusException
+     * @return Session for SolarEdge device
      */
-    void close() throws ModbusException;
-
-    /**
-     * @return
-     */
-    boolean isOpen();
-
-    /**
-     * @param register
-     * @param type
-     * @return
-     * @throws ModbusException
-     */
-    <T> T readRegister(ESolarEdgeRegister register, Class<T> type) throws ModbusException;
-
-    /**
-     * @param registers
-     * @return
-     */
-    Map<ESolarEdgeRegister, SolarEdgeValue<?>> readMultipleRegisters(EnumSet<ESolarEdgeRegister> registers)
-            throws ModbusException;
+    ISolarEdgeSession getSESession();
 }

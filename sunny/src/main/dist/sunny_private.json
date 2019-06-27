@@ -1,11 +1,13 @@
 {
     "deviceId": "sunny",
-    "host": "https://localhost/",
     "market": {
         "marketUrl": "https://localhost"   
     },
     "solarEdgeMonitoringBaseURL": "https://monitoringapi.solaredge.com/site/529405",
     "solarEdgeMonitoringApikey": "JRK97634IPJD9ABBG4MFACJVZGLK4NUN",
     "pvCastBaseURL": "https://api.pvcast.de/plants/908",
-    "pvCastApiKey": "cxDhZtryzwyGHG2yMzqy"
+    "pvCastApiKey": "cxDhZtryzwyGHG2yMzqy",
+    "solarEdgeModbusIpAddress": "192.168.8.240",
+    "solarEdgeModbusPort": 502,
+    "solarEdgeModbusDeviceId": 2    
 }

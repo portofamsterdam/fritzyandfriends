@@ -17,7 +17,6 @@
 package nl.technolution.sunny.solaredge;
 
 import java.net.InetAddress;
-import java.nio.charset.Charset;
 import java.util.EnumSet;
 import java.util.Map;
 
@@ -25,7 +24,6 @@ import com.ghgande.j2mod.modbus.ModbusException;
 import com.ghgande.j2mod.modbus.io.ModbusTransaction;
 import com.ghgande.j2mod.modbus.msg.ReadMultipleRegistersRequest;
 import com.ghgande.j2mod.modbus.msg.ReadMultipleRegistersResponse;
-import com.ghgande.j2mod.modbus.msg.WriteMultipleRegistersRequest;
 import com.ghgande.j2mod.modbus.net.TCPMasterConnection;
 import com.ghgande.j2mod.modbus.util.ModbusUtil;
 
@@ -33,12 +31,12 @@ import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jersey.repackaged.com.google.common.collect.Maps;
-import nl.technolution.sunny.solaredge.sunspec.EModbusDataType;
 import nl.technolution.sunny.solaredge.sunspec.ESolarEdgeRegister;
 import nl.technolution.sunny.solaredge.sunspec.UnsignedInteger;
 import nl.technolution.sunny.solaredge.sunspec.UnsignedLong;
 import nl.technolution.sunny.solaredge.sunspec.UnsignedShort;
+
+import jersey.repackaged.com.google.common.collect.Maps;
 
 /**
  * Class to maintain a connection to the solarEdge unit
@@ -126,43 +124,6 @@ public class ModbusSession implements IModbusSession {
     }
 
     /**
-     * Read data from device slave
-     * 
-     * @param startAddress read from address
-     * @param words data to read
-     * @return result data
-     * @throws ModbusException when data cannot be read
-     */
-    public byte[] readSlave(int startAddress, int words) throws ModbusException {
-
-        ModbusTransaction transaction = SolarEdgeUtils.createTransaction(connection);
-        ReadMultipleRegistersRequest request = SolarEdgeUtils.createReadRequest(unitId);
-
-        request.setReference(startAddress);
-        request.setTransactionID(transaction.getTransactionID());
-        transaction.setRequest(request);
-        try {
-            transaction.execute();
-        } catch (ModbusException e) {
-            close();
-            throw e;
-        }
-
-        byte[] bytes = SolarEdgeUtils
-                .registersToBytes(((ReadMultipleRegistersResponse)transaction.getResponse()).getRegisters());
-        if ((bytes.length) != (words * 2)) {
-            close();
-            throw new ModbusException(
-                    String.format("Read %d bytes instead of expected %d bytes", bytes.length, words * 2));
-        }
-        for (int i = 0; i < words; i++) {
-            LOG.trace("{}", String.format("Read 0x%04X: 0x%04X", (startAddress + i) & 0xFFFF,
-                    ModbusUtil.registerToShort(ArrayUtils.subarray(bytes, i * 2, (i * 2) + 2))));
-        }
-        return bytes;
-    }
-
-    /**
      * Read a register from device
      * 
      * @param startAddress address to read
@@ -170,8 +131,7 @@ public class ModbusSession implements IModbusSession {
      * @return contents of register
      * @throws ModbusException when data cannot be read
      */
-    public byte[] readRegister(short startAddress, int words)
-            throws ModbusException {
+    public byte[] readRegister(short startAddress, int words) throws ModbusException {
         synchronized (lock) {
             if (!isOpen()) {
                 reOpen();
@@ -207,23 +167,8 @@ public class ModbusSession implements IModbusSession {
     /**
      * Read a register of a given type
      */
-    public <T> T readRegister(ESolarEdgeRegister register, Class<T> type)
-            throws ModbusException {
+    public <T> T readRegister(ESolarEdgeRegister register, Class<T> type) throws ModbusException {
         return convertType(readRegister(register.getAddress(), register.getSize()), type);
-    }
-
-    /**
-     * Read multiple registers of given types
-     */
-    public Map<ESolarEdgeRegister, SolarEdgeValue<?>> readRegisters(EnumSet<ESolarEdgeRegister> registers)
-            throws ModbusException {
-        Map<ESolarEdgeRegister, SolarEdgeValue<?>> values = Maps.newHashMap();
-        for (ESolarEdgeRegister register : registers) {
-            Class<?> type = register.getType().getType();
-            // TODO PVE fix warning
-            values.put(register, new SolarEdgeValue(type, readRegister(register, type)));
-        }
-        return values;
     }
 
     /**
@@ -261,80 +206,14 @@ public class ModbusSession implements IModbusSession {
             byte[] bytes = ArrayUtils.subarray(data, address, address + length);
 
             Class<?> type = register.getType().getType();
-            values.put(register, new SolarEdgeValue(type, convertType(bytes, type)));
+
+            @SuppressWarnings({ "rawtypes", "unchecked" })
+            SolarEdgeValue value = new SolarEdgeValue(type, convertType(bytes, type));
+
+            values.put(register, value);
         }
 
         return values;
-    }
-
-    /**
-     * Write date to given register
-     * 
-     * @param startAddress address to write to
-     * @param data to write
-     * @throws ModbusException when data cannot be written
-     */
-    public void writeRegister(short startAddress, byte[] data)
-            throws ModbusException {
-        synchronized (lock) {
-            if (!isOpen()) {
-                reOpen();
-            }
-            int words = data.length / 2;
-            ModbusTransaction transaction = SolarEdgeUtils
-                    .createTransaction(connection);
-            WriteMultipleRegistersRequest request = SolarEdgeUtils
-                    .createWriteRequest(unitId);
-            request.setReference(startAddress);
-            request.setDataLength(words);
-
-            request.setRegisters(SolarEdgeUtils.bytesToRegisters(data));
-            request.setTransactionID(transaction.getTransactionID());
-
-            transaction.setRequest(request);
-
-            for (int i = 0; i < words; i++) {
-                LOG.trace("{}", String.format("Write 0x%04X: 0x%04X", (startAddress + i) & 0xFFFF,
-                        ModbusUtil.registerToShort(ArrayUtils.subarray(data, i * 2, (i * 2) + 2))));
-            }
-
-            try {
-                transaction.execute();
-            } catch (ModbusException e) {
-                close();
-                throw e;
-            }
-        }
-    }
-
-    /**
-     * Write a specific type of data
-     * 
-     * @param register to write
-     * @param value data to write
-     */
-    public void writeRegister(ESolarEdgeRegister register, Object value) throws ModbusException {
-        EModbusDataType dataType = register.getType();
-        if (dataType.getType() == Float.class) {
-            writeRegister(register.getAddress(), SolarEdgeUtils.modiconFloatToRegisters((Float)value));
-        } else if (dataType.getType() == Long.class) {
-            writeRegister(register.getAddress(), SolarEdgeUtils.solarEdgeLongToRegisters((Long)value));
-        } else if (dataType.getType() == UnsignedLong.class) {
-            writeRegister(register.getAddress(), SolarEdgeUtils.solarEdgeUnsignedLongToRegisters((UnsignedLong)value));
-        } else if (dataType.getType() == Integer.class) {
-            writeRegister(register.getAddress(), SolarEdgeUtils.solarEdgeIntegerToRegisters((Integer)value));
-        } else if (dataType.getType() == UnsignedInteger.class) {
-            writeRegister(register.getAddress(),
-                    SolarEdgeUtils.solarEdgeIntegerToRegisters(((UnsignedInteger)value).getSignedValue()));
-        } else if (dataType.getType() == Short.class) {
-            writeRegister(register.getAddress(), ModbusUtil.shortToRegister((Short)value));
-        } else if (dataType.getType() == UnsignedShort.class) {
-            writeRegister(register.getAddress(), ModbusUtil.shortToRegister(((UnsignedShort)value).getSignedValue()));
-        } else if (dataType.getType() == String.class) {
-            writeRegister(register.getAddress(), ((String)value).getBytes(Charset.forName("US-ASCII")));
-        } else {
-            throw new IllegalArgumentException("Unknown type: " + dataType.getType().getName());
-        }
     }
 
     /**
@@ -345,8 +224,7 @@ public class ModbusSession implements IModbusSession {
      * @return instance of given type
      * @throws ModbusException when data cannot be converted
      */
-    public <T> T convertType(byte[] data, Class<T> type)
-            throws ModbusException {
+    public <T> T convertType(byte[] data, Class<T> type) throws ModbusException {
         if (type == Float.class) {
             return type.cast(SolarEdgeUtils.registersToModiconFloat(data));
         } else if (type == Long.class) {

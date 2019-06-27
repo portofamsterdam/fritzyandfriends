@@ -21,6 +21,8 @@ import java.time.Instant;
 import java.util.Iterator;
 import java.util.Map.Entry;
 
+import com.ghgande.j2mod.modbus.ModbusException;
+
 import nl.technolution.DeviceId;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.protocols.efi.CommodityEnum;
@@ -33,11 +35,13 @@ import nl.technolution.protocols.efi.InflexibleRegistration;
 import nl.technolution.protocols.efi.InflexibleUpdate;
 import nl.technolution.protocols.efi.Measurement;
 import nl.technolution.protocols.efi.Measurement.ElectricityMeasurement;
+import nl.technolution.protocols.efi.ProfileContainer;
 import nl.technolution.protocols.efi.SupportedCommodities;
 import nl.technolution.protocols.efi.util.Efi;
 import nl.technolution.sunny.pvcast.cache.IPvForecastsCacher;
 import nl.technolution.sunny.pvcast.model.Forecast;
 import nl.technolution.sunny.pvcast.model.Forecasts;
+import nl.technolution.sunny.solaredge.ISESessionFactory;
 
 /**
  * Helper for creating the required EFI messages for a Inflexible device.
@@ -48,13 +52,16 @@ public class SunnyResourceHelper {
 
     private final DeviceId deviceId;
 
-    public SunnyResourceHelper(DeviceId devieId) {
-        this.deviceId = devieId;
+    public SunnyResourceHelper(DeviceId deviceId) {
+        this.deviceId = deviceId;
     }
 
     private double getGenerationPower() {
-        // TODO MKE read actual value in watt directly from the inverter using modbus connection
-        return -1d;
+        try {
+            return Services.get(ISESessionFactory.class).getSESession().getInverterPower();
+        } catch (ModbusException e) {
+            throw new Error("Unable to retrive generation power: " + e.getMessage());
+        }
     }
 
     /**
@@ -100,6 +107,7 @@ public class SunnyResourceHelper {
             element.setDuration(Efi.DATATYPE_FACTORY.newDuration(duration.toMillis()));
             profile.getElement().add(element);
         }
+        update.setForecastProfiles(new ProfileContainer());
         update.getForecastProfiles().setElectricityProfile(profile);
         return update;
     }
