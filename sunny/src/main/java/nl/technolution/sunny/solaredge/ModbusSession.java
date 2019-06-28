@@ -28,12 +28,12 @@ import com.ghgande.j2mod.modbus.msg.ReadMultipleRegistersResponse;
 import com.ghgande.j2mod.modbus.msg.WriteMultipleRegistersRequest;
 import com.ghgande.j2mod.modbus.net.TCPMasterConnection;
 import com.ghgande.j2mod.modbus.util.ModbusUtil;
+import com.google.common.collect.Maps;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import jersey.repackaged.com.google.common.collect.Maps;
 import nl.technolution.sunny.solaredge.sunspec.EModbusDataType;
 import nl.technolution.sunny.solaredge.sunspec.ESolarEdgeRegister;
 import nl.technolution.sunny.solaredge.sunspec.UnsignedInteger;

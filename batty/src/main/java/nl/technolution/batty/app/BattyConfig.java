@@ -16,105 +16,117 @@
  */
 package nl.technolution.batty.app;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.dropwizard.Configuration;
-import nl.technolution.market.MarketConfig;
+import nl.technolution.dropwizard.FritzyAppConfig;
 
 /**
  * Configuration for Fritzy
  */
-public class BattyConfig extends Configuration {
+public class BattyConfig extends FritzyAppConfig {
 
     @JsonProperty("deviceId")
-    private final String deviceId;
+    private String deviceId;
 
     /** host address of battery */
     @JsonProperty("host")
-    private final String host;
+    private String host;
 
     /** API username */
     @JsonProperty("username")
-    private final String username;
+    private String username;
 
     /** API password */
     @JsonProperty("password")
-    private final String password;
+    private String password;
 
     /** API password */
     @JsonProperty("truststore")
-    private final String truststore;
+    private String truststore;
 
     /** API password */
     @JsonProperty("truststorepass")
-    private final String truststorepass;
+    private String truststorepass;
 
     @JsonProperty("buyMargin")
-    private final int buyMargin;
+    private int buyMargin;
 
     @JsonProperty("sellMargin")
-    private final int sellMargin;
-
-    @JsonProperty("market")
-    private final MarketConfig market;
+    private int sellMargin;
 
     @JsonProperty("useStub")
-    private final boolean useStub;
-
-    @JsonCreator
-    public BattyConfig(@JsonProperty("deviceId") String deviceId,
-            @JsonProperty("host") String host,
-            @JsonProperty("username") String username,
-            @JsonProperty("password") String password,
-            @JsonProperty("truststore") String truststore,
-            @JsonProperty("truststorepass") String truststorepass,
-            @JsonProperty("buyMargin") int buyMargin,
-            @JsonProperty("sellMargin") int sellMargin,
-            @JsonProperty("market") MarketConfig market,
-            @JsonProperty("useStub") boolean useStub) {
-        this.deviceId = deviceId;
-        this.host = host;
-        this.username = username;
-        this.password = password;
-        this.truststore = truststore;
-        this.truststorepass = truststorepass;
-        this.buyMargin = buyMargin;
-        this.sellMargin = sellMargin;
-        this.market = market;
-        this.useStub = useStub;
-    }
+    private boolean useStub;
 
     public String getDeviceId() {
         return deviceId;
+    }
+
+    public void setDeviceId(String deviceId) {
+        this.deviceId = deviceId;
     }
 
     public String getHost() {
         return host;
     }
 
+    public void setHost(String host) {
+        this.host = host;
+    }
+
     public String getUsername() {
         return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     public String getPassword() {
         return password;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public String getTruststore() {
         return truststore;
+    }
+
+    public void setTruststore(String truststore) {
+        this.truststore = truststore;
     }
 
     public String getTruststorepass() {
         return truststorepass;
     }
 
+    public void setTruststorepass(String truststorepass) {
+        this.truststorepass = truststorepass;
+    }
+
+    public int getBuyMargin() {
+        return buyMargin;
+    }
+
+    public void setBuyMargin(int buyMargin) {
+        this.buyMargin = buyMargin;
+    }
+
+    public int getSellMargin() {
+        return sellMargin;
+    }
+
+    public void setSellMargin(int sellMargin) {
+        this.sellMargin = sellMargin;
+    }
+
     public boolean isUseStub() {
         return useStub;
     }
 
-    public MarketConfig getMarket() {
-        return market;
+    public void setUseStub(boolean useStub) {
+        this.useStub = useStub;
     }
 }
 

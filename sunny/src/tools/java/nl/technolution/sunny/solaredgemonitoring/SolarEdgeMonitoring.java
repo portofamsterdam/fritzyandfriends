@@ -47,7 +47,7 @@ public final class SolarEdgeMonitoring {
         // NOTE WHO: Needed for request logging (see also nl.technolution.sunny.pvcast.client.PvCastClient.init)
         SLF4JBridgeHandler.install();
 
-        SunnyConfig config = new SunnyConfig("deviceId", "host", null, 0,
+        SunnyConfig config = new SunnyConfig("deviceId", "host", 0,
                 "https://monitoringapi.solaredge.com/site/529405", "JRK97634IPJD9ABBG4MFACJVZGLK4NUN",
                 "https://api.pvcast.de/plants/908", "cxDhZtryzwyGHG2yMzqy");
         ISolarEdgeMonitoringClient client = new SolarEdgeMonitoringClient();

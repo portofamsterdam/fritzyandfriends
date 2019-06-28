@@ -23,13 +23,13 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 
-import io.dropwizard.Configuration;
-import nl.technolution.market.MarketConfig;
+import nl.technolution.dropwizard.FritzyAppConfig;
+import nl.technolution.dropwizard.MarketConfig;
 
 /**
  * Configuration for APXPrices
  */
-public class ExxyConfig extends Configuration {
+public class ExxyConfig extends FritzyAppConfig {
     /**
      * Base URL for the ENTSO-E API: https://transparency.entsoe.eu/api
      * 

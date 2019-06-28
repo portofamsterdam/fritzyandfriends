@@ -113,4 +113,8 @@ public class BattyResourceManager implements IResourceManager {
         measurement.setElectricityMeasurement(value);
         cem.measurement(measurement);
     }
+
+    public DeviceId getDeviceId() {
+        return deviceId;
+    }
 }

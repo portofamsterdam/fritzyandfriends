@@ -25,8 +25,10 @@ import javax.ws.rs.core.MediaType;
 import com.codahale.metrics.annotation.Timed;
 
 import nl.technolution.DeviceId;
+import nl.technolution.apis.netty.DeviceCapacity;
+import nl.technolution.apis.netty.INettyApi;
+import nl.technolution.apis.netty.OrderReward;
 import nl.technolution.dropwizard.services.Services;
-import nl.technolution.dropwizard.webservice.IEndpoint;
 import nl.technolution.netty.supplylimit.IGridCapacityManager;
 
 /**
@@ -34,7 +36,7 @@ import nl.technolution.netty.supplylimit.IGridCapacityManager;
  */
 @Path("/netty")
 @Produces(MediaType.APPLICATION_JSON)
-public class NettyApi implements IEndpoint {
+public class NettyApi implements INettyApi {
 
     /**
      * Determine grid connection limit of device
@@ -42,6 +44,7 @@ public class NettyApi implements IEndpoint {
      * @param deviceId to find limit for
      * @return limit in amps
      */
+    @Override
     @GET
     @Timed
     @Path("capacity")
@@ -49,5 +52,16 @@ public class NettyApi implements IEndpoint {
     public DeviceCapacity getCapacity(@QueryParam("deviceId") String deviceId) {
         DeviceId id = new DeviceId(deviceId);
         return new DeviceCapacity(Services.get(IGridCapacityManager.class).getGridConnectionLimit(id));
+    }
+
+    @Override
+    public OrderReward getOrderReward(String orderHash) {
+        return null;
+    }
+
+    @Override
+    public void claim(String txHash, String rewardId) {
+        //
+
     }
 }
