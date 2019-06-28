@@ -42,7 +42,7 @@ libraries.mockserver_netty = 'org.mock-server:mockserver-netty:5.5.4'
 // Technolution core
 libraries.techno_core = 'nl.technolution:techno-core:1.5.906'
 
-libraries.test_mockito = "org.mockito:mockito-core:2.18.3"
+libraries.test_mockito = 'org.mockito:mockito-core:2.18.3'
 
 /* Dropwizard, jetty/jersey/jackson */
 libraries.dropwizard = [
@@ -53,7 +53,16 @@ libraries.dropwizard = [
     
 ]
 
-libraries.jerseyclient 
+def jersey_version = '2.27' 
+libraries.jersey = [
+    'org.glassfish.jersey.core:jersey-server:' + jersey_version,
+    'org.glassfish.jersey.core:jersey-common:' + jersey_version,
+    'org.glassfish.jersey.core:jersey-client:' + jersey_version, 
+    // Support for multiple 'parts' (parameters) in body (not in URL) e.g. doCall(String str1, String str2) 
+    'org.glassfish.jersey.containers:jersey-container-servlet:' + jersey_version,   // Jersey as a servlet 
+    'org.glassfish.jersey.ext:jersey-bean-validation:' + jersey_version,            // Bean validation
+    'org.glassfish.jersey.ext:jersey-proxy-client:' + jersey_version               // Proxy client
+]
 
 // Libraries copied from generated build.gradle file for generated code.
 libraries.swagger_generated = [ 

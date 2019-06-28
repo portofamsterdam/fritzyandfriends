@@ -27,6 +27,7 @@ import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import nl.technolution.dropwizard.MarketConfig;
 import nl.technolution.fritzy.gen.model.WebOrder;
 
 /**

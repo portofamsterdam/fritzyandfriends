@@ -16,7 +16,7 @@
  */
 package nl.technolution.fritzy.marketnegotiator;
 
-import nl.technolution.market.MarketConfig;
+import nl.technolution.dropwizard.MarketConfig;
 import nl.technolution.marketnegotiator.AbstractCustomerEnergyManager;
 import nl.technolution.protocols.efi.Instruction;
 import nl.technolution.protocols.efi.ShiftableRegistration;

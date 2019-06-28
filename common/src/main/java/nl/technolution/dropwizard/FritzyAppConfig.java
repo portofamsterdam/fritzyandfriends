@@ -14,42 +14,38 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.market;
+package nl.technolution.dropwizard;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
+import io.dropwizard.Configuration;
+import nl.technolution.apis.ApiConfig;
+
 /**
- * Config needed to use api
+ * 
  */
-public class MarketConfig {
+public class FritzyAppConfig extends Configuration {
 
-    @JsonProperty("marketUrl")
-    private final String marketUrl;
+    @JsonProperty("apiConfig")
+    private ApiConfig apiConfig;
 
-    @JsonProperty("email")
-    private final String email;
+    @JsonProperty("market")
+    private MarketConfig market;
 
-    @JsonProperty("password")
-    private final String password;
-
-    @JsonCreator
-    public MarketConfig(@JsonProperty("marketUrl") String marketUrl, @JsonProperty("email") String email,
-            @JsonProperty("password") String password) {
-        this.marketUrl = marketUrl;
-        this.email = email;
-        this.password = password;
+    public ApiConfig getApiConfig() {
+        return apiConfig;
     }
 
-    public String getMarketUrl() {
-        return marketUrl;
+    public void setApiConfig(ApiConfig apiConfig) {
+        this.apiConfig = apiConfig;
     }
 
-    public String getEmail() {
-        return email;
+    public MarketConfig getMarket() {
+        return market;
     }
 
-    public String getPassword() {
-        return password;
+    public void setMarket(MarketConfig market) {
+        this.market = market;
     }
+
 }

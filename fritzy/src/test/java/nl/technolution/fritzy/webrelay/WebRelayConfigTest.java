@@ -22,7 +22,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 
 import nl.technolution.fritzy.app.FritzyConfig;
-import nl.technolution.market.MarketConfig;
 
 /**
  * 
@@ -36,8 +35,7 @@ public class WebRelayConfigTest {
      */
     @Test
     public void testConfig() throws JsonProcessingException {
-        FritzyConfig obj = new FritzyConfig("Fritzy", "localhost", 80, "/dev/tty", false, false, 0d, 0d, 0,
-                new MarketConfig("https://localhost", "", ""));
+        FritzyConfig obj = new FritzyConfig("Fritzy", "localhost", 80, "/dev/tty", false, false, 0d, 0d, 0);
         System.out.println(
                 new ObjectMapper().writeValueAsString(obj));
     }
