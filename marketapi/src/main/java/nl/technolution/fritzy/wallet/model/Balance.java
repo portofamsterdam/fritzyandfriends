@@ -14,29 +14,20 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.dropwizard;
-
-import io.dropwizard.Application;
-import io.dropwizard.setup.Environment;
-import nl.technolution.apis.ApiEndpoints;
-import nl.technolution.dropwizard.services.ServiceFinder;
-import nl.technolution.dropwizard.tasks.TimedTaskService;
-import nl.technolution.dropwizard.webservice.WebserviceFinder;
+package nl.technolution.fritzy.wallet.model;
 
 /**
- * Basic app for Fritzy applications
  * 
- * @param <T> Dropwizard Configuration Type
  */
-public class FritzyDropWizardApp<T extends FritzyAppConfig> extends Application<T> {
+public class Balance {
 
-    public static final String PKG = "nl.technolution";
+    FritzyBalance balance;
 
-    @Override
-    public void run(T configuration, Environment environment) throws Exception {
-        ServiceFinder.setupDropWizardServices(configuration);
-        WebserviceFinder.setupWebservices(environment);
-        ApiEndpoints.register(configuration.getApiConfig());
-        environment.lifecycle().manage(new TimedTaskService());
+    public FritzyBalance getBalance() {
+        return balance;
+    }
+
+    public void setBalance(FritzyBalance balance) {
+        this.balance = balance;
     }
 }

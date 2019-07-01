@@ -19,6 +19,7 @@ package nl.technolution.batty.trader;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 import nl.technolution.batty.app.BattyConfig;
@@ -27,6 +28,7 @@ import nl.technolution.batty.xstorage.cache.IMachineDataCacher;
 import nl.technolution.batty.xstorage.cache.MachineDataCache;
 import nl.technolution.batty.xstorage.connection.IXStorageFactory;
 import nl.technolution.batty.xstorage.connection.XStorageFactory;
+import nl.technolution.dropwizard.MarketConfig;
 import nl.technolution.dropwizard.services.Services;
 
 /**
@@ -40,12 +42,18 @@ public class BattyTraderTest {
      * 
      */
     @Test
+    @Ignore
     public void testTrading() {
         XStorageFactory service = new XStorageFactory();
-        BattyConfig testConfig = new BattyConfig("Test", "", "", "", "", "", 0, 0, null, true);
+        BattyConfig testConfig = new BattyConfig();
+        testConfig.setUseStub(true);
+        testConfig.setDeviceId("Test");
+        testConfig.setMarket(new MarketConfig("", "", ""));
+        
         service.init(testConfig);
         Services.put(IXStorageFactory.class, service);
         Services.put(IMachineDataCacher.class, new MachineDataCache());
+        
         BattyTrader trader = new BattyTrader();
         trader.init(testConfig);
         Services.put(IBattyTrader.class, trader);

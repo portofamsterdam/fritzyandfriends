@@ -16,6 +16,7 @@
  */
 package nl.technolution.market;
 
+import nl.technolution.dropwizard.MarketConfig;
 import nl.technolution.fritzy.wallet.FritzyApi;
 
 /**

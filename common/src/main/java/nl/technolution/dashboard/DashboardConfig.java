@@ -14,29 +14,27 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.dropwizard;
+package nl.technolution.dashboard;
 
-import io.dropwizard.Application;
-import io.dropwizard.setup.Environment;
-import nl.technolution.apis.ApiEndpoints;
-import nl.technolution.dropwizard.services.ServiceFinder;
-import nl.technolution.dropwizard.tasks.TimedTaskService;
-import nl.technolution.dropwizard.webservice.WebserviceFinder;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import nl.technolution.IJsonnable;
 
 /**
- * Basic app for Fritzy applications
  * 
- * @param <T> Dropwizard Configuration Type
  */
-public class FritzyDropWizardApp<T extends FritzyAppConfig> extends Application<T> {
+public class DashboardConfig implements IJsonnable {
 
-    public static final String PKG = "nl.technolution";
+    @JsonProperty("path")
+    private final String path;
 
-    @Override
-    public void run(T configuration, Environment environment) throws Exception {
-        ServiceFinder.setupDropWizardServices(configuration);
-        WebserviceFinder.setupWebservices(environment);
-        ApiEndpoints.register(configuration.getApiConfig());
-        environment.lifecycle().manage(new TimedTaskService());
+    @JsonCreator
+    public DashboardConfig(@JsonProperty("path") String path) {
+        this.path = path;
+    }
+
+    public String getPath() {
+        return path;
     }
 }

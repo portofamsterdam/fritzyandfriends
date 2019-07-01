@@ -26,6 +26,7 @@ import com.ghgande.j2mod.modbus.msg.ReadMultipleRegistersRequest;
 import com.ghgande.j2mod.modbus.msg.ReadMultipleRegistersResponse;
 import com.ghgande.j2mod.modbus.net.TCPMasterConnection;
 import com.ghgande.j2mod.modbus.util.ModbusUtil;
+import com.google.common.collect.Maps;
 
 import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
@@ -36,7 +37,6 @@ import nl.technolution.sunny.solaredge.sunspec.UnsignedInteger;
 import nl.technolution.sunny.solaredge.sunspec.UnsignedLong;
 import nl.technolution.sunny.solaredge.sunspec.UnsignedShort;
 
-import jersey.repackaged.com.google.common.collect.Maps;
 
 /**
  * Class to maintain a connection to the solarEdge unit

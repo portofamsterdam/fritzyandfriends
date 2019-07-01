@@ -14,29 +14,46 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.dropwizard;
+package nl.technolution.fritzy.wallet.model;
 
-import io.dropwizard.Application;
-import io.dropwizard.setup.Environment;
-import nl.technolution.apis.ApiEndpoints;
-import nl.technolution.dropwizard.services.ServiceFinder;
-import nl.technolution.dropwizard.tasks.TimedTaskService;
-import nl.technolution.dropwizard.webservice.WebserviceFinder;
+import java.math.BigDecimal;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Basic app for Fritzy applications
  * 
- * @param <T> Dropwizard Configuration Type
  */
-public class FritzyDropWizardApp<T extends FritzyAppConfig> extends Application<T> {
+public class FritzyBalance {
 
-    public static final String PKG = "nl.technolution";
+    @JsonProperty("ETH")
+    BigDecimal eth;
+    @JsonProperty("EUR")
+    BigDecimal eur;
+    @JsonProperty("KWH")
+    BigDecimal kwh;
 
-    @Override
-    public void run(T configuration, Environment environment) throws Exception {
-        ServiceFinder.setupDropWizardServices(configuration);
-        WebserviceFinder.setupWebservices(environment);
-        ApiEndpoints.register(configuration.getApiConfig());
-        environment.lifecycle().manage(new TimedTaskService());
+    public BigDecimal getEth() {
+        return eth;
+    }
+
+    public void setEth(BigDecimal eth) {
+        this.eth = eth;
+    }
+
+    public BigDecimal getEur() {
+        return eur;
+    }
+
+    public void setEur(BigDecimal eur) {
+        this.eur = eur;
+    }
+
+    public BigDecimal getKwh() {
+        return kwh;
+    }
+
+    public void setKwh(BigDecimal kwh) {
+        this.kwh = kwh;
     }
 }
+

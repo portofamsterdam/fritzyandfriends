@@ -14,29 +14,25 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.dropwizard;
+package nl.technolution.batty.xstorage.connection;
 
-import io.dropwizard.Application;
-import io.dropwizard.setup.Environment;
-import nl.technolution.apis.ApiEndpoints;
-import nl.technolution.dropwizard.services.ServiceFinder;
-import nl.technolution.dropwizard.tasks.TimedTaskService;
-import nl.technolution.dropwizard.webservice.WebserviceFinder;
+import com.fasterxml.jackson.core.JsonProcessingException;
+
+import nl.technolution.batty.app.BattyConfig;
+import nl.technolution.dropwizard.webservice.JacksonFactory;
 
 /**
- * Basic app for Fritzy applications
  * 
- * @param <T> Dropwizard Configuration Type
  */
-public class FritzyDropWizardApp<T extends FritzyAppConfig> extends Application<T> {
+public class ConfigGenerator {
 
-    public static final String PKG = "nl.technolution";
-
-    @Override
-    public void run(T configuration, Environment environment) throws Exception {
-        ServiceFinder.setupDropWizardServices(configuration);
-        WebserviceFinder.setupWebservices(environment);
-        ApiEndpoints.register(configuration.getApiConfig());
-        environment.lifecycle().manage(new TimedTaskService());
+    /**
+     * @param args
+     * @throws JsonProcessingException
+     */
+    public static void main(String[] args) throws JsonProcessingException {
+        BattyConfig c = new BattyConfig();
+        System.out.println(JacksonFactory.defaultMapper().writerWithDefaultPrettyPrinter().writeValueAsString(c));
     }
+
 }

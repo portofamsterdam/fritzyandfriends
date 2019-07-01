@@ -14,29 +14,30 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.dropwizard;
-
-import io.dropwizard.Application;
-import io.dropwizard.setup.Environment;
-import nl.technolution.apis.ApiEndpoints;
-import nl.technolution.dropwizard.services.ServiceFinder;
-import nl.technolution.dropwizard.tasks.TimedTaskService;
-import nl.technolution.dropwizard.webservice.WebserviceFinder;
+package nl.technolution.dashboard;
 
 /**
- * Basic app for Fritzy applications
  * 
- * @param <T> Dropwizard Configuration Type
  */
-public class FritzyDropWizardApp<T extends FritzyAppConfig> extends Application<T> {
+public enum EEventType {
+    CHAT("CHAT"),
+    ORDER_OFFER("ORDER_OFFER"),
+    ORDER_ACCEPT("ORDER_ACCEPT"),
+    REWARD_OFFER("REWARD_OFFER"),
+    REWARD_CLAIM("REWARD_CLAIM"),
+    LIMIT_ACTOR("LIMIT_ACTOR"),
+    LIMIT_TOTAL("LIMIT_TOTAL"),
+    LIMIT_EXCEEDED("LIMIT_EXCEEDED"),
+    BALANCE("BALANCE"),
+    DEVICE_STATE("DEVICE_STATE");
 
-    public static final String PKG = "nl.technolution";
+    private final String tag;
 
-    @Override
-    public void run(T configuration, Environment environment) throws Exception {
-        ServiceFinder.setupDropWizardServices(configuration);
-        WebserviceFinder.setupWebservices(environment);
-        ApiEndpoints.register(configuration.getApiConfig());
-        environment.lifecycle().manage(new TimedTaskService());
+    EEventType(String tag) {
+        this.tag = tag;
+    }
+
+    public String getTag() {
+        return tag;
     }
 }

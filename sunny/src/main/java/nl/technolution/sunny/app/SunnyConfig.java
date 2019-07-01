@@ -18,14 +18,13 @@ package nl.technolution.sunny.app;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import nl.technolution.market.MarketConfig;
-
-import io.dropwizard.Configuration;
+import nl.technolution.dropwizard.FritzyAppConfig;
+import nl.technolution.dropwizard.MarketConfig;
 
 /**
  * Configuration for Fritzy
  */
-public class SunnyConfig extends Configuration {
+public class SunnyConfig extends FritzyAppConfig {
 
     @JsonProperty("deviceId")
     private String deviceId;
@@ -69,16 +68,16 @@ public class SunnyConfig extends Configuration {
         return market;
     }
 
+    public void setMarket(MarketConfig market) {
+        this.market = market;
+    }
+
     public boolean isUseStub() {
         return useStub;
     }
 
     public void setUseStub(boolean useStub) {
         this.useStub = useStub;
-    }
-
-    public void setMarket(MarketConfig market) {
-        this.market = market;
     }
 
     public String getSolarEdgeMonitoringBaseURL() {

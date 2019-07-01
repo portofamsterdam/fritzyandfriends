@@ -16,27 +16,40 @@
  */
 package nl.technolution.dropwizard;
 
-import io.dropwizard.Application;
-import io.dropwizard.setup.Environment;
-import nl.technolution.apis.ApiEndpoints;
-import nl.technolution.dropwizard.services.ServiceFinder;
-import nl.technolution.dropwizard.tasks.TimedTaskService;
-import nl.technolution.dropwizard.webservice.WebserviceFinder;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
- * Basic app for Fritzy applications
- * 
- * @param <T> Dropwizard Configuration Type
+ * Config needed to use api
  */
-public class FritzyDropWizardApp<T extends FritzyAppConfig> extends Application<T> {
+public class MarketConfig {
 
-    public static final String PKG = "nl.technolution";
+    @JsonProperty("marketUrl")
+    private final String marketUrl;
 
-    @Override
-    public void run(T configuration, Environment environment) throws Exception {
-        ServiceFinder.setupDropWizardServices(configuration);
-        WebserviceFinder.setupWebservices(environment);
-        ApiEndpoints.register(configuration.getApiConfig());
-        environment.lifecycle().manage(new TimedTaskService());
+    @JsonProperty("email")
+    private final String email;
+
+    @JsonProperty("password")
+    private final String password;
+
+    @JsonCreator
+    public MarketConfig(@JsonProperty("marketUrl") String marketUrl, @JsonProperty("email") String email,
+            @JsonProperty("password") String password) {
+        this.marketUrl = marketUrl;
+        this.email = email;
+        this.password = password;
+    }
+
+    public String getMarketUrl() {
+        return marketUrl;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getPassword() {
+        return password;
     }
 }

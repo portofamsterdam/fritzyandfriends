@@ -66,5 +66,6 @@ public final class SolarEdgeMonitoring {
         pvCastClient.postPvMeasurements(pvMeasurements);
         Forecasts forecasts = pvCastClient.getPvForecasts();
         LOG.info("Received forecast object:\n" + forecasts);
+
     }
 }

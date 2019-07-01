@@ -20,36 +20,51 @@ import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-import io.dropwizard.Configuration;
+import nl.technolution.dropwizard.FritzyAppConfig;
 
 /**
  * Configuration for Netty
  */
-public class NettyConfig extends Configuration {
+public class NettyConfig extends FritzyAppConfig {
 
     @JsonProperty("defaultGridConnectionLimit")
-    private final double defaultGridConnectionLimit;
+    private double defaultGridConnectionLimit;
 
     @JsonProperty("deviceLimits")
-    private final Map<String, Double> deviceLimits;
+    private Map<String, Double> deviceLimits;
 
     /**
      * Constructor for {@link NettyConfig} objects
      *
-     * @param defaultLimit
-     * @param limits
+     * @param defaultGridConnectionLimit
+     * @param deviceLimits
      */
-    public NettyConfig(@JsonProperty("defaultGridConnectionLimit") double defaultGridConnectionLimit,
-            @JsonProperty("limit") Map<String, Double> deviceLimits) {
+    public NettyConfig(double defaultGridConnectionLimit, Map<String, Double> deviceLimits) {
         this.defaultGridConnectionLimit = defaultGridConnectionLimit;
         this.deviceLimits = deviceLimits;
+    }
+
+    /**
+     * Constructor for {@link NettyConfig} objects
+     */
+    public NettyConfig() {
+        //
     }
 
     public double getDefaultGridConnectionLimit() {
         return defaultGridConnectionLimit;
     }
 
+    public void setDefaultGridConnectionLimit(double defaultGridConnectionLimit) {
+        this.defaultGridConnectionLimit = defaultGridConnectionLimit;
+    }
+
     public Map<String, Double> getDeviceLimits() {
         return deviceLimits;
     }
+
+    public void setDeviceLimits(Map<String, Double> deviceLimits) {
+        this.deviceLimits = deviceLimits;
+    }
+
 }

@@ -35,8 +35,10 @@ public class ConnectionTest {
     public static void main(String[] args) throws JsonParseException, JsonMappingException, IOException,
             KeyManagementException, NoSuchAlgorithmException, CertificateException, KeyStoreException {
 
-        BattyConfig b = new BattyConfig("", "https://172.30.133.212/assets/inc/server.inc.php", "batty", "batty",
-                "src/main/dist/truststore.jks", "12345678", 0, 0, null, false);
+        // TODO MKE create config to use here
+        BattyConfig b = null;
+        // BattyConfig b = new BattyConfig("", "https://172.30.133.212/assets/inc/server.inc.php", "batty", "batty",
+        // "src/main/dist/truststore.jks", "12345678", 0, 0, null, false);
 
         XStorageConnection conn = new XStorageConnection();
         conn.init(b);

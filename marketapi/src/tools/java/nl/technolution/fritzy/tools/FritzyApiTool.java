@@ -34,7 +34,7 @@ public class FritzyApiTool {
         // order.setTakerAmount("1000000000000000000");
         // String createOrder = api.createOrder(order);
         // System.out.println(createOrder);
-        System.out.println(api.balance());
+        // System.out.println(api.balance());
 
     }
 }

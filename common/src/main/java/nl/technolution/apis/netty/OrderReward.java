@@ -14,7 +14,9 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.netty.api;
+package nl.technolution.apis.netty;
+
+import java.time.LocalDateTime;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -23,12 +25,38 @@ import nl.technolution.IJsonnable;
 /**
  * 
  */
-public class DeviceCapacity implements IJsonnable {
+public class OrderReward implements IJsonnable {
 
-    @JsonProperty("gridConnectionLimit")
-    private final double gridConnectionLimit;
+    @JsonProperty("rewardId")
+    private final String rewardId;
 
-    public DeviceCapacity(@JsonProperty("gridConnectionLimit") double gridConnectionLimit) {
-        this.gridConnectionLimit = gridConnectionLimit;
+    @JsonProperty("reward")
+    private final double reward;
+
+    @JsonProperty("expireTs")
+    private final LocalDateTime expireTs;
+
+    /**
+     * Constructor for {@link OrderReward} objects
+     * 
+     * @param reward value
+     */
+    public OrderReward(String rewardId, double reward, LocalDateTime expireTs) {
+        this.rewardId = rewardId;
+        this.reward = reward;
+        this.expireTs = expireTs;
     }
+
+    public String getRewardId() {
+        return rewardId;
+    }
+
+    public double getReward() {
+        return reward;
+    }
+
+    public LocalDateTime getExpireTs() {
+        return expireTs;
+    }
+
 }

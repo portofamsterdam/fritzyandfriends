@@ -20,6 +20,7 @@ import nl.technolution.DeviceId;
 import nl.technolution.batty.app.BattyConfig;
 import nl.technolution.batty.xstorage.cache.IMachineDataCacher;
 import nl.technolution.dropwizard.services.Services;
+import nl.technolution.fritzy.wallet.FritzyApi;
 
 /**
  * 
@@ -32,7 +33,9 @@ public class BattyTrader implements IBattyTrader {
     @Override
     public void init(BattyConfig config) {
         resourceManager = new BattyResourceManager(new DeviceId(config.getDeviceId()));
-        cem = new BatteryNegotiator(config.getMarket(), resourceManager);
+        FritzyApi market = new FritzyApi(config.getMarket().getMarketUrl());
+        market.login(config.getMarket().getEmail(), config.getMarket().getPassword());
+        cem = new BatteryNegotiator(market, resourceManager);
         resourceManager.registerCustomerEnergyManager(cem);
     }
 
