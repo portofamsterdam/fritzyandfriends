@@ -25,80 +25,75 @@ build_fritzy:
   stage: build
   script: 
     - cd gradle
-    - gradle :fritzy:build :fritzy:copyArtifactsToDocker
+    - gradle :fritzy:build 
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
-      - build/
+      - fritzy/build/
       - .gradle
-      - docker/build/fritzy/
   artifacts:
-    paths: 
-      - docker/build/fritzy/
+    reports:
+      junit: fritzy/build/test-results/test/TEST-*.xml
       
 build_batty:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
   stage: build
   script: 
     - cd gradle
-    - gradle :batty:build :batty:copyArtifactsToDocker
+    - gradle :batty:build
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
       - .gradle
-      - build/
-      - docker/build/batty/
+      - batty/build/
   artifacts:
-    paths: 
-      - docker/build/batty/
+    reports:
+      junit: batty/build/test-results/test/TEST-*.xml
       
 build_netty:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
   stage: build
   script: 
     - cd gradle
-    - gradle :netty:build :netty:copyArtifactsToDocker
+    - gradle :netty:build
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
-      - build/
+      - netty/build/
       - .gradle
-      - docker/build/netty/
   artifacts:
-    paths: 
-      - docker/build/netty/
+    reports:
+      junit: netty/build/test-results/test/TEST-*.xml
       
 build_sunny:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
   stage: build
   script: 
     - cd gradle
-    - gradle :sunny:build :sunny:copyArtifactsToDocker
+    - gradle :sunny:build
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
-      - build/
+      - sunny/build/
       - .gradle
-      - docker/build/sunny/
   artifacts:
-    paths: 
-      - docker/build/sunny/
+    reports:
+      junit: sunny/build/test-results/test/TEST-*.xml
       
 build_exxy:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
   stage: build
   script: 
     - cd gradle
-    - gradle :exxy:build :exxy:copyArtifactsToDocker
+    - gradle :exxy:build
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
-      - build/
+      - exxy/build/
       - .gradle
-      - docker/build/exxy/
   artifacts:
-    paths: 
-      - docker/build/exxy/
+    reports:
+      junit: exxy/build/test-results/test/TEST-*.xml
 
 create_openapi_docs:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
@@ -117,8 +112,10 @@ create_images:
   image: docker-proxy.intranet.technolution.nl/edsn/edsn_docker_aws:latest
   stage: create_images
   script:
+    - cd gradle
+    - gradle copyArtifactsToDocker
     - docker login -u fritzy2 -p 1upTNLP04
-    - cd docker/build/fritzy
+    - cd ../docker/build/fritzy
     - docker build -t fritzy2/fritzy:fritzy .
     - docker push fritzy2/fritzy:fritzy
     - cd ../batty
