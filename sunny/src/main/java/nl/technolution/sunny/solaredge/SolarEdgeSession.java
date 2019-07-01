@@ -82,9 +82,7 @@ public class SolarEdgeSession implements ISolarEdgeSession {
         return session.readRegister(ESolarEdgeRegister.C_SERIALNUMBER, String.class);
     }
 
-    /**
-     * TODO WHO: Make sure this is called at the end (making Iservice 'managed'??)
-     */
+    @Override
     public void stop() {
         try {
             session.close();

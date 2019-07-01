@@ -16,25 +16,23 @@
  */
 package nl.technolution.dropwizard.services;
 
+import io.dropwizard.lifecycle.Managed;
+
 /**
- * Service to be registered by Fritzy dropwizard app
- * 
- * @param <T> Object type used to init serivce
+ * Manages task with @Timed annotation
  */
-public interface IService<T> {
+public final class ServicesService implements Managed {
+    @Override
+    public void stop() throws Exception {
+        for (Object service : Services.getAll()) {
+            IService<?> s = (IService<?>)service;
+            // TODO WHO: enable this
+            // s.deInit();
+        }
+    }
 
-    /**
-     * init service
-     * 
-     * @param config
-     */
-    void init(T config);
-
-    /**
-     * deinitialize service, called at program end and can be used to close resources etc.
-     * 
-     * @param config
-     */
-    // TODO WHO: enable this (and add it to all the implementating classes...
-    // void deInit();
+    @Override
+    public void start() throws Exception {
+        // TODO WHO: Maybe add a start to IService?
+    }
 }

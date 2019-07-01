@@ -27,4 +27,9 @@ public class SolarEdgeSessionStub implements ISolarEdgeSession {
     public double getInverterPower() throws ModbusException {
         return 12345;
     }
+
+    @Override
+    public void stop() {
+        // Nothing to stop in this stub
+    }
 }

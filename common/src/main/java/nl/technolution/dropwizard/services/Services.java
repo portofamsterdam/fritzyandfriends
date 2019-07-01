@@ -16,6 +16,8 @@
  */
 package nl.technolution.dropwizard.services;
 
+import java.util.Collection;
+
 import com.google.common.collect.MutableClassToInstanceMap;
 
 import org.slf4j.Logger;
@@ -66,5 +68,9 @@ public final class Services {
             return instance;
         }
         throw new IllegalStateException("Unregistered service called " + serviceClass);
+    }
+
+    public static Collection<Object> getAll() {
+        return SERVICES.values();
     }
 }
