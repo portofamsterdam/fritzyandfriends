@@ -16,7 +16,10 @@
  */
 package nl.technolution.marketnegotiator;
 
+import org.slf4j.Logger;
+
 import nl.technolution.DeviceId;
+import nl.technolution.Log;
 import nl.technolution.protocols.efi.FlexibilityRegistration;
 import nl.technolution.protocols.efi.FlexibilityRevoke;
 import nl.technolution.protocols.efi.FlexibilityUpdate;
@@ -31,6 +34,8 @@ import nl.technolution.protocols.efi.util.ICustomerEnergyManager;
  */
 public abstract class AbstractCustomerEnergyManager<T extends FlexibilityRegistration, S extends FlexibilityUpdate>
         implements ICustomerEnergyManager<T, S> {
+
+    private final Logger log = Log.getLogger();
 
     private T registration;
     private DeviceId deviceId;
@@ -53,8 +58,7 @@ public abstract class AbstractCustomerEnergyManager<T extends FlexibilityRegistr
 
     @Override
     public void measurement(Measurement measurement) {
-        // TODO WHO: implement this or remove here and force subclass to implement it
-        System.out.println("TODO: Received measuremen but nothing is done with it: " +
+        log.debug("Received measurement but nothing is done with it: " +
                 measurement.getElectricityMeasurement().getPower());
     }
 
