@@ -35,7 +35,8 @@ build_fritzy:
   artifacts:
     paths: 
       - docker/build/fritzy/
-      - fritzy/build/reports/tests/test/
+    reports:
+      junit: fritzy/build/test-results/test/**/TEST-*.xml
       
 build_batty:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
@@ -52,7 +53,8 @@ build_batty:
   artifacts:
     paths: 
       - docker/build/batty/
-      - batty/build/reports/tests/test/
+    reports:
+      - batty/build/test-results/test/**/TEST-*.xml
       
 build_netty:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
@@ -69,7 +71,8 @@ build_netty:
   artifacts:
     paths: 
       - docker/build/netty/
-      - netty/build/reports/tests/test/
+    reports:
+      - netty/build/test-results/test/**/TEST-*.xml
       
 build_sunny:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
@@ -86,7 +89,8 @@ build_sunny:
   artifacts:
     paths: 
       - docker/build/sunny/
-      - sunny/build/reports/tests/test/
+    reports:
+      - sunny/build/test-results/test/**/TEST-*.xml
       
 build_exxy:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
@@ -103,7 +107,8 @@ build_exxy:
   artifacts:
     paths: 
       - docker/build/exxy/
-      - exxy/build/reports/tests/test/
+    reports:
+      - exxy/build/test-results/test/**/TEST-*.xml
 
 create_openapi_docs:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
