@@ -56,6 +56,7 @@ import nl.technolution.exxy.service.IPriceReceiver;
  * 
  */
 public class APXPriceServiceTest {
+
     private static final String SECURITY_TOKEN = "TEST_TOKEN";
     private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'");
 
