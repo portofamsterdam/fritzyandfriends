@@ -60,7 +60,7 @@ libraries.jersey = [
     // Support for multiple 'parts' (parameters) in body (not in URL) e.g. doCall(String str1, String str2) 
     'org.glassfish.jersey.containers:jersey-container-servlet:' + jersey_version,   // Jersey as a servlet 
     'org.glassfish.jersey.ext:jersey-bean-validation:' + jersey_version,            // Bean validation
-    'org.glassfish.jersey.ext:jersey-proxy-client:' + jersey_version               // Proxy client
+    'org.glassfish.jersey.ext:jersey-proxy-client:' + jersey_version,               // Proxy client
     'org.glassfish.jersey.inject:jersey-hk2' + jersey_version // injection stuff
 ]
 
