@@ -29,7 +29,7 @@ build_fritzy:
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
-      - build/
+      - fritzy/build/
       - .gradle
   artifacts:
     reports:
@@ -45,7 +45,7 @@ build_batty:
     key: "$CI_COMMIT_REF_NAME"
     paths:
       - .gradle
-      - build/
+      - batty/build/
   artifacts:
     reports:
       junit: batty/build/test-results/test/TEST-*.xml
@@ -59,7 +59,7 @@ build_netty:
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
-      - build/
+      - netty/build/
       - .gradle
   artifacts:
     reports:
@@ -74,7 +74,7 @@ build_sunny:
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
-      - build/
+      - sunny/build/
       - .gradle
   artifacts:
     reports:
@@ -89,7 +89,7 @@ build_exxy:
   cache:
     key: "$CI_COMMIT_REF_NAME"
     paths:
-      - build/
+      - exxy/build/
       - .gradle
   artifacts:
     reports:
