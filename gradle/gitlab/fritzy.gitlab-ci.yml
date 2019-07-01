@@ -33,7 +33,7 @@ build_fritzy:
       - .gradle
   artifacts:
     reports:
-      junit: fritzy/build/test-results/test/**/TEST-*.xml
+      junit: fritzy/build/test-results/test/TEST-*.xml
       
 build_batty:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
