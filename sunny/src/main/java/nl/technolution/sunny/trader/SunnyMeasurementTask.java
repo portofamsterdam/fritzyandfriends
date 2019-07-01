@@ -23,11 +23,9 @@ import nl.technolution.dropwizard.tasks.ITaskRunner;
 import nl.technolution.dropwizard.tasks.TimedTask;
 
 /**
- * NOTE: don't run this more than once every 15 minutes because there is a usage limitation on the SolarEdge monitoring
- * API. An offset is used to give the server some time to receive and calculate the average for the past quarter.
- * 
+ * Scheduled task for sending measurements.
  */
-@TimedTask(period = 15, unit = TimeUnit.MINUTES, offset = 60, offsetUnit = TimeUnit.SECONDS)
+@TimedTask(period = 30, unit = TimeUnit.SECONDS, offset = 10, offsetUnit = TimeUnit.SECONDS)
 public class SunnyMeasurementTask implements ITaskRunner {
 
     @Override

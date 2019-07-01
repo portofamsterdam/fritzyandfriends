@@ -50,20 +50,15 @@ public class SunnyConfig extends FritzyAppConfig {
     @JsonProperty("pvCastApiKey")
     private Object pvCastApiKey;
 
-    @JsonCreator
-    public SunnyConfig(@JsonProperty("deviceId") String deviceId, @JsonProperty("host") String host,
-            @JsonProperty("maxMargin") int maxMargin,
-            @JsonProperty("solarEdgeMonitoringBaseURL") String solarEdgeMonitoringBaseURL,
-            @JsonProperty("solarEdgeMonitoringApikey") String solarEdgeMonitoringApikey,
-            @JsonProperty("pvCastBaseURL") String pvCastBaseURL, @JsonProperty("pvCastApiKey") String pvCastApiKey) {
-        this.deviceId = deviceId;
-        this.host = host;
-        this.maxMargin = maxMargin;
-        this.solarEdgeMonitoringBaseURL = solarEdgeMonitoringBaseURL;
-        this.solarEdgeMonitoringApikey = solarEdgeMonitoringApikey;
-        this.pvCastBaseURL = pvCastBaseURL;
-        this.pvCastApiKey = pvCastApiKey;
-    }
+
+    @JsonProperty("solarEdgeModbusIpAddress")
+    private String solarEdgeModbusIpAddress;
+
+    @JsonProperty("solarEdgeModbusPort")
+    private int solarEdgeModbusPort;
+
+    @JsonProperty("solarEdgeModbusDeviceId")
+    private int solarEdgeModbusDeviceId;
 
     public String getDeviceId() {
         return deviceId;
