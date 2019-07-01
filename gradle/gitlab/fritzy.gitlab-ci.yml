@@ -36,7 +36,7 @@ build_fritzy:
     paths: 
       - docker/build/fritzy/
     reports:
-      junit: fritzy/build/test-results/test/**/TEST-*.xml
+      junit: ../fritzy/build/test-results/test/**/TEST-*.xml
       
 build_batty:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
@@ -54,7 +54,7 @@ build_batty:
     paths: 
       - docker/build/batty/
     reports:
-      junit: batty/build/test-results/test/**/TEST-*.xml
+      junit: batty/build/test-results/test/TEST-*.xml
       
 build_netty:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
