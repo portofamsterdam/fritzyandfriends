@@ -54,7 +54,7 @@ build_batty:
     paths: 
       - docker/build/batty/
     reports:
-      - batty/build/test-results/test/**/TEST-*.xml
+      junit: batty/build/test-results/test/**/TEST-*.xml
       
 build_netty:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
@@ -72,7 +72,7 @@ build_netty:
     paths: 
       - docker/build/netty/
     reports:
-      - netty/build/test-results/test/**/TEST-*.xml
+      junit: netty/build/test-results/test/**/TEST-*.xml
       
 build_sunny:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
@@ -90,7 +90,7 @@ build_sunny:
     paths: 
       - docker/build/sunny/
     reports:
-      - sunny/build/test-results/test/**/TEST-*.xml
+      junit: sunny/build/test-results/test/**/TEST-*.xml
       
 build_exxy:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
@@ -108,7 +108,7 @@ build_exxy:
     paths: 
       - docker/build/exxy/
     reports:
-      - exxy/build/test-results/test/**/TEST-*.xml
+      junit: exxy/build/test-results/test/**/TEST-*.xml
 
 create_openapi_docs:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
