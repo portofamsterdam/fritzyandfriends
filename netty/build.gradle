@@ -3,6 +3,7 @@ apply plugin: 'application'
 
 dependencies {
     compile project(':common')
+    compile project(':marketapi')
 }
 
 mainClassName = 'nl.technolution.netty.app.NettyApp'
