@@ -29,6 +29,7 @@ import nl.technolution.apis.netty.DeviceCapacity;
 import nl.technolution.apis.netty.INettyApi;
 import nl.technolution.apis.netty.OrderReward;
 import nl.technolution.dropwizard.services.Services;
+import nl.technolution.netty.rewarder.IRewardService;
 import nl.technolution.netty.supplylimit.IGridCapacityManager;
 
 /**
@@ -51,17 +52,19 @@ public class NettyApi implements INettyApi {
     @Produces(MediaType.APPLICATION_JSON)
     public DeviceCapacity getCapacity(@QueryParam("deviceId") String deviceId) {
         DeviceId id = new DeviceId(deviceId);
-        return new DeviceCapacity(Services.get(IGridCapacityManager.class).getGridConnectionLimit(id));
+        IGridCapacityManager gridCapacityManager = Services.get(IGridCapacityManager.class);
+        double gridConnectionLimit = gridCapacityManager.getGridConnectionLimit(id);
+        double groupConnectionLimit = gridCapacityManager.getGroupConnectionLimit(id);
+        return new DeviceCapacity(gridConnectionLimit, groupConnectionLimit);
     }
 
     @Override
-    public OrderReward getOrderReward(String orderHash) {
-        return null;
+    public OrderReward getOrderReward(String taker, String orderHash) {
+        return Services.get(IRewardService.class).calculateReward(taker, orderHash);
     }
 
     @Override
     public void claim(String txHash, String rewardId) {
-        //
-
+        Services.get(IRewardService.class).claim(txHash, rewardId);
     }
 }

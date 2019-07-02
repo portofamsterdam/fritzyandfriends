@@ -14,28 +14,38 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.exxy.api;
+package nl.technolution.netty.rewarder;
 
-import com.fasterxml.jackson.annotation.JsonCreator;
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import nl.technolution.IJsonnable;
+import nl.technolution.apis.netty.OrderReward;
+import nl.technolution.fritzy.wallet.FritzyApi;
+import nl.technolution.fritzy.wallet.order.Order;
+import nl.technolution.netty.app.NettyConfig;
 
 /**
- * Container for APX price in euro per kwh
+ * 
  */
-public class ApxPrice implements IJsonnable {
+public class RewardService implements IRewardService {
 
-    /** euro per kwh */
-    @JsonProperty("price")
-    private final double price;
+    private FritzyApi market;
 
-    @JsonCreator
-    public ApxPrice(@JsonProperty("price") double price)    {
-        this.price = price;
+    @Override
+    public void init(NettyConfig config) {
+        market = new FritzyApi(config.getMarket().getMarketUrl());
+        market.login(config.getMarket().getEmail(), config.getMarket().getPassword());
     }
 
-    public double getPrice() {
-        return price;
+    @Override
+    public OrderReward calculateReward(String taker, String orderHash) {
+        Order order = market.order(orderHash);
+        if (order == null) {
+            return OrderReward.NONE;
+        }
+        return null;
+    }
+
+    @Override
+    public void claim(String txHash, String rewardId) {
+        //
+
     }
 }

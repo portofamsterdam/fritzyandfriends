@@ -80,7 +80,7 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
 
         // Get max capacity
         INettyApi netty = Endpoints.get(INettyApi.class);
-        DeviceId deviceId = resourceManager.getDeviceId(); // TODO MKE get deviceId here
+        DeviceId deviceId = resourceManager.getDeviceId();
         DeviceCapacity deviceCapacity = netty.getCapacity(deviceId.getDeviceId());
         events.log(EEventType.LIMIT_ACTOR, Double.toString(deviceCapacity.getGridConnectionLimit()), null);
 
@@ -89,7 +89,7 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
             if (!isInterestingOrder(order, balance, deviceCapacity)) {
                 continue;
             }
-            OrderReward reward = netty.getOrderReward(order.getHash());
+            OrderReward reward = netty.getOrderReward(market.getAddress(), order.getHash());
             if (!checkAcceptOffer(order, reward)) {
                 continue;
             }

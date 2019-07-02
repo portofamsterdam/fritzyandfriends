@@ -14,52 +14,28 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.apis.netty;
+package nl.technolution.apis.exxy;
 
-import java.time.LocalDateTime;
-
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 import nl.technolution.IJsonnable;
 
 /**
- * 
+ * Container for APX price in euro per kwh
  */
-public class OrderReward implements IJsonnable {
+public class ApxPrice implements IJsonnable {
 
-    public static final OrderReward NONE = new OrderReward("", 0d, LocalDateTime.MIN);
+    /** euro per kwh */
+    @JsonProperty("price")
+    private final double price;
 
-    @JsonProperty("rewardId")
-    private final String rewardId;
-
-    @JsonProperty("reward")
-    private final double reward;
-
-    @JsonProperty("expireTs")
-    private final LocalDateTime expireTs;
-
-
-    /**
-     * Constructor for {@link OrderReward} objects
-     * 
-     * @param reward value
-     */
-    public OrderReward(String rewardId, double reward, LocalDateTime expireTs) {
-        this.rewardId = rewardId;
-        this.reward = reward;
-        this.expireTs = expireTs;
+    @JsonCreator
+    public ApxPrice(@JsonProperty("price") double price)    {
+        this.price = price;
     }
 
-    public String getRewardId() {
-        return rewardId;
+    public double getPrice() {
+        return price;
     }
-
-    public double getReward() {
-        return reward;
-    }
-
-    public LocalDateTime getExpireTs() {
-        return expireTs;
-    }
-
 }

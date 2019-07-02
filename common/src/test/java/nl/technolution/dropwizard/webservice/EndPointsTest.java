@@ -68,12 +68,13 @@ public class EndPointsTest {
         }
 
         @Override
-        public OrderReward getOrderReward(String orderHash) {
-            return null;
+        public void claim(String txHash, String rewardId) {
         }
 
         @Override
-        public void claim(String txHash, String rewardId) {
+        public OrderReward getOrderReward(String taker, String orderHash) {
+            //
+            return null;
         }
     }
 }

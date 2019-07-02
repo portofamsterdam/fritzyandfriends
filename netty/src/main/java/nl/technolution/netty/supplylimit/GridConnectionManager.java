@@ -31,15 +31,22 @@ public class GridConnectionManager implements IGridCapacityManager {
     private Map<DeviceId, Double> griConnectionLimitRegister = Maps.newHashMap();
 
     private double defaultGridConnectionLimit;
+    private double groupConnectionLimit;
 
     @Override
     public void init(NettyConfig config) {
         defaultGridConnectionLimit = config.getDefaultGridConnectionLimit();
+        groupConnectionLimit = config.getGroupConnectionLimit();
         config.getDeviceLimits().forEach((k, v) -> griConnectionLimitRegister.put(new DeviceId(k), v));
     }
 
     @Override
     public double getGridConnectionLimit(DeviceId id) {
         return griConnectionLimitRegister.computeIfAbsent(id, (k) -> defaultGridConnectionLimit);
+    }
+
+    @Override
+    public double getGroupConnectionLimit(DeviceId id) {
+        return groupConnectionLimit;
     }
 }

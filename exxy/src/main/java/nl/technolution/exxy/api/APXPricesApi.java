@@ -28,29 +28,25 @@ import com.codahale.metrics.annotation.Timed;
 
 import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
 
+import io.dropwizard.jersey.params.InstantParam;
+import nl.technolution.apis.exxy.ApxPrice;
+import nl.technolution.apis.exxy.IAPXPricesApi;
 import nl.technolution.dropwizard.services.Services;
-import nl.technolution.dropwizard.webservice.IEndpoint;
 import nl.technolution.exxy.service.APXPricesService;
 import nl.technolution.exxy.service.IAPXPricesService;
-
-import io.dropwizard.jersey.params.InstantParam;
 
 /**
  * 
  */
 @Path("exxy/")
 @Produces(MediaType.APPLICATION_JSON)
-public class APXPricesApi implements IEndpoint {
+public class APXPricesApi implements IAPXPricesApi {
 
-    /**
-     * Get day ahead price in EUR per kWh for the current moment using the cache.
-     * 
-     * @return day ahead price for the current moment
-     */
     @GET
     @Timed
     @Path("currentPrice")
     @Produces(MediaType.APPLICATION_JSON)
+    @Override
     public ApxPrice getCurrentPrice() {
         IAPXPricesService priceService = Services.get(IAPXPricesService.class);
         try {
@@ -60,15 +56,12 @@ public class APXPricesApi implements IEndpoint {
         }
     }
 
-    /**
-     * Get day ahead price in EUR per kWh for the NEXT quarter hour using the cache.
-     * 
-     * @return day ahead price for the next quarter hour (request at 12:01 gives price for 12:15).
-     */
+
     @GET
     @Timed
     @Path("nextQuarterPrice")
     @Produces(MediaType.APPLICATION_JSON)
+    @Override
     public ApxPrice getNextQuarterHourPrice() {
         IAPXPricesService priceService = Services.get(IAPXPricesService.class);
         try {
@@ -78,17 +71,12 @@ public class APXPricesApi implements IEndpoint {
         }
     }
 
-    /**
-     * Get day ahead price in EUR per kWh for the requested moment.
-     * 
-     * NOTE: the cache is bypassed in this case, so this call takes typically some seconds to finish!
-     * 
-     * @return day ahead price for the requested moment
-     */
+
     @GET
     @Timed
     @Path("price")
     @Produces(MediaType.APPLICATION_JSON)
+    @Override
     public ApxPrice getPrice(
             @QueryParam(value = "dateTime") @NotNull @UnwrapValidatedValue InstantParam requestedDateTime) {
         IAPXPricesService priceService = Services.get(IAPXPricesService.class);
