@@ -14,54 +14,37 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.apis;
+package nl.technolution.apis.exxy;
 
-import java.util.Arrays;
-
-import nl.technolution.apis.exxy.IAPXPricesApi;
-import nl.technolution.apis.netty.INettyApi;
+import io.dropwizard.jersey.params.InstantParam;
 import nl.technolution.dropwizard.webservice.IEndpoint;
 
 /**
  * 
  */
-public enum EApiNames {
-
-    NETTY("netty", INettyApi.class),
-    EXXY("exxy", IAPXPricesApi.class);
-
-    private final String name;
-    private final Class<? extends IEndpoint> clazz;
-
+public interface IAPXPricesApi extends IEndpoint {
 
     /**
-     * Constructor for {@link EApiNames} objects
-     *
-     * @param name
-     * @param clazz
+     * Get day ahead price in EUR per kWh for the current moment using the cache.
+     * 
+     * @return day ahead price for the current moment
      */
-    EApiNames(String name, Class<? extends IEndpoint> clazz) {
-        this.name = name;
-        this.clazz = clazz;
-    }
+    ApxPrice getCurrentPrice();
 
     /**
-     * @param name class to find for
-     * @return clazz
+     * Get day ahead price in EUR per kWh for the NEXT quarter hour using the cache.
+     * 
+     * @return day ahead price for the next quarter hour (request at 12:01 gives price for 12:15).
      */
-    public static EApiNames getByName(String name) {
-        return Arrays.asList(values())
-                .stream()
-                .filter(e -> e.name.equals(name))
-                .findFirst().orElseThrow(() -> new IllegalArgumentException(name));
-    }
+    ApxPrice getNextQuarterHourPrice();
 
-    public String getName() {
-        return name;
-    }
-
-    public Class<? extends IEndpoint> getEndpointClass() {
-        return clazz;
-    }
+    /**
+     * Get day ahead price in EUR per kWh for the requested moment.
+     * 
+     * NOTE: the cache is bypassed in this case, so this call takes typically some seconds to finish!
+     * 
+     * @return day ahead price for the requested moment
+     */
+    ApxPrice getPrice(InstantParam requestedDateTime);
 
 }
