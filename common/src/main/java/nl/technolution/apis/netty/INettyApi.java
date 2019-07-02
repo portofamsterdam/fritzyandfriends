@@ -35,10 +35,11 @@ public interface INettyApi extends IEndpoint {
     /**
      * Determine taker reward for a given order.
      * 
+     * @param taker of the reward
      * @param orderHash identifying order
      * @return reward
      */
-    OrderReward getOrderReward(String orderHash);
+    OrderReward getOrderReward(String taker, String orderHash);
 
     /**
      * Claim a reward

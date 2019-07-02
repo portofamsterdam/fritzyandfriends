@@ -30,6 +30,9 @@ public class NettyConfig extends FritzyAppConfig {
     @JsonProperty("defaultGridConnectionLimit")
     private double defaultGridConnectionLimit;
 
+    @JsonProperty("groupConnectionLimit")
+    private double groupConnectionLimit;
+
     @JsonProperty("deviceLimits")
     private Map<String, Double> deviceLimits;
 
@@ -37,10 +40,13 @@ public class NettyConfig extends FritzyAppConfig {
      * Constructor for {@link NettyConfig} objects
      *
      * @param defaultGridConnectionLimit
+     * @param groupConnectionLimit group connection limit
      * @param deviceLimits
      */
-    public NettyConfig(double defaultGridConnectionLimit, Map<String, Double> deviceLimits) {
+    public NettyConfig(double defaultGridConnectionLimit, double groupConnectionLimit,
+            Map<String, Double> deviceLimits) {
         this.defaultGridConnectionLimit = defaultGridConnectionLimit;
+        this.groupConnectionLimit = groupConnectionLimit;
         this.deviceLimits = deviceLimits;
     }
 
@@ -49,6 +55,10 @@ public class NettyConfig extends FritzyAppConfig {
      */
     public NettyConfig() {
         //
+    }
+
+    public double getGroupConnectionLimit() {
+        return groupConnectionLimit;
     }
 
     public double getDefaultGridConnectionLimit() {
