@@ -88,7 +88,7 @@ public class FritzyApi {
     }
 
     /**
-     * Get al orders
+     * Get all orders
      * 
      * @return
      */
@@ -98,6 +98,19 @@ public class FritzyApi {
         Builder request = target.request();
         request.header("Authorization", "Bearer " + accessToken);
         return request.get(GetOrdersResponse.class);
+    }
+
+    /**
+     * Get an order
+     * 
+     * @return
+     */
+    public Order order(String orderHash) {
+        Preconditions.checkArgument(accessToken != null, "login first");
+        WebTarget target = client.target(url + "/orders/" + orderHash);
+        Builder request = target.request();
+        request.header("Authorization", "Bearer " + accessToken);
+        return request.get(Order.class);
     }
 
     /**
@@ -149,5 +162,9 @@ public class FritzyApi {
         Builder request = target.request();
         request.header("Authorization", "Bearer " + accessToken);
         return request.get(Balance.class).getBalance().getEur();
+    }
+
+    public String getAddress() {
+        return address;
     }
 }

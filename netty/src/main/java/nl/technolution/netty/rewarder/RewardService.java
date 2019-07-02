@@ -14,52 +14,38 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.apis.netty;
+package nl.technolution.netty.rewarder;
 
-import java.time.LocalDateTime;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import nl.technolution.IJsonnable;
+import nl.technolution.apis.netty.OrderReward;
+import nl.technolution.fritzy.wallet.FritzyApi;
+import nl.technolution.fritzy.wallet.order.Order;
+import nl.technolution.netty.app.NettyConfig;
 
 /**
  * 
  */
-public class OrderReward implements IJsonnable {
+public class RewardService implements IRewardService {
 
-    public static final OrderReward NONE = new OrderReward("", 0d, LocalDateTime.MIN);
+    private FritzyApi market;
 
-    @JsonProperty("rewardId")
-    private final String rewardId;
-
-    @JsonProperty("reward")
-    private final double reward;
-
-    @JsonProperty("expireTs")
-    private final LocalDateTime expireTs;
-
-
-    /**
-     * Constructor for {@link OrderReward} objects
-     * 
-     * @param reward value
-     */
-    public OrderReward(String rewardId, double reward, LocalDateTime expireTs) {
-        this.rewardId = rewardId;
-        this.reward = reward;
-        this.expireTs = expireTs;
+    @Override
+    public void init(NettyConfig config) {
+        market = new FritzyApi(config.getMarket().getMarketUrl());
+        market.login(config.getMarket().getEmail(), config.getMarket().getPassword());
     }
 
-    public String getRewardId() {
-        return rewardId;
+    @Override
+    public OrderReward calculateReward(String taker, String orderHash) {
+        Order order = market.order(orderHash);
+        if (order == null) {
+            return OrderReward.NONE;
+        }
+        return null;
     }
 
-    public double getReward() {
-        return reward;
-    }
+    @Override
+    public void claim(String txHash, String rewardId) {
+        //
 
-    public LocalDateTime getExpireTs() {
-        return expireTs;
     }
-
 }

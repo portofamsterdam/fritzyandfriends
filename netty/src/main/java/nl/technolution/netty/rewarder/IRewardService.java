@@ -14,52 +14,28 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.apis.netty;
+package nl.technolution.netty.rewarder;
 
-import java.time.LocalDateTime;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import nl.technolution.IJsonnable;
+import nl.technolution.apis.netty.OrderReward;
+import nl.technolution.dropwizard.services.IService;
+import nl.technolution.netty.app.NettyConfig;
 
 /**
  * 
  */
-public class OrderReward implements IJsonnable {
-
-    public static final OrderReward NONE = new OrderReward("", 0d, LocalDateTime.MIN);
-
-    @JsonProperty("rewardId")
-    private final String rewardId;
-
-    @JsonProperty("reward")
-    private final double reward;
-
-    @JsonProperty("expireTs")
-    private final LocalDateTime expireTs;
-
+public interface IRewardService extends IService<NettyConfig> {
 
     /**
-     * Constructor for {@link OrderReward} objects
-     * 
-     * @param reward value
+     * @param taker of the reward
+     * @param orderHash on public market to find
+     * @return offered reward
      */
-    public OrderReward(String rewardId, double reward, LocalDateTime expireTs) {
-        this.rewardId = rewardId;
-        this.reward = reward;
-        this.expireTs = expireTs;
-    }
+    OrderReward calculateReward(String taker, String orderHash);
 
-    public String getRewardId() {
-        return rewardId;
-    }
-
-    public double getReward() {
-        return reward;
-    }
-
-    public LocalDateTime getExpireTs() {
-        return expireTs;
-    }
+    /**
+     * @param txHash taker reward
+     * @param rewardId identifier of reward promis created earlier
+     */
+    void claim(String txHash, String rewardId);
 
 }
