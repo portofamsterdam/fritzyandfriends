@@ -22,12 +22,16 @@ import java.time.ZoneOffset;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import org.slf4j.Logger;
+
 import nl.technolution.IJsonnable;
+import nl.technolution.core.Log;
 
 /**
  * Service for sending events to the dashboard
  */
 public class EventService implements IEvent {
+    private static final Logger LOG = Log.getLogger();
 
     private final ObjectMapper mapper = new ObjectMapper();
 
@@ -50,6 +54,7 @@ public class EventService implements IEvent {
         }
         long timestamp = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC);
         DashboardEvent dashboardEvent = new DashboardEvent(environment, timestamp, actor, tag.getTag(), event, str);
+        LOG.info(dashboardEvent.toString());
         // TODO MKE send event
     }
 
