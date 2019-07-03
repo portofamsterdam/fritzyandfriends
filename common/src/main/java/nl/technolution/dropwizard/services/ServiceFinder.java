@@ -83,7 +83,7 @@ public final class ServiceFinder {
         Class<?> instanceClazz = service.getClass();
         for (Object obj : objects) {
             try {
-                Method m = instanceClazz.getMethod(getInitMethod(), obj.getClass());
+                Method m = instanceClazz.getMethod("init", obj.getClass());
                 LOG.info("Invoking init method {} with {}", m, obj.getClass());
                 m.invoke(service, obj);
             } catch (NoSuchMethodException e) {
@@ -92,23 +92,5 @@ public final class ServiceFinder {
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
-    }
-
-    private static String getInitMethod() {
-        /**
-         * Anonymous class used to get the name of the init method (dirty but best way possible).
-         */
-        final class TempService implements IService<Object> {
-            String initMethodName;
-
-            @Override
-            public void init(Object config) {
-                initMethodName = Thread.currentThread().getStackTrace()[1].getMethodName();
-            }
-        }
-
-        TempService temp = new TempService();
-        temp.init(null);
-        return temp.initMethodName;
     }
 }
