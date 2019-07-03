@@ -53,8 +53,13 @@ public class EndPointsTest {
     @Test
     public void testGeneratedEndpoint() {
         String uri = "http://localhost:8080/nonUsedUrl";
-        ApiConfigRecord cfgr = new ApiConfigRecord(EApiNames.NETTY.getName(), uri, 1000, 1000);
-        ApiConfig cfg = new ApiConfig(Lists.newArrayList(cfgr));
+        ApiConfigRecord cfgr = new ApiConfigRecord();
+        cfgr.setName(EApiNames.NETTY.getName());
+        cfgr.setUrl(uri);
+        cfgr.setReadTimeout(1000);
+        cfgr.setConnectTimeout(1000);
+        ApiConfig cfg = new ApiConfig();
+        cfg.setApis(Lists.newArrayList(cfgr));
         ApiEndpoints.register(cfg);
         INettyApi netty = Endpoints.get(INettyApi.class);
         assertNotNull(netty);
