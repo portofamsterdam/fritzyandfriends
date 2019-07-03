@@ -30,7 +30,7 @@ public class SunnyTrader implements ISunnyTrader {
     @Override
     public void init(SunnyConfig config) {
         resourceManager = new SunnyResourceManager(new DeviceId(config.getDeviceId()));
-        cem = new SunnyNegotiator(config.getMarket(), resourceManager);
+        cem = new SunnyNegotiator(config, resourceManager);
         resourceManager.registerCustomerEnergyManager(cem);
     }
 
