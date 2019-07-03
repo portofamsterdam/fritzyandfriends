@@ -40,6 +40,7 @@ import nl.technolution.protocols.efi.InflexibleForecast;
 import nl.technolution.protocols.efi.InflexibleRegistration;
 import nl.technolution.protocols.efi.InflexibleUpdate;
 import nl.technolution.protocols.efi.Instruction;
+import nl.technolution.protocols.efi.Measurement;
 import nl.technolution.protocols.efi.StorageInstruction;
 import nl.technolution.protocols.efi.util.Efi;
 import nl.technolution.protocols.efi.util.XmlUtils;
@@ -56,6 +57,9 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
 
     private InflexibleForecast forecast;
     private double marketPriceStartOffset;
+    private double availableKWh;
+
+    private double myPrice;
 
     /**
      *
@@ -65,7 +69,8 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
     public SunnyNegotiator(SunnyConfig config, SunnyResourceManager resourceManager) {
         this.resourceManager = resourceManager;
         market = new FritzyApi(config.getMarket().getMarketUrl());
-        market.login(config.getMarket().getEmail(), config.getMarket().getPassword());
+        // TODO: fix config
+        // market.login(config.getMarket().getEmail(), config.getMarket().getPassword());
         marketPriceStartOffset = config.getMarketPriceStartOffset();
     }
 
@@ -74,6 +79,7 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
      */
     public void evaluate() {
         IEvent events = Services.get(IEvent.class);
+        DeviceId deviceId = resourceManager.getDeviceId();
 
         // Get balance
         BigDecimal balance = market.balance();
@@ -81,13 +87,32 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
 
         // Get max capacity
         INettyApi netty = Endpoints.get(INettyApi.class);
-        DeviceId deviceId = resourceManager.getDeviceId(); // TODO MKE get deviceId here
         DeviceCapacity deviceCapacity = netty.getCapacity(deviceId.getDeviceId());
         events.log(EEventType.LIMIT_ACTOR, Double.toString(deviceCapacity.getGridConnectionLimit()), null);
 
+        // use market price as base for my price
+        // TODO WHO: enable this once api is moved to 'common' and add it as api to config in sunny_xx.json
+        // IExxyApi exxy = Endpoints.get(IExxyApi.class);
+        // double marketPrice = exxy.getNextQuarterHourPrice().getPrice();
+        myPrice = 0.21;
+
+        Duration remainingTime = Duration.between(Instant.now(), Efi.getNextQuarter());
+        boolean lastRound = remainingTime.getSeconds() < 61;
+        boolean firstRound = remainingTime.getSeconds() > 14 * 60 + 1;
+
+        // calculate my price based on remaining time (for the last round accept market price)
+        if (!lastRound) {
+            myPrice += (marketPriceStartOffset / 15) * remainingTime.toMinutes();
+        }
+
+        if (firstRound) {
+            // reset available energy
+            availableKWh = getNextQuarterHourForcastedKWh();
+        }
+
         Orders orders = market.orders().getOrders();
         for (WebOrder order : orders.getRecords()) {
-            if (!isInterestingOrder(order, balance, deviceCapacity)) {
+            if (!isInterestingOrder(order, deviceCapacity)) {
                 continue;
             }
             OrderReward reward = netty.getOrderReward(order.getHash());
@@ -96,68 +121,68 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
             }
 
             String txId = market.fillOrder(order.getHash());
+            // TODO WHO: log order as 'data' instead of event (order is not IJsonnable at the moment...)
+            events.log(EEventType.ORDER_ACCEPT, order.toString(), null);
             netty.claim(txId, reward.getRewardId());
+            // TODO WHO: log reward as 'data' instead of event (order is not IJsonnable at the moment...)
+            events.log(EEventType.REWARD_CLAIM, reward.toString(), null);
+
+            // energy sold so no longer available:
+            availableKWh -= getRequestedKwh(order);
         }
         // TODO WHO: post oder for remaining production?? MArtin is working on this....
+        // NOTE: when we accepted one or more proposals we should cancel (some) of our own proposals because the amount
+        // of available energy has changed.
     }
 
-    private boolean isInterestingOrder(WebOrder order, BigDecimal balance, DeviceCapacity deviceCapacity) {
-        // TODO WHO: SEE API documentation: http://82.196.13.251/api/docs/#/Order/post_me_order
-        // 1) check if requested Wh can be met (based on forecast)
-        double power = getNextQuarterHourForcastedPower();
-        double availableWh = power * 0.25; // W to Wh/quarter hour
-        double requestedWh = Double.parseDouble(order.getMakerAssetAmount()); // TODO WHO: is this the right field and
-                                                                              // in Wh?
-        if (requestedWh > availableWh) {
-            LOG.info("Order {} declined because requestedWh ({})> availableWh ({})", order, requestedWh, availableWh);
+    private boolean isInterestingOrder(WebOrder order, DeviceCapacity deviceCapacity) {
+        // Only interested in selling kWh for EUR:
+        if (!(order.getMakerAssetData().equalsIgnoreCase("EUR") && order.getTakerAssetData().equalsIgnoreCase("kWh"))) {
+            LOG.info("Order {} declined because it offered {} for {} (instead of EUR for kWh)",
+                    order.getMakerAssetData(), order.getTakerAssetData());
             return false;
         }
-        // 2) check if price is ok
-        double myPrice = 0.21; // TODO WHO: get price from Exxy, see
-                               // nl.technolution.batty.trader.BatteryNegotiator.evaluate()
-        // 2a) calc my price based on remaining time
-        Duration remainingTime = Duration.between(Instant.now(), Efi.getNextQuarter());
-        boolean lastRound = remainingTime.getSeconds() > 61;
-        if (!lastRound) {
-            myPrice += (marketPriceStartOffset / 15) * remainingTime.getSeconds();
-        }
-        double priceOffered = Double.parseDouble(order.getMakerFee()); // TODO WHO: is this the right field?
-        if (priceOffered < myPrice) {
-            LOG.info("Order {} declined because priceOffered ({}) < myPrice ({})", order, priceOffered, myPrice);
+
+        // check if requested Wh can be met
+        double requestedKWh = getRequestedKwh(order);
+        if (requestedKWh > availableKWh) {
+            LOG.info("Order {} declined because requestedKWh ({})> availableKWh ({})", order, requestedKWh,
+                    availableKWh);
             return false;
         }
-        // TODO WHO is GridConnectionLimit in A?
-        // TODO WHO: move definiton of voltage to some common place
-        if (lastRound && deviceCapacity.getGridConnectionLimit() < power / 230) {
-            // TODO WHO: deviceCapacity.getGridConnectionLimit is de limiet van de 'lokale' aansluiting (dus tussen
-            // sunny en de rest van de systemen, kan sunny niets aan doen.
-            // Altijd loggen via events.log (zie batty).
-            // TODO WHO: can't deliver to grid so should accept order from any other when in last bidding round???
-            return true;
-        }
-        return false;
+        LOG.debug("Order {} is interesingOrder");
+        return true;
+    }
+
+    private static double getRequestedKwh(WebOrder order) {
+        // TODO WHO: is this the right field?
+        return Double.parseDouble(order.getMakerAssetAmount());
     }
 
     /**
      * @return
      */
-    private double getNextQuarterHourForcastedPower() {
+    private double getNextQuarterHourForcastedKWh() {
         Instant nextQuarter = Efi.getNextQuarter();
         Instant start = forecast.getValidFrom().toGregorianCalendar().toInstant();
         for (Element e : forecast.getForecastProfiles().getElectricityProfile().getElement()) {
             Duration duration = XmlUtils.fromXmlDuration(e.getDuration());
             if (start.plus(duration).isAfter(nextQuarter)) {
-                return e.getPower();
+                return e.getPower() * 0.25 / 1000; // W to kWh/quarter hour;
             }
         }
         throw new Error("No forcasted power info available for next quarter (" + nextQuarter + ")");
     }
 
     private boolean checkAcceptOffer(WebOrder order, OrderReward reward) {
-        // TODO WHO: What is this supposed to do?
-        // Verschil met 'isInterestingOrder' is dat hier de 'rewards bij in zitten. Dit zijn euro's die de gene die de
-        // order accepteerd krijgt.
-        return false;
+        // check if price is ok
+        double priceOffered = Double.parseDouble(order.getTakerAssetAmount()); // TODO WHO: is this the right field?
+        if (priceOffered + reward.getReward() < myPrice) {
+            LOG.info("Order {} declined because priceOffered ({}) + reward ({}) < myPrice ({})", order, priceOffered,
+                    reward, myPrice);
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -165,9 +190,14 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
         if (update instanceof InflexibleForecast) {
             forecast = (InflexibleForecast)update;
         }
-        // TODO WHO: returning this empty shell seems not very useful and it is never used?? ask Martin...
-
-        // Can be empty for sunny...
+        // Curtailment is not possible so instruction is always empty
         return Efi.build(StorageInstruction.class, getDeviceId());
+    }
+
+    @Override
+    public void measurement(Measurement measurement) {
+        Services.get(IEvent.class)
+                .log(EEventType.DEVICE_STATE,
+                        "Generating power: " + measurement.getElectricityMeasurement().getPower() + "W", null);
     }
 }
