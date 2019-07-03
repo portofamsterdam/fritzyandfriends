@@ -48,8 +48,8 @@ public final class ServiceFinder {
     public static void setupDropWizardServices(Object... initObjects) {
         // Register endpoints of device controller
         LOG.info("registering services in package {}", FritzyDropWizardApp.PKG);
-        List<Class<? extends IService>> services = TypeFinder
-                .findImplementingClasses(FritzyDropWizardApp.PKG, IService.class);
+        List<Class<? extends IService>> services = TypeFinder.findImplementingClasses(FritzyDropWizardApp.PKG,
+                IService.class);
         LOG.info("Found {} services:", services.size());
 
         for (Class<? extends IService> clazz : services) {
@@ -95,8 +95,20 @@ public final class ServiceFinder {
     }
 
     private static String getInitMethod() {
-        Method[] methods = IService.class.getMethods();
-        Preconditions.checkArgument(methods.length == 1, "IService should only have one method init");
-        return methods[0].getName();
+        /**
+         * Anonymous class used to get the name of the init method (dirty but best way possible).
+         */
+        final class TempService implements IService<Object> {
+            String initMethodName;
+
+            @Override
+            public void init(Object config) {
+                initMethodName = Thread.currentThread().getStackTrace()[1].getMethodName();
+            }
+        }
+
+        TempService temp = new TempService();
+        temp.init(null);
+        return temp.initMethodName;
     }
 }
