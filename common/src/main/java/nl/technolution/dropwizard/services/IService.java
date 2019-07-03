@@ -35,6 +35,7 @@ public interface IService<T> {
      * 
      * @param config
      */
-    // TODO WHO: enable this (and add it to all the implementating classes...
-    // void deInit();
+    default void deInit() {
+        // By default empty implementation.
+    }
 }

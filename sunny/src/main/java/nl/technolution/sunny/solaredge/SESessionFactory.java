@@ -50,8 +50,7 @@ public class SESessionFactory implements ISESessionFactory {
         return solarEdgeSession;
     }
 
-    // TODO WHO: enable Override once it is added to IService
-    // @Override
+    @Override
     public void deInit() {
         solarEdgeSession.stop();
     }

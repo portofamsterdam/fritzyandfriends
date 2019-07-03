@@ -19,20 +19,19 @@ package nl.technolution.dropwizard.services;
 import io.dropwizard.lifecycle.Managed;
 
 /**
- * Manages task with @Timed annotation
+ * Manages services (implementing IService) created by {@link ServiceFinder}
  */
-public final class ServicesService implements Managed {
+public final class ServicesManager implements Managed {
     @Override
     public void stop() throws Exception {
         for (Object service : Services.getAll()) {
             IService<?> s = (IService<?>)service;
-            // TODO WHO: enable this
-            // s.deInit();
+            s.deInit();
         }
     }
 
     @Override
     public void start() throws Exception {
-        // TODO WHO: Maybe add a start to IService?
+        // Services are 'started' during init called by ServiceFinder.
     }
 }
