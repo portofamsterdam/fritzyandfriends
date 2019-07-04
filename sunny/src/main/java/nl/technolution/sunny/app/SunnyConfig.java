@@ -32,6 +32,9 @@ public class SunnyConfig extends FritzyAppConfig {
     @JsonProperty("market")
     private MarketConfig market;
 
+    @JsonProperty("marketPriceStartOffset")
+    private double marketPriceStartOffset;
+
     @JsonProperty("useStub")
     private boolean useStub;
 
@@ -70,6 +73,14 @@ public class SunnyConfig extends FritzyAppConfig {
 
     public void setMarket(MarketConfig market) {
         this.market = market;
+    }
+
+    public double getMarketPriceStartOffset() {
+        return marketPriceStartOffset;
+    }
+
+    public void setMarketPriceStartOffset(double marketPriceStartOffset) {
+        this.marketPriceStartOffset = marketPriceStartOffset;
     }
 
     public boolean isUseStub() {

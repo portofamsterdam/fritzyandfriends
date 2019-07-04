@@ -32,7 +32,10 @@ public class SunnyResourceManager implements IResourceManager {
 
     private ICustomerEnergyManager<InflexibleRegistration, InflexibleUpdate> cem;
 
+    private DeviceId deviceId;
+
     public SunnyResourceManager(DeviceId deviceId) {
+        this.deviceId = deviceId;
         this.helper = new SunnyResourceHelper(deviceId);
     }
 
@@ -52,6 +55,7 @@ public class SunnyResourceManager implements IResourceManager {
         this.cem = cem;
         cem.flexibilityRegistration(helper.getRegistration());
         // TODO WHO: Next causes a race condition because the PvCastClient service is not started yet...
+        // for now don't send it here but do it from the 'trader' task started later...
         // cem.flexibilityUpdate(helper.getFlexibilityUpdate());
     }
 
@@ -70,5 +74,12 @@ public class SunnyResourceManager implements IResourceManager {
     @Override
     public void instructionRevoke(InstructionRevoke instructionRevoke) {
         throw new Error("Curtailment not supported thus no instruction renove is expected");
+    }
+
+    /**
+     * @return
+     */
+    public DeviceId getDeviceId() {
+        return deviceId;
     }
 }
