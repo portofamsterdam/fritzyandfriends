@@ -28,8 +28,6 @@ import nl.technolution.apis.netty.INettyApi;
 import nl.technolution.apis.netty.OrderReward;
 import nl.technolution.core.Log;
 import nl.technolution.dashboard.EEventType;
-import nl.technolution.dashboard.IEvent;
-import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.webservice.Endpoints;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.FritzyApi;
@@ -68,7 +66,7 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
      */
     public SunnyNegotiator(SunnyConfig config, SunnyResourceManager resourceManager) {
         this.resourceManager = resourceManager;
-        market = new FritzyApi(config.getMarket().getMarketUrl());
+        market = new FritzyApi(config.getMarket().getMarketUrl(), config.getEnvironment());
         // TODO: fix config
         // market.login(config.getMarket().getEmail(), config.getMarket().getPassword());
         marketPriceStartOffset = config.getMarketPriceStartOffset();
@@ -78,17 +76,16 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
      * Call periodicly to evaluate market changes
      */
     public void evaluate() {
-        IEvent events = Services.get(IEvent.class);
         DeviceId deviceId = resourceManager.getDeviceId();
 
         // Get balance
         BigDecimal balance = market.balance();
-        events.log(EEventType.BALANCE, balance.toPlainString(), null);
+        market.log(EEventType.BALANCE, balance.toPlainString(), null);
 
         // Get max capacity
         INettyApi netty = Endpoints.get(INettyApi.class);
         DeviceCapacity deviceCapacity = netty.getCapacity(deviceId.getDeviceId());
-        events.log(EEventType.LIMIT_ACTOR, Double.toString(deviceCapacity.getGridConnectionLimit()), null);
+        market.log(EEventType.LIMIT_ACTOR, Double.toString(deviceCapacity.getGridConnectionLimit()), null);
 
         // use market price as base for my price
         // TODO WHO: enable this once api is moved to 'common' and add it as api to config in sunny_xx.json
@@ -115,17 +112,17 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
             if (!isInterestingOrder(order, deviceCapacity)) {
                 continue;
             }
-            OrderReward reward = netty.getOrderReward(order.getHash());
+            OrderReward reward = netty.getOrderReward(market.getAddress(), order.getHash());
             if (!checkAcceptOffer(order, reward)) {
                 continue;
             }
 
             String txId = market.fillOrder(order.getHash());
             // TODO WHO: log order as 'data' instead of event (order is not IJsonnable at the moment...)
-            events.log(EEventType.ORDER_ACCEPT, order.toString(), null);
+            market.log(EEventType.ORDER_ACCEPT, order.toString(), null);
             netty.claim(txId, reward.getRewardId());
             // TODO WHO: log reward as 'data' instead of event (order is not IJsonnable at the moment...)
-            events.log(EEventType.REWARD_CLAIM, reward.toString(), null);
+            market.log(EEventType.REWARD_CLAIM, reward.toString(), null);
 
             // energy sold so no longer available:
             availableKWh -= getRequestedKwh(order);
@@ -196,8 +193,7 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
 
     @Override
     public void measurement(Measurement measurement) {
-        Services.get(IEvent.class)
-                .log(EEventType.DEVICE_STATE,
+        market.log(EEventType.DEVICE_STATE,
                         "Generating power: " + measurement.getElectricityMeasurement().getPower() + "W", null);
     }
 }
