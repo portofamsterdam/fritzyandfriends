@@ -23,7 +23,7 @@ public class FritzyApiTool {
     public static void main(String[] args) {
 
         String url = "http://82.196.13.251/api/";
-        FritzyApi api = new FritzyApi(url);
+        FritzyApi api = new FritzyApi(url, "TestTool");
         api.login("test@fiets.be", "qazqaz");
         // Arrays.asList(api.orders().getOrders().getRecords()).forEach(o -> System.out.println(o));
         //

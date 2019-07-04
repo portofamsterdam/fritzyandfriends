@@ -33,7 +33,7 @@ public class BattyTrader implements IBattyTrader {
     @Override
     public void init(BattyConfig config) {
         resourceManager = new BattyResourceManager(new DeviceId(config.getDeviceId()));
-        FritzyApi market = new FritzyApi(config.getMarket().getMarketUrl());
+        FritzyApi market = new FritzyApi(config.getMarket().getMarketUrl(), config.getEnvironment());
         market.login(config.getMarket().getEmail(), config.getMarket().getPassword());
         cem = new BatteryNegotiator(market, resourceManager);
         resourceManager.registerCustomerEnergyManager(cem);
