@@ -89,7 +89,7 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
 
         // use market price as base for my price
         // TODO WHO: enable this once api is moved to 'common' and add it as api to config in sunny_xx.json
-        // IExxyApi exxy = Endpoints.get(IExxyApi.class);
+        // IAPXPricesApi exxy = Endpoints.get(IAPXPricesApi.class);
         // double marketPrice = exxy.getNextQuarterHourPrice().getPrice();
         myPrice = 0.21;
 
