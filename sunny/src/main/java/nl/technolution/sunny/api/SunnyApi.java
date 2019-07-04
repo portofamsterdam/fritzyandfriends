@@ -22,8 +22,11 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 
 import com.codahale.metrics.annotation.Timed;
+import com.ghgande.j2mod.modbus.ModbusException;
 
+import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.webservice.IEndpoint;
+import nl.technolution.sunny.solaredge.ISESessionFactory;
 
 /**
  * 
@@ -33,15 +36,19 @@ import nl.technolution.dropwizard.webservice.IEndpoint;
 public class SunnyApi implements IEndpoint {
 
     /**
-     * Retrieve state of Fritzy
+     * Retrieve state of Sunny
      * 
-     * @return state of cooler and temparature
+     * @return state of Sunny (power generation)
      */
     @GET
     @Timed
     @Path("state")
     @Produces(MediaType.APPLICATION_JSON)
     public SunnyState getState() {
-        return new SunnyState(1500d);
+        try {
+            return new SunnyState(Services.get(ISESessionFactory.class).getSESession().getInverterPower());
+        } catch (ModbusException e) {
+            throw new Error(e.getMessage(), e);
+        }
     }
 }

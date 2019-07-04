@@ -49,4 +49,9 @@ public class SESessionFactory implements ISESessionFactory {
     public ISolarEdgeSession getSESession() {
         return solarEdgeSession;
     }
+
+    @Override
+    public void deInit() {
+        solarEdgeSession.stop();
+    }
 }

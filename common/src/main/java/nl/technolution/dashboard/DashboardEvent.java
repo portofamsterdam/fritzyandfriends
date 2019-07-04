@@ -43,11 +43,8 @@ public final class DashboardEvent implements IJsonnable {
     @JsonProperty("data")
     private final String data;
 
-    public DashboardEvent(@JsonProperty("environment") String environment,
-            @JsonProperty("timestamp") long timestamp,
-            @JsonProperty("actor") String actor,
-            @JsonProperty("tag") String tag,
-            @JsonProperty("event") String event,
+    public DashboardEvent(@JsonProperty("environment") String environment, @JsonProperty("timestamp") long timestamp,
+            @JsonProperty("actor") String actor, @JsonProperty("tag") String tag, @JsonProperty("event") String event,
             @JsonProperty("data") String data) {
         this.environment = environment;
         this.timestamp = timestamp;
@@ -55,5 +52,11 @@ public final class DashboardEvent implements IJsonnable {
         this.tag = tag;
         this.event = event;
         this.data = data;
+    }
+
+    @Override
+    public String toString() {
+        return "DashboardEvent [environment=" + environment + ", timestamp=" + timestamp + ", actor=" + actor +
+                ", tag=" + tag + ", event=" + event + ", data=" + data + "]";
     }
 }

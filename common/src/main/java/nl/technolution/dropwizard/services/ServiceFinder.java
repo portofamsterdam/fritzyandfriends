@@ -48,8 +48,8 @@ public final class ServiceFinder {
     public static void setupDropWizardServices(Object... initObjects) {
         // Register endpoints of device controller
         LOG.info("registering services in package {}", FritzyDropWizardApp.PKG);
-        List<Class<? extends IService>> services = TypeFinder
-                .findImplementingClasses(FritzyDropWizardApp.PKG, IService.class);
+        List<Class<? extends IService>> services = TypeFinder.findImplementingClasses(FritzyDropWizardApp.PKG,
+                IService.class);
         LOG.info("Found {} services:", services.size());
 
         for (Class<? extends IService> clazz : services) {
@@ -83,7 +83,7 @@ public final class ServiceFinder {
         Class<?> instanceClazz = service.getClass();
         for (Object obj : objects) {
             try {
-                Method m = instanceClazz.getMethod(getInitMethod(), obj.getClass());
+                Method m = instanceClazz.getMethod("init", obj.getClass());
                 LOG.info("Invoking init method {} with {}", m, obj.getClass());
                 m.invoke(service, obj);
             } catch (NoSuchMethodException e) {
@@ -92,11 +92,5 @@ public final class ServiceFinder {
                 throw new RuntimeException(e.getMessage(), e);
             }
         }
-    }
-
-    private static String getInitMethod() {
-        Method[] methods = IService.class.getMethods();
-        Preconditions.checkArgument(methods.length == 1, "IService should only have one method init");
-        return methods[0].getName();
     }
 }

@@ -29,4 +29,9 @@ public interface ISolarEdgeSession {
      */
     double getInverterPower() throws ModbusException;
 
+    /**
+     * Stops the session
+     */
+    void stop();
+
 }

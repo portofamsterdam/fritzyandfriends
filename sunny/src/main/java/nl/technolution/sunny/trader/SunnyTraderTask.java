@@ -14,28 +14,24 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.dropwizard.services;
+package nl.technolution.sunny.trader;
+
+import java.util.concurrent.TimeUnit;
+
+import nl.technolution.dropwizard.services.Services;
+import nl.technolution.dropwizard.tasks.ITaskRunner;
+import nl.technolution.dropwizard.tasks.TimedTask;
 
 /**
- * Service to be registered by Fritzy dropwizard app
  * 
- * @param <T> Object type used to init serivce
  */
-public interface IService<T> {
+@TimedTask(period = 1, unit = TimeUnit.MINUTES)
+public class SunnyTraderTask implements ITaskRunner {
 
-    /**
-     * init service
-     * 
-     * @param config
-     */
-    void init(T config);
-
-    /**
-     * deinitialize service, called at program end and can be used to close resources etc.
-     * 
-     * @param config
-     */
-    default void deInit() {
-        // By default empty implementation.
+    @Override
+    public void execute() {
+        ISunnyTrader trader = Services.get(ISunnyTrader.class);
+        trader.evaluateDevice();
+        trader.evaluateMarket();
     }
 }

@@ -25,7 +25,7 @@ import nl.technolution.IJsonnable;
  */
 public class ApiConfigRecord implements IJsonnable {
     @JsonProperty("name")
-    private final String name;
+    private String name;
     @JsonProperty("url")
     private String url;
     @JsonProperty("connectTimeout")
@@ -33,24 +33,12 @@ public class ApiConfigRecord implements IJsonnable {
     @JsonProperty("readTimeout")
     private int readTimeout;
 
-    /**
-    *
-    * @param url to connect to
-    * @param connectTimeout timeout after connect ms
-    * @param readTimeout timeout after read ms
-    */
-    public ApiConfigRecord(@JsonProperty("name") String name,
-            @JsonProperty("url") String url,
-           @JsonProperty("connectTimeout") int connectTimeout,
-           @JsonProperty("readTimeout") int readTimeout) {
-        this.name = name;
-        this.url = url;
-        this.connectTimeout = connectTimeout;
-        this.readTimeout = readTimeout;
-   }
-
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getUrl() {
@@ -76,4 +64,5 @@ public class ApiConfigRecord implements IJsonnable {
     public void setReadTimeout(int readTimeout) {
         this.readTimeout = readTimeout;
     }
+
 }
