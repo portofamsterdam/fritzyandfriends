@@ -17,8 +17,8 @@
 package nl.technolution.netty.rewarder;
 
 import nl.technolution.apis.netty.OrderReward;
+import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.FritzyApi;
-import nl.technolution.fritzy.wallet.order.Order;
 import nl.technolution.netty.app.NettyConfig;
 
 /**
@@ -30,13 +30,13 @@ public class RewardService implements IRewardService {
 
     @Override
     public void init(NettyConfig config) {
-        market = new FritzyApi(config.getMarket().getMarketUrl());
+        market = new FritzyApi(config.getMarket().getMarketUrl(), config.getEnvironment());
         market.login(config.getMarket().getEmail(), config.getMarket().getPassword());
     }
 
     @Override
     public OrderReward calculateReward(String taker, String orderHash) {
-        Order order = market.order(orderHash);
+        WebOrder order = market.order(orderHash);
         if (order == null) {
             return OrderReward.NONE;
         }

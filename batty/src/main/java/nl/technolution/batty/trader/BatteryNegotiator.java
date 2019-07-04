@@ -23,8 +23,6 @@ import nl.technolution.apis.netty.DeviceCapacity;
 import nl.technolution.apis.netty.INettyApi;
 import nl.technolution.apis.netty.OrderReward;
 import nl.technolution.dashboard.EEventType;
-import nl.technolution.dashboard.IEvent;
-import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.webservice.Endpoints;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.FritzyApi;
@@ -72,17 +70,16 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
      * Call periodicly to evaluate market changes
      */
     public void evaluate() {
-        IEvent events = Services.get(IEvent.class);
 
         // Get balance
         BigDecimal balance = market.balance();
-        events.log(EEventType.BALANCE, balance.toPlainString(), null);
+        market.log(EEventType.BALANCE, balance.toPlainString(), null);
 
         // Get max capacity
         INettyApi netty = Endpoints.get(INettyApi.class);
         DeviceId deviceId = resourceManager.getDeviceId();
         DeviceCapacity deviceCapacity = netty.getCapacity(deviceId.getDeviceId());
-        events.log(EEventType.LIMIT_ACTOR, Double.toString(deviceCapacity.getGridConnectionLimit()), null);
+        market.log(EEventType.LIMIT_ACTOR, Double.toString(deviceCapacity.getGridConnectionLimit()), null);
 
         Orders orders = market.orders().getOrders();
         for (WebOrder order : orders.getRecords()) {
