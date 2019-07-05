@@ -30,7 +30,7 @@ public class FritzyApiTool {
     public static void main(String[] args) {
 
         String url = "http://82.196.13.251/api/";
-        FritzyApi api = new FritzyApi(url);
+        FritzyApi api = new FritzyApi(url, "FritzyApiTool");
         // api.register(USER, "test", PASS);
         api.login(USER, PASS);
         String testWalletAddress = api.getAddress();
