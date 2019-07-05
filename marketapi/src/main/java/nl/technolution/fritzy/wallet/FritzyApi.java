@@ -32,6 +32,7 @@ import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.login.LoginParameters;
 import nl.technolution.fritzy.wallet.login.LoginResponse;
 import nl.technolution.fritzy.wallet.model.Balance;
+import nl.technolution.fritzy.wallet.model.ValueTransfer;
 import nl.technolution.fritzy.wallet.order.GetOrdersResponse;
 import nl.technolution.fritzy.wallet.order.Order;
 import nl.technolution.fritzy.wallet.register.RegisterParameters;
@@ -166,5 +167,23 @@ public class FritzyApi {
 
     public String getAddress() {
         return address;
+    }
+
+    /**
+     * Mint value to an address
+     * 
+     * @param address to send value to
+     * @param value to mint
+     */
+    public void mint(String address, BigDecimal value) {
+        Preconditions.checkArgument(accessToken != null, "login first");
+        WebTarget target = client.target(url + "/me/token/mint");
+        Builder request = target.request();
+        request.header("Authorization", "Bearer " + accessToken);
+        ValueTransfer order = new ValueTransfer();
+        order.setAddress(address);
+        order.setValue(value);
+        WebOrder orderResponse = request.post(Entity.entity(order, MediaType.APPLICATION_JSON), WebOrder.class);
+        // TODO MKE log response
     }
 }
