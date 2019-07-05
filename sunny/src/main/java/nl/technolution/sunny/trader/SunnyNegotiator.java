@@ -52,10 +52,6 @@ import nl.technolution.sunny.app.SunnyConfig;
 public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleRegistration, InflexibleUpdate> {
     private static final Logger LOG = Log.getLogger();
 
-    private static final String SUNNY_ADDRESS = "Sunny Address";
-
-    // TODO WHO: 1 kWh / 15 minutes = 4 kW. This seems way to much for Fritzy... Can Fritzy solve this by changing the
-    // taker and maker amounts?
     private static final double MAX_ORDER_SIZE_KWH = 1;
 
     private final FritzyApi market;
@@ -99,11 +95,13 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
         IAPXPricesApi exxy = Endpoints.get(IAPXPricesApi.class);
         double marketPrice = exxy.getNextQuarterHourPrice().getPrice();
 
-        // TODO WHO: better way to detect first round?
+        // TODO WHO: better way to detect first round? ==> Maybe the round number will become available via the market
+        // API.
         Duration remainingTime = Duration.between(Instant.now(), Efi.getNextQuarter());
         boolean firstRound = remainingTime.getSeconds() > 14 * 60;
 
-        // calculate my price based on remaining time (for the last round offset is 0, accept market price)
+        // calculate my price based on remaining time (for the last round remaining minuts is 0 so offset is 0 => accept
+        // market price)
         double offset = (marketPriceStartOffset / 15) * remainingTime.toMinutes();
         myPrice = marketPrice + offset;
         LOG.debug("myPrice: {} (marketPrice : {}, offset: {}, marketPriceStartOffset {})", myPrice, marketPrice, offset,
@@ -112,18 +110,17 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
         if (firstRound) {
             // reset available energy
             availableKWh = getNextQuarterHourForcastedKWh();
+            // TOOD WHO: mint available energy
+            // market.mint(
             LOG.debug("First round, available energy set to {} kWh based on prediction.", availableKWh);
         }
 
         Orders orders = market.orders().getOrders();
         for (WebOrder order : orders.getRecords()) {
-            // TODO WHO: how to distinguish my own orders?
-            // TODO WHO: based on maker address? If so how to know what address sunny has?
-            if (order.getMakerAddress().equals(SUNNY_ADDRESS)) {
-                // TODO WHO: how to know if an oder is accepted?
+            // my own order?
+            if (order.getMakerAddress().equals(market.getAddress())) {
+                // TODO WHO: how to know if an oder is accepted? ==> Martin checks with Jurian if next check is OK
                 if (!order.getTakerAddress().isEmpty()) {
-                    // TODO WHO: should market.fillOrder be called for 'own' orders?
-                    // String txId = market.fillOrder(order.getHash());
                     // energy sold so no longer available:
                     availableKWh -= getRequestedKwh(order);
                 } else {
@@ -142,7 +139,6 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
             if (!checkAcceptOffer(order, reward)) {
                 continue;
             }
-
             String txId = market.fillOrder(order.getHash());
             market.log(EEventType.ORDER_ACCEPT, order.toString(), null);
             netty.claim(txId, reward.getRewardId());
@@ -196,7 +192,6 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
     }
 
     private static double getRequestedKwh(WebOrder order) {
-        // TODO WHO: is this the right field?
         return Double.parseDouble(order.getMakerAssetAmount());
     }
 
@@ -217,7 +212,7 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
 
     private boolean checkAcceptOffer(WebOrder order, OrderReward reward) {
         // check if price is ok
-        double priceOffered = Double.parseDouble(order.getTakerAssetAmount()); // TODO WHO: is this the right field?
+        double priceOffered = Double.parseDouble(order.getTakerAssetAmount());
         if (priceOffered + reward.getReward() < myPrice) {
             LOG.info("Order {} declined because priceOffered ({}) + reward ({}) < myPrice ({})", order, priceOffered,
                     reward, myPrice);
