@@ -23,7 +23,7 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.temporal.ChronoField;
-import java.util.Calendar;
+import java.time.temporal.ChronoUnit;
 import java.util.Date;
 
 import org.junit.Test;
@@ -41,13 +41,14 @@ public class EfiTest {
      */
     @Test
     public void testDates() {
-        Calendar now = Calendar.getInstance();
+        Instant nowInNextQuarter = Instant.now().plus(15, ChronoUnit.MINUTES);
         Instant quarter = Efi.getNextQuarter();
         assertEquals(0L, quarter.toEpochMilli() % 900000L);
+
         assertEquals(LocalDateTime.ofInstant(quarter, ZoneId.systemDefault()).get(ChronoField.HOUR_OF_DAY),
-                now.get(Calendar.HOUR_OF_DAY));
+                LocalDateTime.ofInstant(nowInNextQuarter, ZoneId.systemDefault()).get(ChronoField.HOUR_OF_DAY));
         assertEquals(LocalDateTime.ofInstant(quarter, ZoneId.systemDefault()).get(ChronoField.DAY_OF_MONTH),
-                now.get(Calendar.DAY_OF_MONTH));
+                LocalDateTime.ofInstant(nowInNextQuarter, ZoneId.systemDefault()).get(ChronoField.DAY_OF_MONTH));
     }
 
     @Test
