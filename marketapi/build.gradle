@@ -12,7 +12,7 @@ dependencies {
     compile libraries.javax_validation
     compile libraries.jackson_annotations
     compile libraries.swagger_annotate
-    // compile libraries.codegen
+    compile project(':common')
     
     swaggerCodegen libraries.swagger_codegen
 }
