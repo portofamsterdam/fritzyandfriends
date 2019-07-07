@@ -209,9 +209,10 @@ public class FritzyApi implements IFritzyApi {
         form.param("address", address);
         form.param("value", value.toPlainString());
         form.param("contractAddress", contractAddress.name());
-        WebOrder orderResponse = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE),
-                WebOrder.class);
-        // TODO MKE log response
+        Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
+            LOG.warn("mint failed: " + response);
+        }
     }
 
     /**
