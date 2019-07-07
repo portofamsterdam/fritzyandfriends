@@ -1,7 +1,10 @@
 {
     "deviceId": "sunny",
+    "environment": "prodoc",
     "market": {
-        "marketUrl": "https://localhost"   
+        "marketUrl": "http://82.196.13.251/api",
+        "email": "test@fiets.be",
+        "password": "qazqaz"
     },
     "marketPriceStartOffset": 0.05,
     "apiConfig": {
