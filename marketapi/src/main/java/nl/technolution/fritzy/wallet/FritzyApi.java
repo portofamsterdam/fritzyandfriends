@@ -23,6 +23,7 @@ import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
 import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
+import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -37,7 +38,8 @@ import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.login.LoginParameters;
 import nl.technolution.fritzy.wallet.login.LoginResponse;
 import nl.technolution.fritzy.wallet.model.Balance;
-import nl.technolution.fritzy.wallet.model.ValueTransfer;
+import nl.technolution.fritzy.wallet.model.EContractAddress;
+import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.order.GetOrdersResponse;
 import nl.technolution.fritzy.wallet.order.Order;
 import nl.technolution.fritzy.wallet.register.RegisterParameters;
@@ -176,12 +178,33 @@ public class FritzyApi implements IFritzyApi {
      * @return balance
      */
     @Override
-    public BigDecimal balance() {
+    public FritzyBalance balance() {
         Preconditions.checkArgument(accessToken != null, "login first");
         WebTarget target = client.target(url + "/me/balance");
         Builder request = target.request();
         request.header("Authorization", "Bearer " + accessToken);
-        return request.get(Balance.class).getBalance().getEur();
+        return request.get(Balance.class).getBalance();
+    }
+
+    /**
+     * Mint value to an address
+     * 
+     * @param address to send value to
+     * @param value to mint
+     */
+    @Override
+    public void mint(String address, BigDecimal value, EContractAddress contractAddress) {
+        Preconditions.checkArgument(accessToken != null, "login first");
+        WebTarget target = client.target(url + "/me/token/mint");
+        Builder request = target.request();
+        request.header("Authorization", "Bearer " + accessToken);
+        Form form = new Form();
+        form.param("address", address);
+        form.param("value", value.toPlainString());
+        form.param("contractAddress", contractAddress.name());
+        WebOrder orderResponse = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE),
+                WebOrder.class);
+        // TODO MKE log response
     }
 
     /**
@@ -209,21 +232,4 @@ public class FritzyApi implements IFritzyApi {
         return address;
     }
 
-    /**
-     * Mint value to an address
-     * 
-     * @param address to send value to
-     * @param value to mint
-     */
-    public void mint(String address, BigDecimal value) {
-        Preconditions.checkArgument(accessToken != null, "login first");
-        WebTarget target = client.target(url + "/me/token/mint");
-        Builder request = target.request();
-        request.header("Authorization", "Bearer " + accessToken);
-        ValueTransfer order = new ValueTransfer();
-        order.setAddress(address);
-        order.setValue(value);
-        WebOrder orderResponse = request.post(Entity.entity(order, MediaType.APPLICATION_JSON), WebOrder.class);
-        // TODO MKE log response
-    }
 }

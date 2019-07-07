@@ -21,7 +21,11 @@ import java.math.BigDecimal;
 import com.google.common.base.Preconditions;
 
 import nl.technolution.fritzy.wallet.FritzyApi;
+import nl.technolution.fritzy.wallet.model.EContractAddress;
 
+/**
+ * Tool to test API calls
+ */
 public class FritzyApiTool {
 
     private static final String PASS = "qazqaz";
@@ -29,20 +33,20 @@ public class FritzyApiTool {
 
     public static void main(String[] args) {
 
-        String url = "http://82.196.13.251/api/";
+        String url = "http://82.196.13.251/api";
         FritzyApi api = new FritzyApi(url, "FritzyApiTool");
         // api.register(USER, "test", PASS);
         api.login(USER, PASS);
         String testWalletAddress = api.getAddress();
-        Preconditions.checkArgument(0L == api.balance().longValue());
+        BigDecimal eur = api.balance().getEur();
         
 
         api.login("test@fiets.be", PASS);
-        BigDecimal monies = BigDecimal.valueOf(500L);
-        api.mint(testWalletAddress, monies);
+        BigDecimal monies = BigDecimal.valueOf(10L);
+        api.mint(testWalletAddress, monies, EContractAddress.KWH);
 
         api.login(USER, PASS);
-        Preconditions.checkArgument(monies.longValue() == api.balance().longValue());
+        Preconditions.checkArgument(monies.longValue() + eur.longValue() == api.balance().getEur().longValue());
         
         // Arrays.asList(api.orders().getOrders().getRecords()).forEach(o -> System.out.println(o));
         //

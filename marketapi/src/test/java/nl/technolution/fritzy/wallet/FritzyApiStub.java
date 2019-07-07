@@ -25,6 +25,8 @@ import java.util.List;
 import nl.technolution.IJsonnable;
 import nl.technolution.dashboard.EEventType;
 import nl.technolution.fritzy.gen.model.WebOrder;
+import nl.technolution.fritzy.wallet.model.EContractAddress;
+import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.order.GetOrdersResponse;
 import nl.technolution.fritzy.wallet.order.Order;
 import nl.technolution.fritzy.wallet.order.Orders;
@@ -80,12 +82,19 @@ public class FritzyApiStub implements IFritzyApi {
     }
 
     @Override
-    public BigDecimal balance() {
-        return BigDecimal.valueOf(1000L);
+    public void log(EEventType tag, String msg, IJsonnable data) {
+        events.add(new DashboardEvent("test", user, msg, tag.getTag(), new Date(), data.toString()));
     }
 
     @Override
-    public void log(EEventType tag, String msg, IJsonnable data) {
-        events.add(new DashboardEvent("test", user, msg, tag.getTag(), new Date(), data.toString()));
+    public FritzyBalance balance() {
+        //
+        return null;
+    }
+
+    @Override
+    public void mint(String address, BigDecimal value, EContractAddress contractAddress) {
+        //
+
     }
 }
