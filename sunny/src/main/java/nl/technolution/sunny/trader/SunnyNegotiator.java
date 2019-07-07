@@ -16,7 +16,6 @@
  */
 package nl.technolution.sunny.trader;
 
-import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -32,6 +31,7 @@ import nl.technolution.dashboard.EEventType;
 import nl.technolution.dropwizard.webservice.Endpoints;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.FritzyApi;
+import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.order.Order;
 import nl.technolution.fritzy.wallet.order.Orders;
 import nl.technolution.marketnegotiator.AbstractCustomerEnergyManager;
@@ -83,8 +83,8 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
         DeviceId deviceId = resourceManager.getDeviceId();
 
         // Get balance
-        BigDecimal balance = market.balance();
-        market.log(EEventType.BALANCE, balance.toPlainString(), null);
+        FritzyBalance balance = market.balance();
+        market.log(EEventType.BALANCE, balance.getEur().toPlainString(), null);
 
         // Get max capacity
         INettyApi netty = Endpoints.get(INettyApi.class);
