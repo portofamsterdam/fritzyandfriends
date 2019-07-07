@@ -25,7 +25,9 @@ import nl.technolution.dropwizard.tasks.TimedTask;
 /**
  * 
  */
-@TimedTask(period = 1, unit = TimeUnit.MINUTES)
+// NOTE: use a unique offset for every device so all evaluations are not done on the same moment and race conditions are
+// avoided.
+@TimedTask(period = 1, unit = TimeUnit.MINUTES, offset = 30, offsetUnit = TimeUnit.SECONDS)
 public class SunnyTraderTask implements ITaskRunner {
 
     @Override

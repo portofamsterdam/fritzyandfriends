@@ -23,6 +23,7 @@ import java.time.Instant;
 import org.slf4j.Logger;
 
 import nl.technolution.DeviceId;
+import nl.technolution.apis.exxy.IAPXPricesApi;
 import nl.technolution.apis.netty.DeviceCapacity;
 import nl.technolution.apis.netty.INettyApi;
 import nl.technolution.apis.netty.OrderReward;
@@ -31,6 +32,7 @@ import nl.technolution.dashboard.EEventType;
 import nl.technolution.dropwizard.webservice.Endpoints;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.FritzyApi;
+import nl.technolution.fritzy.wallet.order.Order;
 import nl.technolution.fritzy.wallet.order.Orders;
 import nl.technolution.marketnegotiator.AbstractCustomerEnergyManager;
 import nl.technolution.protocols.efi.ElectricityProfile.Element;
@@ -50,6 +52,8 @@ import nl.technolution.sunny.app.SunnyConfig;
 public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleRegistration, InflexibleUpdate> {
     private static final Logger LOG = Log.getLogger();
 
+    private static final double MAX_ORDER_SIZE_KWH = 1;
+
     private final FritzyApi market;
     private final SunnyResourceManager resourceManager;
 
@@ -67,13 +71,13 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
     public SunnyNegotiator(SunnyConfig config, SunnyResourceManager resourceManager) {
         this.resourceManager = resourceManager;
         market = new FritzyApi(config.getMarket().getMarketUrl(), config.getEnvironment());
-        // TODO: fix config
-        // market.login(config.getMarket().getEmail(), config.getMarket().getPassword());
+        market.login(config.getMarket().getEmail(), config.getMarket().getPassword());
         marketPriceStartOffset = config.getMarketPriceStartOffset();
     }
 
     /**
-     * Call periodicly to evaluate market changes
+     * Call periodically to evaluate market changes
+     * 
      */
     public void evaluate() {
         DeviceId deviceId = resourceManager.getDeviceId();
@@ -88,27 +92,46 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
         market.log(EEventType.LIMIT_ACTOR, Double.toString(deviceCapacity.getGridConnectionLimit()), null);
 
         // use market price as base for my price
-        // TODO WHO: enable this once api is moved to 'common' and add it as api to config in sunny_xx.json
-        // IAPXPricesApi exxy = Endpoints.get(IAPXPricesApi.class);
-        // double marketPrice = exxy.getNextQuarterHourPrice().getPrice();
-        myPrice = 0.21;
+        IAPXPricesApi exxy = Endpoints.get(IAPXPricesApi.class);
+        double marketPrice = exxy.getNextQuarterHourPrice().getPrice();
 
+        // TODO WHO: better way to detect first round? ==> Maybe the round number will become available via the market
+        // API.
         Duration remainingTime = Duration.between(Instant.now(), Efi.getNextQuarter());
-        boolean lastRound = remainingTime.getSeconds() < 61;
-        boolean firstRound = remainingTime.getSeconds() > 14 * 60 + 1;
+        boolean firstRound = remainingTime.getSeconds() > 14 * 60;
 
-        // calculate my price based on remaining time (for the last round accept market price)
-        if (!lastRound) {
-            myPrice += (marketPriceStartOffset / 15) * remainingTime.toMinutes();
-        }
+        // calculate my price based on remaining time (for the last round remaining minuts is 0 so offset is 0 => accept
+        // market price)
+        double offset = (marketPriceStartOffset / 15) * remainingTime.toMinutes();
+        myPrice = marketPrice + offset;
+        LOG.debug("myPrice: {} (marketPrice : {}, offset: {}, marketPriceStartOffset {})", myPrice, marketPrice, offset,
+                marketPriceStartOffset);
 
         if (firstRound) {
             // reset available energy
             availableKWh = getNextQuarterHourForcastedKWh();
+            // TOOD WHO: mint available energy
+            // market.mint(
+            LOG.debug("First round, available energy set to {} kWh based on prediction.", availableKWh);
         }
 
         Orders orders = market.orders().getOrders();
         for (WebOrder order : orders.getRecords()) {
+            // my own order?
+            if (order.getMakerAddress().equals(market.getAddress())) {
+                // TODO WHO: how to know if an oder is accepted? ==> Martin checks with Jurian if next check is OK
+                if (!order.getTakerAddress().isEmpty()) {
+                    // energy sold so no longer available:
+                    availableKWh -= getRequestedKwh(order);
+                } else {
+                    // cancel outstanding orders, new order are created later on based on the new price
+                    // TODO WHO: void method, what happens when cancel is impossible? (e.g. when it accepted by another
+                    // party during this for loop...)
+                    market.cancelOrder(order.getHash());
+                    LOG.debug("Order canceled: " + order);
+                }
+                continue;
+            }
             if (!isInterestingOrder(order, deviceCapacity)) {
                 continue;
             }
@@ -116,20 +139,37 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
             if (!checkAcceptOffer(order, reward)) {
                 continue;
             }
-
             String txId = market.fillOrder(order.getHash());
-            // TODO WHO: log order as 'data' instead of event (order is not IJsonnable at the moment...)
             market.log(EEventType.ORDER_ACCEPT, order.toString(), null);
             netty.claim(txId, reward.getRewardId());
-            // TODO WHO: log reward as 'data' instead of event (order is not IJsonnable at the moment...)
             market.log(EEventType.REWARD_CLAIM, reward.toString(), null);
 
             // energy sold so no longer available:
             availableKWh -= getRequestedKwh(order);
         }
-        // TODO WHO: post oder for remaining production?? MArtin is working on this....
-        // NOTE: when we accepted one or more proposals we should cancel (some) of our own proposals because the amount
-        // of available energy has changed.
+        createNewOrders();
+    }
+
+    private void createNewOrders() {
+        double totalOrderKwh = availableKWh;
+        while (totalOrderKwh > 0) {
+            double orderSize;
+            if (totalOrderKwh > MAX_ORDER_SIZE_KWH) {
+                orderSize = MAX_ORDER_SIZE_KWH;
+            } else {
+                orderSize = totalOrderKwh;
+            }
+
+            Order order = new Order();
+            order.setMakerToken("kWh");
+            order.setMakerAmount(Double.toString(orderSize));
+            order.setTakerToken("EUR");
+            order.setTakerAmount(Double.toString(myPrice));
+            market.createOrder(order);
+            market.log(EEventType.ORDER_OFFER, order.toString(), null);
+
+            totalOrderKwh -= orderSize;
+        }
     }
 
     private boolean isInterestingOrder(WebOrder order, DeviceCapacity deviceCapacity) {
@@ -152,7 +192,6 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
     }
 
     private static double getRequestedKwh(WebOrder order) {
-        // TODO WHO: is this the right field?
         return Double.parseDouble(order.getMakerAssetAmount());
     }
 
@@ -173,7 +212,7 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
 
     private boolean checkAcceptOffer(WebOrder order, OrderReward reward) {
         // check if price is ok
-        double priceOffered = Double.parseDouble(order.getTakerAssetAmount()); // TODO WHO: is this the right field?
+        double priceOffered = Double.parseDouble(order.getTakerAssetAmount());
         if (priceOffered + reward.getReward() < myPrice) {
             LOG.info("Order {} declined because priceOffered ({}) + reward ({}) < myPrice ({})", order, priceOffered,
                     reward, myPrice);
@@ -194,6 +233,6 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
     @Override
     public void measurement(Measurement measurement) {
         market.log(EEventType.DEVICE_STATE,
-                        "Generating power: " + measurement.getElectricityMeasurement().getPower() + "W", null);
+                "Generating power: " + measurement.getElectricityMeasurement().getPower() + "W", null);
     }
 }

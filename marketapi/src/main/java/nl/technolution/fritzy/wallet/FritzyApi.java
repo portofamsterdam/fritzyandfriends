@@ -25,14 +25,17 @@ import javax.ws.rs.client.Invocation.Builder;
 import javax.ws.rs.client.WebTarget;
 import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 
 import org.glassfish.jersey.client.JerseyClientBuilder;
+import org.slf4j.Logger;
 
 import nl.technolution.IJsonnable;
+import nl.technolution.core.Log;
 import nl.technolution.dashboard.EEventType;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.login.LoginParameters;
@@ -48,6 +51,7 @@ import nl.technolution.fritzy.wallet.register.RegisterParameters;
  * Access to acount for Fritzy
  */
 public class FritzyApi implements IFritzyApi {
+    private static final Logger LOG = Log.getLogger();
 
     private final ObjectMapper mapper = new ObjectMapper();
     private final String url;
@@ -169,7 +173,10 @@ public class FritzyApi implements IFritzyApi {
         WebTarget target = client.target(url + "/me/order/" + hash + "/cancel");
         Builder request = target.request();
         request.header("Authorization", "Bearer " + accessToken);
-        request.post(Entity.entity(new Object(), MediaType.APPLICATION_JSON));
+        Response response = request.post(Entity.entity(new Object(), MediaType.APPLICATION_JSON));
+        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
+            LOG.warn("cancelOrder failed: " + response);
+        }
     }
 
     /**
