@@ -21,6 +21,9 @@ import java.math.BigDecimal;
 import nl.technolution.IJsonnable;
 import nl.technolution.dashboard.EEventType;
 import nl.technolution.fritzy.gen.model.WebOrder;
+import nl.technolution.fritzy.wallet.model.EContractAddress;
+import nl.technolution.fritzy.wallet.model.EContractAddress;
+import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.order.GetOrdersResponse;
 import nl.technolution.fritzy.wallet.order.Order;
 
@@ -79,7 +82,7 @@ public interface IFritzyApi {
      * 
      * @return balance
      */
-    BigDecimal balance();
+    FritzyBalance balance();
 
     /**
      * @param tag
@@ -87,5 +90,13 @@ public interface IFritzyApi {
      * @param data
      */
     void log(EEventType tag, String msg, IJsonnable data);
+
+    /**
+     * mint money
+     * 
+     * @param address to send money to
+     * @param
+     */
+    void mint(String address, BigDecimal value, EContractAddress contractAddress);
 
 }

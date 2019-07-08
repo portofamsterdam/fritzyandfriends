@@ -16,8 +16,6 @@
  */
 package nl.technolution.batty.trader;
 
-import java.math.BigDecimal;
-
 import nl.technolution.DeviceId;
 import nl.technolution.apis.netty.DeviceCapacity;
 import nl.technolution.apis.netty.INettyApi;
@@ -26,6 +24,7 @@ import nl.technolution.dashboard.EEventType;
 import nl.technolution.dropwizard.webservice.Endpoints;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.FritzyApi;
+import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.order.Orders;
 import nl.technolution.marketnegotiator.AbstractCustomerEnergyManager;
 import nl.technolution.protocols.efi.ActuatorInstruction;
@@ -72,8 +71,8 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
     public void evaluate() {
 
         // Get balance
-        BigDecimal balance = market.balance();
-        market.log(EEventType.BALANCE, balance.toPlainString(), null);
+        FritzyBalance balance = market.balance();
+        market.log(EEventType.BALANCE, balance.getEur().toPlainString(), null);
 
         // Get max capacity
         INettyApi netty = Endpoints.get(INettyApi.class);
@@ -97,7 +96,7 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
         }
     }
 
-    private boolean isInterestingOrder(WebOrder order, BigDecimal balance, DeviceCapacity deviceCapacity) {
+    private boolean isInterestingOrder(WebOrder order, FritzyBalance balance, DeviceCapacity deviceCapacity) {
         // TODO MKE: check order content
         return true;
     }
