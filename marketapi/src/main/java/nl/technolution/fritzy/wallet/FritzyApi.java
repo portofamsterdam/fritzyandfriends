@@ -52,6 +52,7 @@ import nl.technolution.fritzy.wallet.register.RegisterParameters;
  */
 public class FritzyApi implements IFritzyApi {
     private static final Logger LOG = Log.getLogger();
+    private static final String BURN_ADDRESS = "0x0000000000000000000000000000000000000000";
 
     private final ObjectMapper mapper = new ObjectMapper();
     private final String url;
@@ -215,6 +216,25 @@ public class FritzyApi implements IFritzyApi {
         }
     }
 
+
+    @Override
+    public void burn(String address, BigDecimal value, EContractAddress contractAddress) {
+        Preconditions.checkArgument(accessToken != null, "login first");
+
+        WebTarget target = client.target(url + "/me/token/burn");
+        Builder request = target.request();
+        request.header("Authorization", "Bearer " + accessToken);
+        Form form = new Form();
+        form.param("address", address);
+        form.param("value", value.toPlainString());
+        form.param("contractAddress", contractAddress.name());
+        Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
+            LOG.warn("burn failed: " + response);
+        }
+
+    }
+
     /**
      * @param tag
      * @param msg
@@ -239,5 +259,6 @@ public class FritzyApi implements IFritzyApi {
     public String getAddress() {
         return address;
     }
+
 
 }
