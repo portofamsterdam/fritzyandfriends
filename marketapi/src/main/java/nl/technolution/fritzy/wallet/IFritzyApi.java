@@ -22,7 +22,6 @@ import nl.technolution.IJsonnable;
 import nl.technolution.dashboard.EEventType;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
-import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.order.GetOrdersResponse;
 import nl.technolution.fritzy.wallet.order.Order;
@@ -92,11 +91,21 @@ public interface IFritzyApi {
     void log(EEventType tag, String msg, IJsonnable data);
 
     /**
-     * mint money
+     * mint tokens. E.g. kwh, eur or eth
      * 
-     * @param address to send money to
-     * @param
+     * @param address to send tokens to
+     * @param value amount to mint
+     * @param contractAddress type of token to mint.
      */
     void mint(String address, BigDecimal value, EContractAddress contractAddress);
+
+    /**
+     * burn tokens
+     * 
+     * @param address to burn token from
+     * @param value amount to burn
+     * @param contractAddress token to burn
+     */
+    void burn(String address, BigDecimal value, EContractAddress contractAddress);
 
 }

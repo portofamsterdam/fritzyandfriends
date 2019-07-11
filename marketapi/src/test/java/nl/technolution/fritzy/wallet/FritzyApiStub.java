@@ -31,6 +31,9 @@ import nl.technolution.fritzy.wallet.order.GetOrdersResponse;
 import nl.technolution.fritzy.wallet.order.Order;
 import nl.technolution.fritzy.wallet.order.Orders;
 
+/**
+ * Stub the Fritsy API
+ */
 public class FritzyApiStub implements IFritzyApi {
 
     private final List<DashboardEvent> events = new ArrayList<>();
@@ -94,6 +97,12 @@ public class FritzyApiStub implements IFritzyApi {
 
     @Override
     public void mint(String address, BigDecimal value, EContractAddress contractAddress) {
+        //
+
+    }
+
+    @Override
+    public void burn(String address, BigDecimal value, EContractAddress contractAddress) {
         //
 
     }
