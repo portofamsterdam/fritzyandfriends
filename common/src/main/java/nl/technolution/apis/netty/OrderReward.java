@@ -27,39 +27,75 @@ import nl.technolution.IJsonnable;
  */
 public class OrderReward implements IJsonnable {
 
-    public static final OrderReward NONE = new OrderReward("", 0d, LocalDateTime.MIN);
-
     @JsonProperty("rewardId")
-    private final String rewardId;
+    private String rewardId;
 
     @JsonProperty("reward")
-    private final double reward;
+    private double reward;
+
+    @JsonProperty("taker")
+    private String taker;
+
+    @JsonProperty("orderHash")
+    private String orderHash;
 
     @JsonProperty("expireTs")
-    private final LocalDateTime expireTs;
-
+    private LocalDateTime expireTs;
 
     /**
-     * Constructor for {@link OrderReward} objects
+     * Create a reward without any value
      * 
-     * @param reward value
+     * @param taker of the order
+     * @param txId of order where the reward is for
+     * @return
      */
-    public OrderReward(String rewardId, double reward, LocalDateTime expireTs) {
-        this.rewardId = rewardId;
-        this.reward = reward;
-        this.expireTs = expireTs;
+    public static OrderReward none(String taker, String orderHash) {
+        OrderReward r = new OrderReward();
+        r.setExpireTs(LocalDateTime.now());
+        r.setReward(0.0d);
+        r.setRewardId("");
+        r.setTaker(taker);
+        r.setOrderHash(orderHash);
+        return r;
     }
 
     public String getRewardId() {
         return rewardId;
     }
 
+    public void setRewardId(String rewardId) {
+        this.rewardId = rewardId;
+    }
+
     public double getReward() {
         return reward;
+    }
+
+    public void setReward(double reward) {
+        this.reward = reward;
+    }
+
+    public String getTaker() {
+        return taker;
+    }
+
+    public void setTaker(String taker) {
+        this.taker = taker;
+    }
+
+    public String getOrderHash() {
+        return orderHash;
+    }
+
+    public void setOrderHash(String orderHash) {
+        this.orderHash = orderHash;
     }
 
     public LocalDateTime getExpireTs() {
         return expireTs;
     }
 
+    public void setExpireTs(LocalDateTime expireTs) {
+        this.expireTs = expireTs;
+    }
 }

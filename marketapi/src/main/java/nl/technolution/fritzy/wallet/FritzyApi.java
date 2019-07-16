@@ -38,6 +38,7 @@ import nl.technolution.IJsonnable;
 import nl.technolution.core.Log;
 import nl.technolution.dashboard.EEventType;
 import nl.technolution.fritzy.gen.model.WebOrder;
+import nl.technolution.fritzy.gen.model.WebUser;
 import nl.technolution.fritzy.wallet.login.LoginParameters;
 import nl.technolution.fritzy.wallet.login.LoginResponse;
 import nl.technolution.fritzy.wallet.model.Balance;
@@ -96,7 +97,7 @@ public class FritzyApi implements IFritzyApi {
      * @param password
      */
     @Override
-    public void register(String email, String user, String password) {
+    public WebUser register(String email, String user, String password) {
         WebTarget target = client.target(url + "/register");
         Builder request = target.request();
 
@@ -105,7 +106,7 @@ public class FritzyApi implements IFritzyApi {
         registerParameters.setName(user);
         registerParameters.setPassword(password);
 
-        request.post(Entity.entity(registerParameters, MediaType.APPLICATION_JSON));
+        return request.post(Entity.entity(registerParameters, MediaType.APPLICATION_JSON), WebUser.class);
     }
 
     /**
@@ -218,21 +219,31 @@ public class FritzyApi implements IFritzyApi {
 
 
     @Override
-    public void burn(String address, BigDecimal value, EContractAddress contractAddress) {
+    public void burn(BigDecimal value, EContractAddress contractAddress) {
         Preconditions.checkArgument(accessToken != null, "login first");
 
         WebTarget target = client.target(url + "/me/token/burn");
         Builder request = target.request();
         request.header("Authorization", "Bearer " + accessToken);
         Form form = new Form();
-        form.param("address", address);
         form.param("value", value.toPlainString());
         form.param("contractAddress", contractAddress.name());
         Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
         if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
             LOG.warn("burn failed: " + response);
         }
+    }
 
+    /**
+     * Get users
+     * 
+     * @return all users
+     */
+    @Override
+    public WebUser[] getUsers() {
+        WebTarget target = client.target(url + "/users");
+        Builder request = target.request();
+        return request.get(WebUser[].class);
     }
 
     /**

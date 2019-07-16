@@ -21,6 +21,7 @@ import java.math.BigDecimal;
 import nl.technolution.IJsonnable;
 import nl.technolution.dashboard.EEventType;
 import nl.technolution.fritzy.gen.model.WebOrder;
+import nl.technolution.fritzy.gen.model.WebUser;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.order.GetOrdersResponse;
@@ -41,8 +42,9 @@ public interface IFritzyApi {
      * @param email
      * @param user
      * @param password
+     * @return
      */
-    void register(String email, String user, String password);
+    WebUser register(String email, String user, String password);
 
     /**
      * Get all orders
@@ -102,10 +104,16 @@ public interface IFritzyApi {
     /**
      * burn tokens
      * 
-     * @param address to burn token from
      * @param value amount to burn
      * @param contractAddress token to burn
      */
-    void burn(String address, BigDecimal value, EContractAddress contractAddress);
+    void burn(BigDecimal value, EContractAddress contractAddress);
+
+    /**
+     * Get all known users registered in the market
+     * 
+     * @return registered users
+     */
+    WebUser[] getUsers();
 
 }

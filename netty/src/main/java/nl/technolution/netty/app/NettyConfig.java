@@ -17,6 +17,7 @@
 package nl.technolution.netty.app;
 
 import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 
@@ -35,6 +36,12 @@ public class NettyConfig extends FritzyAppConfig {
 
     @JsonProperty("deviceLimits")
     private Map<String, Double> deviceLimits;
+
+    @JsonProperty("localusers")
+    private Set<String> localusers;
+
+    @JsonProperty("localreward")
+    private double localReward;
 
     /**
      * Constructor for {@link NettyConfig} objects
@@ -75,6 +82,26 @@ public class NettyConfig extends FritzyAppConfig {
 
     public void setDeviceLimits(Map<String, Double> deviceLimits) {
         this.deviceLimits = deviceLimits;
+    }
+
+    public Set<String> getLocalusers() {
+        return localusers;
+    }
+
+    public void setLocalusers(Set<String> localusers) {
+        this.localusers = localusers;
+    }
+
+    public double getLocalReward() {
+        return localReward;
+    }
+
+    public void setLocalReward(double localReward) {
+        this.localReward = localReward;
+    }
+
+    public void setGroupConnectionLimit(double groupConnectionLimit) {
+        this.groupConnectionLimit = groupConnectionLimit;
     }
 
 }

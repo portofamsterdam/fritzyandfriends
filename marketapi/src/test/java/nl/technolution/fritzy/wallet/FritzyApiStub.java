@@ -17,14 +17,24 @@
 package nl.technolution.fritzy.wallet;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
+
+import org.apache.commons.lang3.StringUtils;
 
 import nl.technolution.IJsonnable;
 import nl.technolution.dashboard.EEventType;
 import nl.technolution.fritzy.gen.model.WebOrder;
+import nl.technolution.fritzy.gen.model.WebUser;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.order.GetOrdersResponse;
@@ -36,19 +46,36 @@ import nl.technolution.fritzy.wallet.order.Orders;
  */
 public class FritzyApiStub implements IFritzyApi {
 
-    private final List<DashboardEvent> events = new ArrayList<>();
-    private String user;
-    private Orders orders;
 
-    @Override
-    public void login(String user, String password) {
-        //
-        this.user = user;
+    private final List<DashboardEvent> events = new ArrayList<>();
+    private final List<WebUser> users = new ArrayList<>();
+    private final Map<String, FritzyBalance> balances = new HashMap<>();
+    private final Orders orders;
+
+    private WebUser loginInUser;
+
+    public FritzyApiStub() {
+        orders = new Orders();
+        orders.setRecords(new WebOrder[0]);
     }
 
     @Override
-    public void register(String email, String user, String password) {
-        // User is always registered in stub
+    public void login(String user, String password) {
+        this.loginInUser = users.stream()
+                .filter(u -> u.getEmail().equals(user))
+                .findFirst()
+                .orElseThrow(AssertionError::new);
+    }
+
+    @Override
+    public WebUser register(String email, String username, String password) {
+        WebUser user = new WebUser();
+        String address = generateHash(username.hashCode());
+        user.setAddress(address);
+        user.setEmail(email);
+        user.setName(username);
+        users.add(user);
+        return user;
     }
 
     @Override
@@ -68,42 +95,89 @@ public class FritzyApiStub implements IFritzyApi {
 
     @Override
     public String fillOrder(String orderHash) {
-        //
+        WebOrder order = order(orderHash);
+        Preconditions.checkNotNull(order);
+        Preconditions.checkArgument(order.getTakerAddress() == null);
+        order.setTakerAddress(loginInUser.getAddress());
+
+        // TODO MKE implement filling order
         return null;
     }
 
     @Override
     public String createOrder(Order order) {
-        //
-        return null;
+        List<WebOrder> ordersList = Lists.newArrayList(Arrays.asList(orders.getRecords()));
+        WebOrder webOrder = new WebOrder();
+        String generateHash = generateHash(Instant.now().hashCode());
+        webOrder.setHash(generateHash);
+        webOrder.setMakerAddress(loginInUser.getAddress());
+        webOrder.setMakerAssetAmount(order.getMakerAmount());
+        webOrder.setMakerAssetData(order.getTakerToken());
+        ordersList.add(webOrder);
+        orders.setRecords(ordersList.toArray(new WebOrder[ordersList.size()]));
+        return generateHash;
     }
 
     @Override
     public void cancelOrder(String hash) {
-        //
-
+        List<WebOrder> ordersList = Arrays.asList(orders.getRecords());
+        Iterator<WebOrder> itr = ordersList.iterator();
+        while (itr.hasNext()) {
+            if (itr.next().getHash().equals(hash)) {
+                itr.remove();
+            }
+        }
+        orders.setRecords(ordersList.toArray(new WebOrder[ordersList.size()]));
     }
 
     @Override
     public void log(EEventType tag, String msg, IJsonnable data) {
-        events.add(new DashboardEvent("test", user, msg, tag.getTag(), new Date(), data.toString()));
+        events.add(new DashboardEvent("test", loginInUser.getName(), msg, tag.getTag(), new Date(), data.toString()));
     }
 
     @Override
     public FritzyBalance balance() {
-        //
-        return null;
+        return balances.computeIfAbsent(loginInUser.getAddress(), k -> new FritzyBalance());
     }
 
     @Override
     public void mint(String address, BigDecimal value, EContractAddress contractAddress) {
-        //
-
+        FritzyBalance balence = balances.computeIfAbsent(address, k -> new FritzyBalance());
+        switch (contractAddress) {
+        case ETH:
+            balence.setEth(balence.getEth().add(value));
+            break;
+        case EUR:
+            balence.setEur(balence.getEur().add(value));
+            break;
+        case KWH:
+            balence.setKwh(balence.getKwh().add(value));
+            break;
+        }
     }
 
     @Override
-    public void burn(String address, BigDecimal value, EContractAddress contractAddress) {
-        //
+    public void burn(BigDecimal value, EContractAddress contractAddress) {
+        FritzyBalance balence = balances.computeIfAbsent(loginInUser.getAddress(), k -> new FritzyBalance());
+        switch (contractAddress) {
+        case ETH:
+            balence.setEth(balence.getEth().subtract(value));
+            break;
+        case EUR:
+            balence.setEur(balence.getEur().subtract(value));
+            break;
+        case KWH:
+            balence.setKwh(balence.getKwh().subtract(value));
+            break;
+        }
+    }
 
+    @Override
+    public WebUser[] getUsers() {
+        return users.toArray(new WebUser[users.size()]);
+    }
+
+    private String generateHash(int hash) {
+        return "0x" + StringUtils.leftPad("", 32, "f") + String.format("%08X", hash);
     }
 }

@@ -14,46 +14,31 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.fritzy.wallet.model;
+package nl.technolution.fritzy.wallet;
 
-import java.math.BigDecimal;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
+import nl.technolution.dropwizard.FritzyAppConfig;
 
 /**
  * 
  */
-public class FritzyBalance {
+public class FritzyApiFactoryStub implements IFritzyApiFactory {
 
-    @JsonProperty("ETH")
-    BigDecimal eth = new BigDecimal(0);
-    @JsonProperty("EUR")
-    BigDecimal eur = new BigDecimal(0);
-    @JsonProperty("KWH")
-    BigDecimal kwh = new BigDecimal(0);
+    private IFritzyApi api;
 
-    public BigDecimal getEth() {
-        return eth;
+    @Override
+    public void init(FritzyAppConfig config) {
     }
 
-    public void setEth(BigDecimal eth) {
-        this.eth = eth;
-    }
-
-    public BigDecimal getEur() {
-        return eur;
-    }
-
-    public void setEur(BigDecimal eur) {
-        this.eur = eur;
-    }
-
-    public BigDecimal getKwh() {
-        return kwh;
-    }
-
-    public void setKwh(BigDecimal kwh) {
-        this.kwh = kwh;
+    @Override
+    public IFritzyApi build() {
+        if (api != null) {
+            return api;
+        }
+        synchronized (FritzyApiFactoryStub.class) {
+            if (api == null) {
+                api = new FritzyApiStub();
+            }
+            return api;
+        }
     }
 }
-
