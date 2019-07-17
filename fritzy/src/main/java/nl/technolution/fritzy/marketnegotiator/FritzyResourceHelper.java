@@ -17,36 +17,47 @@
 package nl.technolution.fritzy.marketnegotiator;
 
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.temporal.ChronoUnit;
+
+import org.slf4j.Logger;
 
 import nl.technolution.DeviceId;
+import nl.technolution.core.Log;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.fritzy.app.FritzyConfig;
 import nl.technolution.fritzy.io.IIoFactory;
+import nl.technolution.protocols.efi.Actuator;
+import nl.technolution.protocols.efi.ActuatorBehaviour;
+import nl.technolution.protocols.efi.ActuatorBehaviours;
+import nl.technolution.protocols.efi.ActuatorStatus;
+import nl.technolution.protocols.efi.Actuators;
 import nl.technolution.protocols.efi.CommodityEnum;
 import nl.technolution.protocols.efi.DeviceClass;
 import nl.technolution.protocols.efi.DeviceDescription;
-import nl.technolution.protocols.efi.ElectricityProfile;
-import nl.technolution.protocols.efi.ElectricityProfile.Element;
-import nl.technolution.protocols.efi.SequentialProfile;
-import nl.technolution.protocols.efi.SequentialProfileAlternative;
-import nl.technolution.protocols.efi.SequentialProfiles;
-import nl.technolution.protocols.efi.ShiftableRegistration;
-import nl.technolution.protocols.efi.ShiftableUpdate;
-import nl.technolution.protocols.efi.SupportedCommodities;
+import nl.technolution.protocols.efi.LeakageElement;
+import nl.technolution.protocols.efi.LeakageFunction;
+import nl.technolution.protocols.efi.StorageDiscreteRunningMode;
+import nl.technolution.protocols.efi.StorageDiscreteRunningMode.DiscreteRunningModeElement;
+import nl.technolution.protocols.efi.StorageRegistration;
+import nl.technolution.protocols.efi.StorageRunningModes;
+import nl.technolution.protocols.efi.StorageStatus;
+import nl.technolution.protocols.efi.StorageSystemDescription;
+import nl.technolution.protocols.efi.StorageUpdate;
 import nl.technolution.protocols.efi.util.Efi;
 
 /**
  * 
  */
 public class FritzyResourceHelper {
+    public static final int ACTUATOR_ID = 1;
+    private static final Logger LOG = Log.getLogger();
 
     private FritzyConfig config;
     private DeviceId deviceId;
-    private double coolingDegreesPerSecond = 1d / 60 / 60;
-    private double heatingDegreesPerSecond = 1d / 10 / 60;
+    private double coolingDegreesPerSecond = 0;
+    private double heatingDegreesPerSecond = 0;
 
     private class State {
         double temperature;
@@ -72,47 +83,81 @@ public class FritzyResourceHelper {
         deviceId = new DeviceId(config.getDeviceId());
     }
 
-    ShiftableRegistration getRegistration() {
-        ShiftableRegistration reg = Efi.build(ShiftableRegistration.class, deviceId);
-        SupportedCommodities commodity = new SupportedCommodities();
-        commodity.getCommodityType().add(CommodityEnum.ELECTRICITY);
+    StorageRegistration getRegistration() {
+        StorageRegistration reg = Efi.build(StorageRegistration.class, deviceId);
         DeviceDescription description = new DeviceDescription();
         description.setDeviceClass(DeviceClass.REFRIGERATOR);
         reg.setDeviceDescription(description);
-        reg.setSupportedCommodities(commodity);
-        reg.setInstructionProcessingDelay(Efi.DATATYPE_FACTORY.newDuration(0));
+
+        reg.setFillLevelLabel("Temperature");
+        reg.setFillLevelUnit("°C");
+
+        Actuators actuators = new Actuators();
+        Actuator actuator = new Actuator();
+        actuator.setId(ACTUATOR_ID);
+        actuator.getSupportedCommodity().add(CommodityEnum.ELECTRICITY);
+        actuators.getActuator().add(actuator);
+        reg.setActuators(actuators);
+
+        reg.setInstructionProcessingDelay(Efi.DATATYPE_FACTORY.newDuration(50));
         return reg;
     }
 
-    private boolean coolingPossible() {
-        double midTemp = config.getMaxTemp() - config.getMinTemp() / 2;
+    StorageSystemDescription getStorageSystemDescription() {
+        StorageSystemDescription update = Efi.build(StorageSystemDescription.class, deviceId);
+        LeakageElement element = new LeakageElement();
+        element.setFillLevelLowerBound(config.getMinTemp());
+        element.setFillLevelUpperBound(config.getMaxTemp());
+        // make negative because fillLevel (temperature) goes up due to leakages
+        // TODO WHO: how should CEM know when leakage is applicable?? Ony in idle (here 'OFF') running mode! For now
+        // ignore it...
+        element.setLeakageRate(-config.getLeakageRate());
+        LeakageFunction leakage = new LeakageFunction();
+        leakage.getLeakageElement().add(element);
+        update.setLeakageBehaviour(leakage);
 
-        // cooling is possible when:
-        // not running + temperature above 'middle temp' (start only above 'middle' temp to prevent continuously on/off)
-        // AND temp above min
-        return ((!newState.isCooling && (newState.temperature > midTemp)) &&
-                (newState.temperature > config.getMinTemp()));
-    }
+        ActuatorBehaviours actuatorBehaviours = new ActuatorBehaviours();
+        ActuatorBehaviour fritzyBehaviour = new ActuatorBehaviour();
+        fritzyBehaviour.setActuatorId(ACTUATOR_ID);
 
-    private boolean coolingNeeded() {
-        double midTemp = config.getMaxTemp() - config.getMinTemp() / 2;
-        // cooling is needed when:
-        // running + temperature still above 'middle temp' (stop only above 'middle' temp to prevent continuously
-        // on/off)
-        // OR temp above max
-        return ((newState.isCooling && (newState.temperature > midTemp)) ||
-                (newState.temperature > config.getMaxTemp()));
-    }
+        StorageRunningModes runningModes = new StorageRunningModes();
 
-    private Instant getMayStart() {
-        return newState.instant.plus(
-                (long)((config.getCoolingAllowedBottemTemp() - newState.temperature) / heatingDegreesPerSecond),
-                ChronoUnit.SECONDS);
-    }
+        // On (cooling) running mode
+        StorageDiscreteRunningMode onRunningMode = new StorageDiscreteRunningMode();
+        onRunningMode.setId(EFritzyRunningMode.ON.getRunningModeId());
+        onRunningMode.setLabel(EFritzyRunningMode.ON.name());
 
-    private Instant getMustStart() {
-        return newState.instant.plus((long)(config.getMaxTemp() - newState.temperature / heatingDegreesPerSecond),
-                ChronoUnit.SECONDS);
+        DiscreteRunningModeElement onElement = new DiscreteRunningModeElement();
+        onElement.setFillLevelLowerBound(config.getMinTemp());
+        onElement.setFillLevelUpperBound(config.getMaxTemp());
+        onElement.setElectricalPower(config.getPower());
+        onElement.setRunningCost(BigDecimal.valueOf(0)); // assume running device is free
+        onElement.setFillingRate(config.getCoolingSpeed());
+        onRunningMode.getDiscreteRunningModeElement().add(onElement);
+
+        // Off (heating up) running mode
+        StorageDiscreteRunningMode offRunningMode = new StorageDiscreteRunningMode();
+        offRunningMode.setId(EFritzyRunningMode.OFF.getRunningModeId());
+        offRunningMode.setLabel(EFritzyRunningMode.OFF.name());
+
+        DiscreteRunningModeElement offElement = new DiscreteRunningModeElement();
+        offElement.setFillLevelLowerBound(config.getMinTemp());
+        offElement.setFillLevelUpperBound(config.getMaxTemp());
+        offElement.setElectricalPower(0d);
+        offElement.setRunningCost(BigDecimal.valueOf(0)); // assume running device is free
+        offElement.setFillingRate(config.getLeakageRate());
+        offRunningMode.getDiscreteRunningModeElement().add(offElement);
+
+        runningModes.getDiscreteRunningModeOrContinuousRunningMode().add(onRunningMode);
+        runningModes.getDiscreteRunningModeOrContinuousRunningMode().add(offRunningMode);
+
+        // TODO: add timers to prevent continues switching between on/off (not needed when working with 15 minute
+        // periods)
+
+        fritzyBehaviour.setRunningModes(runningModes);
+        actuatorBehaviours.getActuatorBehaviour().add(fritzyBehaviour);
+        update.setActuatorBehaviours(actuatorBehaviours);
+        return update;
     }
 
     private void updateState() {
@@ -132,46 +177,61 @@ public class FritzyResourceHelper {
             if (previousState.isCooling) {
                 double newCoolingDegreesPerSecond = (previousState.temperature - newState.temperature) /
                         Duration.between(previousState.instant, newState.instant).getSeconds();
-                coolingDegreesPerSecond = (coolingDegreesPerSecond + newCoolingDegreesPerSecond) / 2;
+                if (coolingDegreesPerSecond == 0) {
+                    coolingDegreesPerSecond = newCoolingDegreesPerSecond;
+                } else {
+                    coolingDegreesPerSecond = (coolingDegreesPerSecond + newCoolingDegreesPerSecond) / 2;
+                }
             } else {
                 double newHeatingDegreesPerSecond = (newState.temperature - previousState.temperature) /
                         Duration.between(previousState.instant, newState.instant).getSeconds();
-                heatingDegreesPerSecond = (heatingDegreesPerSecond + newHeatingDegreesPerSecond) / 2;
+                if (heatingDegreesPerSecond == 0) {
+                    heatingDegreesPerSecond = newHeatingDegreesPerSecond;
+                } else {
+                    heatingDegreesPerSecond = (heatingDegreesPerSecond + newHeatingDegreesPerSecond) / 2;
+                }
             }
-            previousState = newState;
+        }
+
+        LOG.info(String.format(
+                "isCooling: %b (previous: %b)  temperature: %.6f °C  cooling: %.6f °C/s heatup: %.6f °C/s",
+                newState.isCooling, previousState.isCooling, newState.temperature, coolingDegreesPerSecond,
+                heatingDegreesPerSecond));
+
+        previousState = newState;
+    }
+
+    private void outOflimitsProtection(FritzyController controller) {
+        if (newState.temperature > (config.getMaxTemp() + 0.5) && !newState.isCooling) {
+            controller.on();
+            updateState();
+            LOG.warn("OutOflimitsProtection: turned Fritzy on without instruction because too hot and not cooling.");
+        }
+        if (newState.temperature < (config.getMinTemp() - 0.5) && newState.isCooling) {
+            controller.off();
+            updateState();
+            LOG.warn("OutOflimitsProtection: turned Fritzy off without instruction because too cold and still " +
+                    "cooling.");
         }
     }
 
-    ShiftableUpdate getFlexibilityUpdate() {
+    /**
+     * @param controller
+     * @return
+     */
+    public StorageUpdate getFlexibilityUpdate(FritzyController controller) {
+        StorageStatus update = Efi.build(StorageStatus.class, deviceId);
+
         updateState();
+        outOflimitsProtection(controller);
 
-        Instant startAfter = getMayStart();
-        Instant finishBefore = null;
-        Duration cycleDuration = Duration.ofMinutes(15);
-
-        ShiftableUpdate shiftableUpdate = Efi.build(ShiftableUpdate.class, deviceId);
-        shiftableUpdate.setValidFrom(Efi.calendarOfInstant(startAfter));
-        shiftableUpdate.setEndBefore(Efi.calendarOfInstant(finishBefore));
-        SequentialProfiles profiles = new SequentialProfiles();
-
-        // TODO MKE create flexibility
-        SequentialProfile profile = new SequentialProfile();
-        profile.setMaxIntervalBefore(Efi.DATATYPE_FACTORY.newDuration(0));
-        profile.setSequenceNr(1);
-
-        SequentialProfileAlternative sequentialProfileAlternative = new SequentialProfileAlternative();
-        sequentialProfileAlternative.setAlternativeNr(1);
-        ElectricityProfile electricityProfile = new ElectricityProfile();
-        Element eProfileElement = new Element();
-        eProfileElement.setDuration(Efi.DATATYPE_FACTORY.newDuration(cycleDuration.toMillis()));
-        eProfileElement.setPower(0);
-        electricityProfile.getElement().add(eProfileElement);
-        sequentialProfileAlternative.setElectricityProfile(electricityProfile);
-        profile.getSequentialProfileAlternatives().getSequentialProfileAlternative().add(sequentialProfileAlternative);
-
-        profiles.getSequentialProfile().add(profile);
-        shiftableUpdate.setSequentialProfiles(profiles);
-        return shiftableUpdate;
+        update.setValidFrom(Efi.calendarOfInstant(Instant.now()));
+        update.setCurrentFillLevel(newState.temperature);
+        ActuatorStatus status = new ActuatorStatus();
+        status.setActuatorId(ACTUATOR_ID);
+        status.setCurrentRunningMode(EFritzyRunningMode.fromIsCooling(newState.isCooling).getRunningModeId());
+        update.getActuatorStatuses().getActuatorStatus().add(status);
+        return update;
     }
 
     /**
@@ -179,7 +239,7 @@ public class FritzyResourceHelper {
      * 
      * @return
      */
-    public int getPower() {
+    public double getPower() {
         updateState();
         if (newState.isCooling) {
             return config.getPower();
