@@ -55,21 +55,20 @@ public class FritzyConfig extends FritzyAppConfig {
     @JsonProperty("maxMargin")
     private int maxMargin;
 
+    @JsonProperty("power")
+    // Power in W
+    private double power;
+
+    @JsonProperty("leakageRate")
+    // in °C per second
+    private double leakageRate;
+
+    @JsonProperty("coolingSpeed")
+    // in °C per second
+    private double coolingSpeed;
+
     public FritzyConfig() {
         // Empty constructor
-    }
-
-    public FritzyConfig(String deviceId, String host, int port, String serialPort, boolean stubTemparature,
-            boolean stubRelay, double minTemp, double maxTemp, int maxMargin) {
-        this.deviceId = deviceId;
-        this.host = host;
-        this.port = port;
-        this.serialPort = serialPort;
-        this.stubTemparature = stubTemparature;
-        this.stubRelay = stubRelay;
-        this.minTemp = minTemp;
-        this.maxTemp = maxTemp;
-        this.maxMargin = maxMargin;
     }
 
     public String getDeviceId() {
@@ -144,4 +143,27 @@ public class FritzyConfig extends FritzyAppConfig {
         this.maxMargin = maxMargin;
     }
 
+    public double getPower() {
+        return power;
+    }
+
+    public void setPower(double power) {
+        this.power = power;
+    }
+
+    public double getLeakageRate() {
+        return leakageRate;
+    }
+
+    public void setLeakageRate(double leakageRate) {
+        this.leakageRate = leakageRate;
+    }
+
+    public double getCoolingSpeed() {
+        return coolingSpeed;
+    }
+
+    public void setCoolingSpeed(double coolingSpeed) {
+        this.coolingSpeed = coolingSpeed;
+    }
 }
