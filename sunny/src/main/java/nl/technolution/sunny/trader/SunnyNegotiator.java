@@ -103,8 +103,7 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
         boolean firstRound = remainingTime.getSeconds() > 14 * 60;
 
         // calculate my price based on remaining time (for the last round remaining minutes is 0 so offset is 0 =>
-        // accept
-        // market price)
+        // accept market price)
         double offset = (marketPriceStartOffset / 15) * remainingTime.toMinutes();
         myPrice = marketPrice + offset;
         LOG.debug("myPrice: {} (marketPrice : {}, offset: {}, marketPriceStartOffset {})", myPrice, marketPrice, offset,
