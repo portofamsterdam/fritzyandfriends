@@ -190,4 +190,10 @@ public class FritzyApiStub implements IFritzyApi {
         //
 
     }
+
+    @Override
+    public String transfer(BigDecimal value, EContractAddress contractAddress, String toAddress) {
+        //
+        return null;
+    }
 }
