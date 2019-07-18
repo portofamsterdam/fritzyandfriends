@@ -40,6 +40,7 @@ import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.order.GetOrdersResponse;
 import nl.technolution.fritzy.wallet.order.Order;
 import nl.technolution.fritzy.wallet.order.Orders;
+import nl.technolution.fritzy.wallet.order.Record;
 
 /**
  * Stub the Fritsy API
@@ -56,7 +57,7 @@ public class FritzyApiStub implements IFritzyApi {
 
     public FritzyApiStub() {
         orders = new Orders();
-        orders.setRecords(new WebOrder[0]);
+        orders.setRecords(new Record[0]);
     }
 
     @Override
@@ -88,6 +89,7 @@ public class FritzyApiStub implements IFritzyApi {
     @Override
     public WebOrder order(String orderHash) {
         return Arrays.asList(orders.getRecords()).stream()
+                .map(r -> r.getOrder())
                 .filter(o -> o.getHash().equals(orderHash))
                 .findFirst()
                 .orElse(null);
@@ -106,28 +108,30 @@ public class FritzyApiStub implements IFritzyApi {
 
     @Override
     public String createOrder(Order order) {
-        List<WebOrder> ordersList = Lists.newArrayList(Arrays.asList(orders.getRecords()));
+        List<Record> ordersList = Lists.newArrayList(Arrays.asList(orders.getRecords()));
         WebOrder webOrder = new WebOrder();
         String generateHash = generateHash(Instant.now().hashCode());
         webOrder.setHash(generateHash);
         webOrder.setMakerAddress(loginInUser.getAddress());
         webOrder.setMakerAssetAmount(order.getMakerAmount());
         webOrder.setMakerAssetData(order.getTakerToken());
-        ordersList.add(webOrder);
-        orders.setRecords(ordersList.toArray(new WebOrder[ordersList.size()]));
+        Record e = new Record();
+        e.setOrder(webOrder);
+        ordersList.add(e);
+        orders.setRecords(ordersList.toArray(new Record[ordersList.size()]));
         return generateHash;
     }
 
     @Override
     public void cancelOrder(String hash) {
-        List<WebOrder> ordersList = Arrays.asList(orders.getRecords());
-        Iterator<WebOrder> itr = ordersList.iterator();
+        List<Record> ordersList = Lists.newArrayList(Arrays.asList(orders.getRecords()));
+        Iterator<Record> itr = ordersList.iterator();
         while (itr.hasNext()) {
-            if (itr.next().getHash().equals(hash)) {
+            if (itr.next().getOrder().getHash().equals(hash)) {
                 itr.remove();
             }
         }
-        orders.setRecords(ordersList.toArray(new WebOrder[ordersList.size()]));
+        orders.setRecords(ordersList.toArray(new Record[ordersList.size()]));
     }
 
     @Override
@@ -179,5 +183,11 @@ public class FritzyApiStub implements IFritzyApi {
 
     private String generateHash(int hash) {
         return "0x" + StringUtils.leftPad("", 32, "f") + String.format("%08X", hash);
+    }
+
+    @Override
+    public void addMinter(String address, EContractAddress contractAddress) {
+        //
+
     }
 }

@@ -34,6 +34,7 @@ import nl.technolution.fritzy.wallet.FritzyApi;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.order.Order;
 import nl.technolution.fritzy.wallet.order.Orders;
+import nl.technolution.fritzy.wallet.order.Record;
 import nl.technolution.marketnegotiator.AbstractCustomerEnergyManager;
 import nl.technolution.protocols.efi.ElectricityProfile.Element;
 import nl.technolution.protocols.efi.InflexibleForecast;
@@ -116,7 +117,8 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
         }
 
         Orders orders = market.orders().getOrders();
-        for (WebOrder order : orders.getRecords()) {
+        for (Record record : orders.getRecords()) {
+            WebOrder order = record.getOrder();
             // my own order?
             if (order.getMakerAddress().equals(market.getAddress())) {
                 // TODO WHO: how to know if an oder is accepted? ==> Martin checks with Jurian if next check is OK

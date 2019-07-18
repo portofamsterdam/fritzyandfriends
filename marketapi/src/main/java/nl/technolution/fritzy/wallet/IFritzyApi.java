@@ -73,6 +73,7 @@ public interface IFritzyApi {
      */
     String createOrder(Order order);
 
+
     /**
      * @param hash
      */
@@ -115,5 +116,22 @@ public interface IFritzyApi {
      * @return registered users
      */
     WebUser[] getUsers();
+
+
+    /**
+     * @param address who can mint
+     * @param contractAddress what can be minted
+     */
+    void addMinter(String address, EContractAddress contractAddress);
+
+    /**
+     * Transfer money to an address
+     * 
+     * @param value how much
+     * @param contractAddress of this
+     * @param toAddress to
+     * @return txId
+     */
+    String transfer(BigDecimal value, EContractAddress contractAddress, String toAddress);
 
 }

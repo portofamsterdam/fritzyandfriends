@@ -20,7 +20,22 @@ package nl.technolution.fritzy.wallet.model;
  * Contract address
  */
 public enum EContractAddress {
-    KWH,
-    ETH,
-    EUR;
+    KWH("kwh"),
+    ETH("eth"),
+    EUR("eur");
+
+    private final String contractName;
+
+    /**
+     * Constructor for {@link EContractAddress} objects
+     *
+     * @param contractName to set
+     */
+    EContractAddress(String contractName) {
+        this.contractName = contractName;
+    }
+
+    public String getContractName() {
+        return contractName;
+    }
 }

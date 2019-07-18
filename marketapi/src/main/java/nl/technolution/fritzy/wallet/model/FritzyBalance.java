@@ -55,5 +55,12 @@ public class FritzyBalance {
     public void setKwh(BigDecimal kwh) {
         this.kwh = kwh;
     }
+
+    @Override
+    public String toString() {
+        return "FritzyBalance [" + (eth != null ? "eth=" + eth + ", " : "") + (eur != null ? "eur=" + eur + ", " : "") +
+                (kwh != null ? "kwh=" + kwh : "") + "]";
+    }
+
 }
 
