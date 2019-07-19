@@ -16,6 +16,7 @@
  */
 package nl.technolution.sunny.trader;
 
+import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 
@@ -31,6 +32,7 @@ import nl.technolution.dashboard.EEventType;
 import nl.technolution.dropwizard.webservice.Endpoints;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.FritzyApi;
+import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.order.Order;
 import nl.technolution.fritzy.wallet.order.Orders;
@@ -100,8 +102,8 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
         Duration remainingTime = Duration.between(Instant.now(), Efi.getNextQuarter());
         boolean firstRound = remainingTime.getSeconds() > 14 * 60;
 
-        // calculate my price based on remaining time (for the last round remaining minuts is 0 so offset is 0 => accept
-        // market price)
+        // calculate my price based on remaining time (for the last round remaining minutes is 0 so offset is 0 =>
+        // accept market price)
         double offset = (marketPriceStartOffset / 15) * remainingTime.toMinutes();
         myPrice = marketPrice + offset;
         LOG.debug("myPrice: {} (marketPrice : {}, offset: {}, marketPriceStartOffset {})", myPrice, marketPrice, offset,
@@ -110,8 +112,8 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
         if (firstRound) {
             // reset available energy
             availableKWh = getNextQuarterHourForcastedKWh();
-            // TOOD WHO: mint available energy
-            // market.mint(
+            // TOOD WHO: what address to use?
+            market.mint(market.getAddress(), BigDecimal.valueOf(availableKWh), EContractAddress.KWH);
             LOG.debug("First round, available energy set to {} kWh based on prediction.", availableKWh);
         }
 
@@ -119,7 +121,7 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
         for (WebOrder order : orders.getRecords()) {
             // my own order?
             if (order.getMakerAddress().equals(market.getAddress())) {
-                // TODO WHO: how to know if an oder is accepted? ==> Martin checks with Jurian if next check is OK
+                // when the taker address is set this means someone accepted our order
                 if (!order.getTakerAddress().isEmpty()) {
                     // energy sold so no longer available:
                     availableKWh -= getRequestedKwh(order);

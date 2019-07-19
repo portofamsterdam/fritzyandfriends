@@ -16,39 +16,48 @@
  */
 package nl.technolution.fritzy.marketnegotiator;
 
-import java.io.IOException;
-
-import org.slf4j.Logger;
-
-import nl.technolution.core.Log;
-import nl.technolution.dropwizard.services.Services;
-import nl.technolution.fritzy.io.IIoFactory;
+import java.util.Arrays;
 
 /**
  * 
  */
-public class FritzyController {
-    private static final Logger LOG = Log.getLogger();
+public enum EFritzyRunningMode {
 
-    /**
-     * Power on Fritzy
-     */
-    public void on() {
-        try {
-            Services.get(IIoFactory.class).getWebRelay().setRelay(true);
-        } catch (IOException e) {
-            LOG.error("Error powering on fritzy:", e);
-        }
+    OFF(0),
+
+    ON(1);
+
+    private final int runningModeId;
+
+    EFritzyRunningMode(int runningModeId) {
+        this.runningModeId = runningModeId;
     }
 
     /**
-     * Power off Fritzy
+     * Find based on runningmode Id
+     * 
+     * @param runningModeId to find
+     * @return EFritzyInstruction
      */
-    public void off() {
-        try {
-            Services.get(IIoFactory.class).getWebRelay().setRelay(false);
-        } catch (IOException e) {
-            LOG.error("Error powering off fritzy:", e);
-        }
+    public static EFritzyRunningMode fromRunningModeId(int runningModeId) {
+        return Arrays.asList(values())
+                .stream()
+                .filter(e -> e.runningModeId == runningModeId)
+                .findFirst()
+                .orElseThrow(IllegalArgumentException::new);
+    }
+
+    /**
+     * Find based on boolean
+     * 
+     * @param isCooling
+     * @return
+     */
+    public static EFritzyRunningMode fromIsCooling(boolean isCooling) {
+        return (isCooling ? ON : OFF);
+    }
+
+    public int getRunningModeId() {
+        return runningModeId;
     }
 }

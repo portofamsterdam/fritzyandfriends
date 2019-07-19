@@ -35,8 +35,12 @@ public class WebRelayConfigTest {
      */
     @Test
     public void testConfig() throws JsonProcessingException {
-        FritzyConfig obj = new FritzyConfig("Fritzy", "localhost", 80, "/dev/tty", false, false, 0d, 0d, 0);
-        System.out.println(
-                new ObjectMapper().writeValueAsString(obj));
+        FritzyConfig obj = new FritzyConfig();
+        obj.setDeviceId("Fritzy");
+        obj.setHost("localhost");
+        obj.setPort(80);
+        obj.setSerialPort("/dev/tty");
+        obj.setStubRelay(false);
+        System.out.println(new ObjectMapper().writeValueAsString(obj));
     }
 }
