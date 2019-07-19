@@ -17,17 +17,22 @@
 package nl.technolution.fritzy.io.webrelay;
 
 import java.io.IOException;
-import java.time.LocalDateTime;
 
 /**
  * Open on even hours
  */
 public class RelayStub implements IWebRelay {
 
+    boolean isCooling = false;
+
     @Override
     public WebRelayState getState() throws IOException {
-        boolean isCooling = LocalDateTime.now().getHour() % 2 == 0;
         return new WebRelayState(isCooling, isCooling, 0, 0);
     }
 
+    @Override
+    public WebRelayState setRelay(boolean state) throws IOException {
+        isCooling = state;
+        return new WebRelayState(isCooling, isCooling, 0, 0);
+    }
 }

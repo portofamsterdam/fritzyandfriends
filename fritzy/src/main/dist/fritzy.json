@@ -5,9 +5,10 @@
     "serialPort": "/dev/ttyS3",
     "stubTemparature": true,
     "stubRelay": true,
+    "market": { "marketUrl": "https://localhost:8080/test" },
     "minTemp": 2,
     "maxTemp": 7,
-    "maxMargin" : 5,
-    "market": { "marketUrl": "https://localhost:8080/test" }
-    
+    "power": 100
+    "leakageRate" : 0.000278
+    "coolingSpeed" : 0.002222
 }

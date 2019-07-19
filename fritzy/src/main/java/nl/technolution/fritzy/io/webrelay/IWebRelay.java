@@ -31,4 +31,11 @@ public interface IWebRelay {
      */
     WebRelayState getState() throws IOException;
 
+    /**
+     * @param state
+     * @return new state
+     * @throws IOException
+     */
+    WebRelayState setRelay(boolean state) throws IOException;
+
 }

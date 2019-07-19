@@ -16,7 +16,6 @@
  */
 package nl.technolution.fritzy.marketnegotiator;
 
-import nl.technolution.DeviceId;
 import nl.technolution.fritzy.app.FritzyConfig;
 
 /**
@@ -29,7 +28,7 @@ public final class FritzyTrader implements IFritzyTrader {
 
     @Override
     public void init(FritzyConfig config) {
-        resourceManager = new FritzyResourceManager(new DeviceId(config.getDeviceId()));
+        resourceManager = new FritzyResourceManager(config);
         cem = new FritzyNegotiator(config.getMarket(), resourceManager);
         resourceManager.registerCustomerEnergyManager(cem);
 
@@ -37,19 +36,20 @@ public final class FritzyTrader implements IFritzyTrader {
 
     @Override
     public void evaluateMarket() {
-        //
-
+        cem.evaluate();
     }
 
     @Override
     public void evaluateDevice() {
-        //
-
+        resourceManager.evaluate();
     }
 
     @Override
     public void sendMeasurement() {
-        //
+        resourceManager.sendMeasurement();
+    }
 
+    public FritzyNegotiator getCem() {
+        return cem;
     }
 }
