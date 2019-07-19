@@ -188,12 +188,29 @@ public class FritzyApiStub implements IFritzyApi {
     @Override
     public void addMinter(String address, EContractAddress contractAddress) {
         //
-
     }
 
     @Override
     public String transfer(BigDecimal value, EContractAddress contractAddress, String toAddress) {
-        //
-        return null;
+        FritzyBalance sender = balances.computeIfAbsent(loginInUser.getAddress(), k -> new FritzyBalance());
+        FritzyBalance receiver = balances.computeIfAbsent(toAddress, k -> new FritzyBalance());
+        switch (contractAddress) {
+        case ETH:
+            Preconditions.checkArgument(sender.getEth().compareTo(value) > 0);
+            sender.setEth(sender.getEth().subtract(value));
+            receiver.setEth(receiver.getEth().add(value));
+            break;
+        case EUR:
+            Preconditions.checkArgument(sender.getEur().compareTo(value) > 0);
+            sender.setEur(sender.getEur().subtract(value));
+            receiver.setEur(receiver.getEur().add(value));
+            break;
+        case KWH:
+            Preconditions.checkArgument(sender.getKwh().compareTo(value) > 0);
+            sender.setKwh(sender.getKwh().subtract(value));
+            receiver.setKwh(receiver.getKwh().add(value));
+            break;
+        }
+        return generateHash(sender.hashCode() ^ receiver.hashCode());
     }
 }
