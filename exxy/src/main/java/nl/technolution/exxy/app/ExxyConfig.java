@@ -16,26 +16,40 @@
  */
 package nl.technolution.exxy.app;
 
+import java.io.IOException;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 
+import nl.technolution.apis.ApiConfig;
+import nl.technolution.apis.ApiConfigRecord;
+import nl.technolution.apis.EApiNames;
 import nl.technolution.dropwizard.FritzyAppConfig;
 import nl.technolution.dropwizard.MarketConfig;
+import nl.technolution.dropwizard.webservice.JacksonFactory;
 
 /**
  * Configuration for APXPrices
  */
 public class ExxyConfig extends FritzyAppConfig {
+
+    @JsonProperty("deviceId")
+    private String deviceId;
+
     /**
      * Base URL for the ENTSO-E API: https://transparency.entsoe.eu/api
      * 
      */
     @JsonProperty("baseURL")
-    private final String baseURL;
+    private String baseURL;
 
     /**
      * Security token (access token) as supplied by ENTSO-E.
@@ -46,13 +60,13 @@ public class ExxyConfig extends FritzyAppConfig {
      * 
      */
     @JsonProperty("securityToken")
-    private final String securityToken;
+    private String securityToken;
 
     /**
      * How much kWh can exxy sell in a trade period
      */
     @JsonProperty("capacity")
-    private final int capacity;
+    private int capacity;
 
     /**
      * Map with fixed prices in EUR per kWh for every hour of the day (local time). Hours > 23 are ignored. When
@@ -73,7 +87,8 @@ public class ExxyConfig extends FritzyAppConfig {
      * MArket properties
      */
     @JsonProperty("market")
-    private final MarketConfig market;
+    private MarketConfig market;
+
 
     @JsonCreator
     public ExxyConfig(@JsonProperty("baseURL") String baseURL, 
@@ -89,6 +104,70 @@ public class ExxyConfig extends FritzyAppConfig {
         this.useFixedPrices = useFixedPrices;
         this.market = market;
         validateConfig();
+    }
+
+    /**
+     * 
+     */
+    public ExxyConfig() {
+
+    }
+
+    /**
+     * Generate exxy config
+     * 
+     * @param args none
+     * @throws IOException
+     * @throws JsonMappingException
+     * @throws JsonGenerationException
+     */
+    public static void main(String[] args) throws JsonGenerationException, JsonMappingException, IOException {
+
+        ObjectMapper mapper = JacksonFactory.defaultMapper();
+        ExxyConfig c = new ExxyConfig();
+        c.deviceId = "exxy";
+        c.setEnvironment("production");
+
+        c.baseURL = "https://transparency.entsoe.eu/api";
+        c.securityToken = "0b1d9ae3-d9a6-4c6b-8dc1-c62a18387ac5";
+        c.capacity = 100;
+        c.useFixedPrices = false;
+        c.fixedPrices = Maps.newHashMap();
+        c.fixedPrices.put(0, 0.01d);
+        c.fixedPrices.put(1, 0.02d);
+        c.fixedPrices.put(2, 0.03d);
+        c.fixedPrices.put(3, 0.04d);
+        c.fixedPrices.put(4, 0.05d);
+        c.fixedPrices.put(5, 0.06d);
+        c.fixedPrices.put(6, 0.07d);
+        c.fixedPrices.put(7, 0.08d);
+        c.fixedPrices.put(8, 0.09d);
+        c.fixedPrices.put(9, 0.10d);
+        c.fixedPrices.put(10, 0.11d);
+        c.fixedPrices.put(11, 0.12d);
+        c.fixedPrices.put(12, 0.13d);
+        c.fixedPrices.put(13, 0.14d);
+        c.fixedPrices.put(14, 0.15d);
+        c.fixedPrices.put(15, 0.16d);
+        c.fixedPrices.put(16, 0.17d);
+        c.fixedPrices.put(17, 0.18d);
+        c.fixedPrices.put(18, 0.19d);
+        c.fixedPrices.put(19, 0.20d);
+        c.fixedPrices.put(20, 0.21d);
+        c.fixedPrices.put(21, 0.22d);
+        c.fixedPrices.put(22, 0.23d);
+        c.fixedPrices.put(23, 0.24d);
+
+        MarketConfig market = new MarketConfig(false, "http://82.196.13.251/api", "exxy@fritzy.nl", "exxy");
+        c.setMarket(market);
+
+        ApiConfig apiConfig = new ApiConfig();
+        ApiConfigRecord netty = new ApiConfigRecord(EApiNames.NETTY.getName(), "http://localhost:8083/", 5000, 5000);
+        ApiConfigRecord exxy = new ApiConfigRecord(EApiNames.EXXY.getName(), "http://localhost:8085/", 5000, 5000);
+        apiConfig.setApis(Lists.newArrayList(netty, exxy));
+        c.setApiConfig(apiConfig);
+
+        mapper.writerWithDefaultPrettyPrinter().writeValue(System.out, c);
     }
 
     /**

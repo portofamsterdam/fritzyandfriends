@@ -10,5 +10,18 @@
     "useStub": true,
     "market": {
         "marketUrl": "https://localhost"   
-    }
+    },
+    "apiConfig" : {
+    "apis" : [ {
+      "name" : "netty",
+      "url" : "http://localhost:8083/",
+      "connectTimeout" : 5000,
+      "readTimeout" : 5000
+    }, {
+      "name" : "exxy",
+      "url" : "http://localhost:8085/",
+      "connectTimeout" : 5000,
+      "readTimeout" : 5000
+    } ]
+  }
 }
