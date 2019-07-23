@@ -25,6 +25,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -121,8 +122,31 @@ public class FritzyApiStub implements IFritzyApi {
         Preconditions.checkArgument(order.getTakerAddress() == null);
         order.setTakerAddress(loginInUser.getAddress());
 
-        // TODO MKE implement filling order
-        return null;
+        BigDecimal takerGet = new BigDecimal(order.getTakerAssetAmount()).multiply(BigDecimal.valueOf(-1L));
+        BigDecimal takerGive = new BigDecimal(order.getMakerAssetAmount());
+        incr(EContractAddress.valueOf(order.getTakerAssetData()), takerGet, order.getTakerAddress());
+        incr(EContractAddress.valueOf(order.getMakerAssetData()), takerGive, order.getTakerAddress());
+
+        BigDecimal makerGet = new BigDecimal(order.getMakerAssetAmount()).multiply(BigDecimal.valueOf(-1L));
+        BigDecimal makerGive = new BigDecimal(order.getTakerAssetAmount());
+        incr(EContractAddress.valueOf(order.getMakerAssetData()), makerGet, order.getMakerAddress());
+        incr(EContractAddress.valueOf(order.getTakerAssetData()), makerGive, order.getMakerAddress());
+
+        return generateHash(Objects.hash(orderHash));
+    }
+
+    private void incr(EContractAddress contractaddress, BigDecimal takerAssetAmount, String takerAddress) {
+        FritzyBalance balance = balances.computeIfAbsent(takerAddress, k -> new FritzyBalance());
+        switch (contractaddress) {
+        case EUR:
+            balance.setEur(balance.getEur().add(takerAssetAmount));
+            break;
+        case KWH:
+            balance.setKwh(balance.getKwh().add(takerAssetAmount));
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
     }
 
     @Override
@@ -133,7 +157,9 @@ public class FritzyApiStub implements IFritzyApi {
         webOrder.setHash(generateHash);
         webOrder.setMakerAddress(loginInUser.getAddress());
         webOrder.setMakerAssetAmount(order.getMakerAmount());
-        webOrder.setMakerAssetData(order.getTakerToken());
+        webOrder.setMakerAssetData(order.getMakerToken());
+        webOrder.setTakerAssetAmount(order.getTakerAmount());
+        webOrder.setTakerAssetData(order.getTakerToken());
         Record e = new Record();
         e.setOrder(webOrder);
         ordersList.add(e);
