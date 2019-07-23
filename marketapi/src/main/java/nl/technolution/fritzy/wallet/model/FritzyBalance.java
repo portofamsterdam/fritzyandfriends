@@ -26,11 +26,11 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 public class FritzyBalance {
 
     @JsonProperty("ETH")
-    BigDecimal eth;
+    BigDecimal eth = new BigDecimal(0);
     @JsonProperty("EUR")
-    BigDecimal eur;
+    BigDecimal eur = new BigDecimal(0);
     @JsonProperty("KWH")
-    BigDecimal kwh;
+    BigDecimal kwh = new BigDecimal(0);
 
     public BigDecimal getEth() {
         return eth;
@@ -55,5 +55,12 @@ public class FritzyBalance {
     public void setKwh(BigDecimal kwh) {
         this.kwh = kwh;
     }
+
+    @Override
+    public String toString() {
+        return "FritzyBalance [" + (eth != null ? "eth=" + eth + ", " : "") + (eur != null ? "eur=" + eur + ", " : "") +
+                (kwh != null ? "kwh=" + kwh : "") + "]";
+    }
+
 }
 

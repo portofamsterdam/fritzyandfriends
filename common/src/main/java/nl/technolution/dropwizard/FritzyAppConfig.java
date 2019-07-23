@@ -35,6 +35,21 @@ public class FritzyAppConfig extends Configuration {
     @JsonProperty("market")
     private MarketConfig market;
 
+    public FritzyAppConfig() {
+        //
+    }
+
+    /**
+     * @param environment to set
+     * @param apiConfig to use for APIs
+     * @param market to connect to
+     */
+    public FritzyAppConfig(String environment, ApiConfig apiConfig, MarketConfig market) {
+        this.environment = environment;
+        this.apiConfig = apiConfig;
+        this.market = market;
+    }
+
     public String getEnvironment() {
         return environment;
     }

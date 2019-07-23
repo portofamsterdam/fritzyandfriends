@@ -48,7 +48,7 @@ public class BattyTraderTest {
         BattyConfig testConfig = new BattyConfig();
         testConfig.setUseStub(true);
         testConfig.setDeviceId("Test");
-        testConfig.setMarket(new MarketConfig("", "", ""));
+        testConfig.setMarket(new MarketConfig(true, "", "", ""));
         
         service.init(testConfig);
         Services.put(IXStorageFactory.class, service);

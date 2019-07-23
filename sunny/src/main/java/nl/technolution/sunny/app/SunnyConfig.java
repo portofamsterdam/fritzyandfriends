@@ -16,10 +16,20 @@
  */
 package nl.technolution.sunny.app;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.io.IOException;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
+
+import nl.technolution.apis.ApiConfig;
+import nl.technolution.apis.ApiConfigRecord;
+import nl.technolution.apis.EApiNames;
 import nl.technolution.dropwizard.FritzyAppConfig;
 import nl.technolution.dropwizard.MarketConfig;
+import nl.technolution.dropwizard.webservice.JacksonFactory;
 
 /**
  * Configuration for Fritzy
@@ -58,6 +68,38 @@ public class SunnyConfig extends FritzyAppConfig {
 
     @JsonProperty("solarEdgeModbusDeviceId")
     private int solarEdgeModbusDeviceId;
+
+    /**
+     * Write a config
+     * 
+     * @param args
+     * @throws JsonGenerationException
+     * @throws JsonMappingException
+     * @throws IOException
+     */
+    public static void main(String[] args) throws JsonGenerationException, JsonMappingException, IOException {
+        // print config
+        ObjectMapper mapper = JacksonFactory.defaultMapper();
+        SunnyConfig c = new SunnyConfig();
+        c.deviceId = "sunny";
+        c.market = new MarketConfig(false, "http://82.196.13.251/api", "sunny@fritzy.nl", "sunny");
+        c.marketPriceStartOffset = 1;
+        c.useStub = false;
+        c.solarEdgeMonitoringBaseURL = "https://monitoringapi.solaredge.com/site/529405";
+        c.solarEdgeMonitoringApikey = "JRK97634IPJD9ABBG4MFACJVZGLK4NUN";
+        c.pvCastBaseURL = "https://api.pvcast.de/plants/908";
+        c.pvCastApiKey = "cxDhZtryzwyGHG2yMzqy";
+        c.solarEdgeModbusIpAddress = "192.168.8.240";
+        c.solarEdgeModbusPort = 502;
+        c.solarEdgeModbusDeviceId = 2;
+        ApiConfig apiConfig = new ApiConfig();
+        ApiConfigRecord netty = new ApiConfigRecord(EApiNames.NETTY.getName(), "http://localhost:8083/", 5000, 5000);
+        ApiConfigRecord exxy = new ApiConfigRecord(EApiNames.EXXY.getName(), "http://localhost:8085/", 5000, 5000);
+        apiConfig.setApis(Lists.newArrayList(netty, exxy));
+        c.setApiConfig(apiConfig);
+        c.setEnvironment("production");
+        mapper.writerWithDefaultPrettyPrinter().writeValue(System.out, c);
+    }
 
     public String getDeviceId() {
         return deviceId;

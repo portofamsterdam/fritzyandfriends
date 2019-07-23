@@ -26,6 +26,7 @@ import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.FritzyApi;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.order.Orders;
+import nl.technolution.fritzy.wallet.order.Record;
 import nl.technolution.marketnegotiator.AbstractCustomerEnergyManager;
 import nl.technolution.protocols.efi.ActuatorInstruction;
 import nl.technolution.protocols.efi.ActuatorInstructions;
@@ -81,7 +82,8 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
         market.log(EEventType.LIMIT_ACTOR, Double.toString(deviceCapacity.getGridConnectionLimit()), null);
 
         Orders orders = market.orders().getOrders();
-        for (WebOrder order : orders.getRecords()) {
+        for (Record record : orders.getRecords()) {
+            WebOrder order = record.getOrder();
             if (!isInterestingOrder(order, balance, deviceCapacity)) {
                 continue;
             }
