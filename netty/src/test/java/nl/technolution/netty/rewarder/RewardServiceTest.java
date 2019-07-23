@@ -27,10 +27,11 @@ import org.junit.Before;
 import org.junit.Test;
 
 import nl.technolution.apis.netty.OrderReward;
+import nl.technolution.dropwizard.FritzyAppConfig;
 import nl.technolution.dropwizard.MarketConfig;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.fritzy.gen.model.WebUser;
-import nl.technolution.fritzy.wallet.FritzyApiFactoryStub;
+import nl.technolution.fritzy.wallet.FritzyApiFactory;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
@@ -48,7 +49,9 @@ public class RewardServiceTest {
 
     @Before
     public void setup() {
-        FritzyApiFactoryStub service = new FritzyApiFactoryStub();
+        FritzyApiFactory service = new FritzyApiFactory();
+        MarketConfig marketConfig = new MarketConfig(true, "", NETTY, "");
+        service.init(new FritzyAppConfig(RewardServiceTest.class.getSimpleName(), null, marketConfig));
         Services.put(IFritzyApiFactory.class, service);
 
         // Create user netty with some funds
@@ -82,7 +85,7 @@ public class RewardServiceTest {
 
         RewardService s = new RewardService();
         NettyConfig config = new NettyConfig();
-        MarketConfig marketConfig = new MarketConfig("", NETTY, "");
+        MarketConfig marketConfig = new MarketConfig(true, "", NETTY, "");
         config.setMarket(marketConfig);
         double localReward = 1d;
         config.setLocalReward(localReward);

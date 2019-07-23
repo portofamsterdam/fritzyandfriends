@@ -24,6 +24,9 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  */
 public class MarketConfig {
 
+    @JsonProperty("useStub")
+    private final boolean useStub;
+
     @JsonProperty("marketUrl")
     private final String marketUrl;
 
@@ -34,11 +37,18 @@ public class MarketConfig {
     private final String password;
 
     @JsonCreator
-    public MarketConfig(@JsonProperty("marketUrl") String marketUrl, @JsonProperty("email") String email,
+    public MarketConfig(@JsonProperty("useStub") boolean useStub,
+            @JsonProperty("marketUrl") String marketUrl,
+            @JsonProperty("email") String email,
             @JsonProperty("password") String password) {
+        this.useStub = useStub;
         this.marketUrl = marketUrl;
         this.email = email;
         this.password = password;
+    }
+
+    public boolean isUseStub() {
+        return useStub;
     }
 
     public String getMarketUrl() {
