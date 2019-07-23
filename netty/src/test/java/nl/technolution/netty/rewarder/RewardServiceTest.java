@@ -60,8 +60,6 @@ public class RewardServiceTest {
         String nettyAddr = Arrays.asList(api.getUsers()).stream().findFirst().get().getAddress();
         api.login(NETTY, "");
         api.mint(nettyAddr, BigDecimal.valueOf(1000), EContractAddress.EUR);
-
-
     }
 
     /**
@@ -118,7 +116,7 @@ public class RewardServiceTest {
         s.claim(orderHash, txId);
 
         api.login(USERA, "");
-        assertEquals(5, api.balance().getKwh());
-        assertEquals(99, api.balance().getEur());
+        assertEquals(new BigDecimal(5), api.balance().getKwh());
+        assertEquals(new BigDecimal(99), api.balance().getEur());
     }
 }
