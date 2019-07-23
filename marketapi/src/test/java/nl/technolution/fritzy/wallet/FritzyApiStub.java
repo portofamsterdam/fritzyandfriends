@@ -213,4 +213,9 @@ public class FritzyApiStub implements IFritzyApi {
         }
         return generateHash(sender.hashCode() ^ receiver.hashCode());
     }
+
+    @Override
+    public String getAddress() {
+        return loginInUser.getAddress();
+    }
 }

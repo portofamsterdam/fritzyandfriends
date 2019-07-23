@@ -326,6 +326,7 @@ public class FritzyApi implements IFritzyApi {
         request.post(Entity.entity(dashboardEvent, MediaType.APPLICATION_JSON));
     }
 
+    @Override
     public String getAddress() {
         return address;
     }

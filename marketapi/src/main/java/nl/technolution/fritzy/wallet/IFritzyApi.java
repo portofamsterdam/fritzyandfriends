@@ -134,4 +134,11 @@ public interface IFritzyApi {
      */
     String transfer(BigDecimal value, EContractAddress contractAddress, String toAddress);
 
+    /**
+     * Get address of logged-in user
+     * 
+     * @return address
+     */
+    String getAddress();
+
 }

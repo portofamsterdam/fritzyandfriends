@@ -29,9 +29,11 @@ import nl.technolution.apis.netty.INettyApi;
 import nl.technolution.apis.netty.OrderReward;
 import nl.technolution.core.Log;
 import nl.technolution.dashboard.EEventType;
+import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.webservice.Endpoints;
 import nl.technolution.fritzy.gen.model.WebOrder;
-import nl.technolution.fritzy.wallet.FritzyApi;
+import nl.technolution.fritzy.wallet.IFritzyApi;
+import nl.technolution.fritzy.wallet.IFritzyApiFactory;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.order.Order;
@@ -57,7 +59,6 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
 
     private static final double MAX_ORDER_SIZE_KWH = 1;
 
-    private final FritzyApi market;
     private final SunnyResourceManager resourceManager;
 
     private InflexibleForecast forecast;
@@ -66,6 +67,8 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
 
     private double myPrice;
 
+    private IFritzyApi cachedFritzyApi;
+
     /**
      *
      * @param config config used for trading
@@ -73,9 +76,14 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
      */
     public SunnyNegotiator(SunnyConfig config, SunnyResourceManager resourceManager) {
         this.resourceManager = resourceManager;
-        market = new FritzyApi(config.getMarket().getMarketUrl(), config.getEnvironment());
-        market.login(config.getMarket().getEmail(), config.getMarket().getPassword());
         marketPriceStartOffset = config.getMarketPriceStartOffset();
+    }
+
+    private IFritzyApi getMarket() {
+        if (cachedFritzyApi == null) {
+            cachedFritzyApi = Services.get(IFritzyApiFactory.class).build();
+        }
+        return cachedFritzyApi;
     }
 
     /**
@@ -84,6 +92,7 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
      */
     public void evaluate() {
         DeviceId deviceId = resourceManager.getDeviceId();
+        IFritzyApi market = getMarket();
 
         // Get balance
         FritzyBalance balance = market.balance();
@@ -151,10 +160,10 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
             // energy sold so no longer available:
             availableKWh -= getRequestedKwh(order);
         }
-        createNewOrders();
+        createNewOrders(market);
     }
 
-    private void createNewOrders() {
+    private void createNewOrders(IFritzyApi market) {
         double totalOrderKwh = availableKWh;
         while (totalOrderKwh > 0) {
             double orderSize;
@@ -236,7 +245,7 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
 
     @Override
     public void measurement(Measurement measurement) {
-        market.log(EEventType.DEVICE_STATE,
+        getMarket().log(EEventType.DEVICE_STATE,
                 "Generating power: " + measurement.getElectricityMeasurement().getPower() + "W", null);
     }
 }

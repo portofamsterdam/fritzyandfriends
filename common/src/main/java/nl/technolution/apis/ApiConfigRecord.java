@@ -33,6 +33,25 @@ public class ApiConfigRecord implements IJsonnable {
     @JsonProperty("readTimeout")
     private int readTimeout;
 
+    public ApiConfigRecord() {
+        //
+    }
+
+    /**
+     * Constructor for {@link ApiConfigRecord} objects
+     *
+     * @param name
+     * @param url
+     * @param connectTimeout
+     * @param readTimeout
+     */
+    public ApiConfigRecord(String name, String url, int connectTimeout, int readTimeout) {
+        this.name = name;
+        this.url = url;
+        this.connectTimeout = connectTimeout;
+        this.readTimeout = readTimeout;
+    }
+
     public String getName() {
         return name;
     }

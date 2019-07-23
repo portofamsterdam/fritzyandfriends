@@ -27,8 +27,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import com.google.common.collect.Maps;
-
-import org.glassfish.jersey.internal.guava.Sets;
+import com.google.common.collect.Sets;
 
 import nl.technolution.apis.netty.OrderReward;
 import nl.technolution.dropwizard.services.Services;
