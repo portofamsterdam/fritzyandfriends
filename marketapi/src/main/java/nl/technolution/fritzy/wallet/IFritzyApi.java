@@ -25,7 +25,6 @@ import nl.technolution.fritzy.gen.model.WebUser;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.order.GetOrdersResponse;
-import nl.technolution.fritzy.wallet.order.Order;
 
 /**
  * 
@@ -69,10 +68,14 @@ public interface IFritzyApi {
     String fillOrder(String orderHash);
 
     /**
-     * @param order to create
+     * @param makerToken what do you sell
+     * @param takerToken what do you buy
+     * @param makerAmount how many do you sell
+     * @param takerAmount how many
+     * @return tx Hash
      */
-    String createOrder(Order order);
-
+    String createOrder(EContractAddress makerToken, EContractAddress takerToken, BigDecimal makerAmount,
+            BigDecimal takerAmount);
 
     /**
      * @param hash
@@ -140,5 +143,6 @@ public interface IFritzyApi {
      * @return address
      */
     String getAddress();
+
 
 }

@@ -17,7 +17,8 @@
 package nl.technolution.fritzy.wallet;
 
 import java.math.BigDecimal;
-import java.util.Date;
+import java.time.ZonedDateTime;
+import java.time.format.DateTimeFormatter;
 
 import javax.ws.rs.client.Client;
 import javax.ws.rs.client.Entity;
@@ -38,6 +39,7 @@ import nl.technolution.IJsonnable;
 import nl.technolution.core.Log;
 import nl.technolution.dashboard.EEventType;
 import nl.technolution.fritzy.gen.model.WebOrder;
+import nl.technolution.fritzy.gen.model.WebTransaction;
 import nl.technolution.fritzy.gen.model.WebUser;
 import nl.technolution.fritzy.wallet.login.LoginParameters;
 import nl.technolution.fritzy.wallet.login.LoginResponse;
@@ -47,14 +49,13 @@ import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.order.CreateOrderResponse;
 import nl.technolution.fritzy.wallet.order.FillOrderResponse;
 import nl.technolution.fritzy.wallet.order.GetOrdersResponse;
-import nl.technolution.fritzy.wallet.order.Order;
-import nl.technolution.fritzy.wallet.order.TransferResponse;
 import nl.technolution.fritzy.wallet.register.RegisterParameters;
 
 /**
  * Access to acount for Fritzy
  */
 public class FritzyApi implements IFritzyApi {
+    private static final BigDecimal TOKEN_FACTOR = new BigDecimal("1000000000000000000");
     private static final Logger LOG = Log.getLogger();
     private static final String BURN_ADDRESS = "0x0000000000000000000000000000000000000000";
 
@@ -178,30 +179,33 @@ public class FritzyApi implements IFritzyApi {
         WebTarget target = client.target(url + "/me/order/" + orderHash);
         Builder request = target.request();
         request.header("Authorization", "Bearer " + accessToken);
-        FillOrderResponse webOrder = request.post(Entity.json(null), FillOrderResponse.class);
-        return webOrder.getOrder().getHash();
+        Response response = request.post(Entity.json(null));
+
+        // LOG.debug("Response: " + response.readEntity(String.class));
+
+        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
+            LOG.warn("createOrder failed(): " + response);
+        }
+        return response.readEntity(FillOrderResponse.class).getTransactionHash();
     }
 
-    /**
-     * @param order to create
-     */
     @Override
-    public String createOrder(Order order) {
+    public String createOrder(EContractAddress makerToken, EContractAddress takerToken, BigDecimal makerAmount,
+            BigDecimal takerAmount) {
         Preconditions.checkArgument(accessToken != null, "login first");
-        LOG.info("Creating order {} {} by {}", order.getMakerAmount(), order.getMakerToken(), actor);
+        LOG.info("Creating order {} {} for {} {} by {}", makerAmount, makerToken, takerAmount, takerToken, actor);
         WebTarget target = client.target(url + "/me/order");
         Builder request = target.request();
         request.header("Authorization", "Bearer " + accessToken);
         Form form = new Form();
-        form.param("makerToken", order.getMakerToken());
-        form.param("takerToken", order.getTakerToken());
-        form.param("makerAmount", order.getMakerAmount());
-        form.param("takerAmount", order.getTakerAmount());
+        form.param("makerToken", makerToken.getContractName());
+        form.param("takerToken", takerToken.getContractName());
+        form.param("makerAmount", makerAmount.multiply(TOKEN_FACTOR).toPlainString());
+        form.param("takerAmount", takerAmount.multiply(TOKEN_FACTOR).toPlainString());
         Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
         if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
             LOG.warn("createOrder failed(): " + response);
         }
-        LOG.debug("Response: " + response.readEntity(String.class));
         return response.readEntity(CreateOrderResponse.class).getOrder().getHash();
     }
 
@@ -246,13 +250,15 @@ public class FritzyApi implements IFritzyApi {
     @Override
     public void mint(String address, BigDecimal value, EContractAddress contractAddress) {
         Preconditions.checkArgument(accessToken != null, "login first");
-        LOG.info("Minting {} {} to {}", value, contractAddress, actor);
+        BigDecimal tokens = value.multiply(TOKEN_FACTOR);
+        LOG.info("Minting {} {} to {} tokens: {}", value, contractAddress, actor, tokens);
         WebTarget target = client.target(url + "/me/token/mint");
         Builder request = target.request();
         request.header("Authorization", "Bearer " + accessToken);
         Form form = new Form();
         form.param("address", address);
-        form.param("value", "" + value.multiply(BigDecimal.valueOf(1000000000000000000L)).longValue());
+
+        form.param("value", "" + tokens.toPlainString());
         form.param("contractAddress", contractAddress.getContractName());
         Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
         if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
@@ -269,7 +275,7 @@ public class FritzyApi implements IFritzyApi {
         Builder request = target.request();
         request.header("Authorization", "Bearer " + accessToken);
         Form form = new Form();
-        form.param("value", "" + value.multiply(BigDecimal.valueOf(1000000000000000000L)).longValue());
+        form.param("value", "" + value.multiply(TOKEN_FACTOR));
         form.param("contractAddress", contractAddress.getContractName());
         Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
         if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
@@ -286,14 +292,13 @@ public class FritzyApi implements IFritzyApi {
         request.header("Authorization", "Bearer " + accessToken);
         Form form = new Form();
         form.param("to", toAddress);
-        form.param("value", "" + value.multiply(BigDecimal.valueOf(1000000000000000000L)).longValue());
+        form.param("value", "" + value.multiply(TOKEN_FACTOR));
         form.param("contractAddress", contractAddress.getContractName());
         Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
         if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
             LOG.warn("transfer failed: {}", response);
         }
-        return response.readEntity(TransferResponse.class).getTranaction().getTx();
-
+        return response.readEntity(WebTransaction.class).getTx();
     }
 
     /**
@@ -317,18 +322,25 @@ public class FritzyApi implements IFritzyApi {
     @Override
     public void log(EEventType tag, String msg, IJsonnable data) {
         LOG.info("Logging event {}: {}", tag, msg != null ? msg : "");
-        String str;
+        String dataString;
         try {
-            str = data == null ? null : mapper.writeValueAsString(data);
+            dataString = data == null ? null : mapper.writeValueAsString(data);
         } catch (JsonProcessingException e) {
-            // TODO MKE: handle exception
-            throw new RuntimeException(e.getMessage(), e);
+            dataString = "<eventdata not found>";
         }
-        DashboardEvent dashboardEvent = new DashboardEvent(environment, actor, msg, tag.getTag(), new Date(), str);
-
         WebTarget target = client.target(url + "/event");
         Builder request = target.request();
-        request.post(Entity.entity(dashboardEvent, MediaType.APPLICATION_JSON));
+        Form form = new Form();
+        form.param("environment ", "test");
+        form.param("actor", actor);
+        form.param("msg ", msg);
+        form.param("tag ", tag.getTag());
+        form.param("timestamp ", ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        form.param("data", dataString);
+        Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
+            LOG.warn("log event failed: {}", response);
+        }
     }
 
     @Override

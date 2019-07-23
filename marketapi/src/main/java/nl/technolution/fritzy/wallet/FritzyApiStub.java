@@ -42,7 +42,6 @@ import nl.technolution.fritzy.gen.model.WebUser;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.order.GetOrdersResponse;
-import nl.technolution.fritzy.wallet.order.Order;
 import nl.technolution.fritzy.wallet.order.Orders;
 import nl.technolution.fritzy.wallet.order.Record;
 
@@ -150,24 +149,6 @@ public class FritzyApiStub implements IFritzyApi {
     }
 
     @Override
-    public String createOrder(Order order) {
-        List<Record> ordersList = Lists.newArrayList(Arrays.asList(orders.getRecords()));
-        WebOrder webOrder = new WebOrder();
-        String generateHash = generateHash(Instant.now().hashCode());
-        webOrder.setHash(generateHash);
-        webOrder.setMakerAddress(loginInUser.getAddress());
-        webOrder.setMakerAssetAmount(order.getMakerAmount());
-        webOrder.setMakerAssetData(order.getMakerToken());
-        webOrder.setTakerAssetAmount(order.getTakerAmount());
-        webOrder.setTakerAssetData(order.getTakerToken());
-        Record e = new Record();
-        e.setOrder(webOrder);
-        ordersList.add(e);
-        orders.setRecords(ordersList.toArray(new Record[ordersList.size()]));
-        return generateHash;
-    }
-
-    @Override
     public void cancelOrder(String hash) {
         List<Record> ordersList = Lists.newArrayList(Arrays.asList(orders.getRecords()));
         Iterator<Record> itr = ordersList.iterator();
@@ -269,5 +250,25 @@ public class FritzyApiStub implements IFritzyApi {
     @Override
     public String getAddress() {
         return loginInUser.getAddress();
+    }
+
+    @Override
+    public String createOrder(EContractAddress makerToken, EContractAddress takerToken, BigDecimal makerAmount,
+            BigDecimal takerAmount) {
+
+        List<Record> ordersList = Lists.newArrayList(Arrays.asList(orders.getRecords()));
+        WebOrder webOrder = new WebOrder();
+        String generateHash = generateHash(Instant.now().hashCode());
+        webOrder.setHash(generateHash);
+        webOrder.setMakerAddress(loginInUser.getAddress());
+        webOrder.setMakerAssetAmount(makerAmount.toPlainString());
+        webOrder.setMakerAssetData(makerToken.getContractName());
+        webOrder.setTakerAssetAmount(takerAmount.toPlainString());
+        webOrder.setTakerAssetData(takerToken.getContractName());
+        Record e = new Record();
+        e.setOrder(webOrder);
+        ordersList.add(e);
+        orders.setRecords(ordersList.toArray(new Record[ordersList.size()]));
+        return generateHash;
     }
 }

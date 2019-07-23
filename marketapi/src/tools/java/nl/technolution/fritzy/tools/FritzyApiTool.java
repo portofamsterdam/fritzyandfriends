@@ -18,19 +18,22 @@ package nl.technolution.fritzy.tools;
 
 import java.math.BigDecimal;
 import java.util.Arrays;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Uninterruptibles;
 
 import org.slf4j.Logger;
 
 import nl.technolution.Log;
+import nl.technolution.apis.exxy.ApxPrice;
+import nl.technolution.dashboard.EEventType;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.FritzyApi;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
-import nl.technolution.fritzy.wallet.order.Order;
 import nl.technolution.fritzy.wallet.order.Record;
 
 /**
@@ -52,7 +55,7 @@ public class FritzyApiTool {
         String url = "http://82.196.13.251/api";
         api = new FritzyApi(url, "FritzyApiTool");
 
-        // setMinters(ADMIN, ADMINPASS, USER1, USER2);
+        setMinters(ADMIN, ADMINPASS, Lists.newArrayList(USER1, USER2));
         resetUser(USER1, PASS);
         resetUser(USER2, PASS);
 
@@ -66,15 +69,10 @@ public class FritzyApiTool {
         BigDecimal monies = BigDecimal.valueOf(10L);
 
         // user 1 mints 10 kwh
-        api.mint(user1Address, monies, EContractAddress.KWH);
+        api.mint(user1Address, monies.add(BigDecimal.ONE), EContractAddress.KWH);
 
         // offer 10 kwh for 10 eur
-        Order order = new Order();
-        order.setMakerAmount(monies.toPlainString());
-        order.setMakerToken(EContractAddress.KWH.getContractName());
-        order.setTakerAmount(monies.toPlainString());
-        order.setTakerToken(EContractAddress.EUR.getContractName());
-        String txId = api.createOrder(order);
+        String txId = api.createOrder(EContractAddress.KWH, EContractAddress.EUR, monies, monies);
 
         // Check the created order
         Arrays.asList(api.orders().getOrders().getRecords())
@@ -90,11 +88,11 @@ public class FritzyApiTool {
         balance = api.balance();
         LOG.info("{} balance {}", USER2, balance);
         BigDecimal kwhs = balance.getEur();
-        api.mint(user1Address, monies, EContractAddress.EUR);
+        api.mint(user2Address, monies.add(BigDecimal.ONE), EContractAddress.EUR);
 
         api.fillOrder(txId);
         // sleep a bit for tranaction to complete
-        Uninterruptibles.sleepUninterruptibly(20, TimeUnit.SECONDS);
+        Uninterruptibles.sleepUninterruptibly(5, TimeUnit.SECONDS);
 
         balance = api.balance();
         LOG.info("{} balance {}", USER2, balance);
@@ -114,9 +112,13 @@ public class FritzyApiTool {
         Preconditions.checkArgument(user2eurBalanceAfterOrder.add(user1eurBalanceAfterOrder).equals(currentBalance));
         api.burn(currentBalance, EContractAddress.EUR);
 
+        api.log(EEventType.BALANCE, currentBalance.toPlainString() + " eur", null);
+        api.log(EEventType.LIMIT_ACTOR, "8A", null);
+        api.log(EEventType.CHAT, "chat text", new ApxPrice(1d));
+
     }
 
-    private static void setMinters(String adminUser, String adminpass, String... newMinter) {
+    private static void setMinters(String adminUser, String adminpass, List<String> newMinter) {
         for (String user : newMinter) {
             // Login as user to get address
             api.login(user, PASS);
