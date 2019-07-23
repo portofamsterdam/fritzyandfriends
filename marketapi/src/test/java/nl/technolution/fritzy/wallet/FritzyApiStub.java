@@ -26,6 +26,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
@@ -33,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import nl.technolution.IJsonnable;
 import nl.technolution.dashboard.EEventType;
+import nl.technolution.dropwizard.webservice.JacksonFactory;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.gen.model.WebUser;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
@@ -47,7 +50,9 @@ import nl.technolution.fritzy.wallet.order.Record;
  */
 public class FritzyApiStub implements IFritzyApi {
 
+    private static FritzyApiStub stubbedApi;
 
+    private final ObjectMapper MAPPER = JacksonFactory.defaultMapper();
     private final List<DashboardEvent> events = new ArrayList<>();
     private final List<WebUser> users = new ArrayList<>();
     private final Map<String, FritzyBalance> balances = new HashMap<>();
@@ -55,9 +60,23 @@ public class FritzyApiStub implements IFritzyApi {
 
     private WebUser loginInUser;
 
-    public FritzyApiStub() {
+    private FritzyApiStub() {
         orders = new Orders();
         orders.setRecords(new Record[0]);
+    }
+
+    /**
+     * Singleton instance of stub
+     * 
+     * @return
+     */
+    public static FritzyApiStub instance() {
+        synchronized (FritzyApiStub.class) {
+            if (stubbedApi == null) {
+                stubbedApi = new FritzyApiStub();
+            }
+        }
+        return stubbedApi;
     }
 
     @Override
@@ -136,7 +155,14 @@ public class FritzyApiStub implements IFritzyApi {
 
     @Override
     public void log(EEventType tag, String msg, IJsonnable data) {
-        events.add(new DashboardEvent("test", loginInUser.getName(), msg, tag.getTag(), new Date(), data.toString()));
+        String username = loginInUser != null ? loginInUser.getName() : "unknown";
+        String dataStr;
+        try {
+            dataStr = data != null ? MAPPER.writeValueAsString(data) : "";
+        } catch (JsonProcessingException e) {
+            dataStr = "<eventdata unparsable>";
+        }
+        events.add(new DashboardEvent("test", username, msg, tag.getTag(), new Date(), dataStr));
     }
 
     @Override

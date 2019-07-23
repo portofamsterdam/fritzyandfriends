@@ -82,7 +82,7 @@ public class SunnyConfig extends FritzyAppConfig {
         ObjectMapper mapper = JacksonFactory.defaultMapper();
         SunnyConfig c = new SunnyConfig();
         c.deviceId = "sunny";
-        c.market = new MarketConfig("http://82.196.13.251/api", "sunny@fritzy.nl", "sunny");
+        c.market = new MarketConfig(false, "http://82.196.13.251/api", "sunny@fritzy.nl", "sunny");
         c.marketPriceStartOffset = 1;
         c.useStub = false;
         c.solarEdgeMonitoringBaseURL = "https://monitoringapi.solaredge.com/site/529405";

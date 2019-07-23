@@ -88,11 +88,16 @@ public class FritzyApi implements IFritzyApi {
         LoginParameters loginParameters = new LoginParameters();
         loginParameters.setEmail(user);
         loginParameters.setPassword(password);
-        LoginResponse response = request.post(Entity.entity(loginParameters, MediaType.APPLICATION_JSON),
-                LoginResponse.class);
-        this.address = response.getUser().getAddress();
-        this.actor = response.getUser().getName();
-        this.accessToken = response.getAccessToken();
+        Response response = request.post(Entity.entity(loginParameters, MediaType.APPLICATION_JSON));
+        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
+            LOG.error("login failed: {}", response);
+            throw new IllegalStateException("Unable to login as " + user);
+        }
+        LoginResponse login = response.readEntity(LoginResponse.class);
+        this.address = login.getUser().getAddress();
+        this.actor = login.getUser().getName();
+        this.accessToken = login.getAccessToken();
+
     }
 
     /**

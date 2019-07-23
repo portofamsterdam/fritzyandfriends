@@ -27,5 +27,4 @@ public interface IFritzyApiFactory extends IService<FritzyAppConfig> {
      * build api
      */
     IFritzyApi build();
-
 }

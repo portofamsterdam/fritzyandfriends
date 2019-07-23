@@ -14,6 +14,7 @@
     } ]
   },
   "market" : {
+    "useStub" : false,
     "marketUrl" : "http://82.196.13.251/api",
     "email" : "sunny@fritzy.nl",
     "password" : "sunny"
