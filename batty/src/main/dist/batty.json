@@ -1,27 +1,33 @@
 {
-    "deviceId": "batty",
-    "host": "https://172.30.133.212/assets/inc/server.inc.php",
-    "username": "batty",
-    "password": "batty",
-    "truststore":"src/main/dist/truststore.jks",
-    "truststorepass":"12345678",
-    "buyMargin": 2,
-    "sellMargin" : 2,
-    "useStub": true,
-    "market": {
-        "marketUrl": "https://localhost"   
-    },
-    "apiConfig" : {
+  "environment" : "production",
+  
+  "deviceId" : "batty",
+  "host" : "192.168.8.241",
+  "username" : "batty",
+  "password" : "batty",
+  "truststore" : "src/main/dist/truststore.jks",
+  "truststorepass" : "12345678",
+  "buyMargin" : 2,
+  "sellMargin" : 2,
+  "useStub" : false,
+  
+  "apiConfig" : {
     "apis" : [ {
       "name" : "netty",
-      "url" : "http://localhost:8083/",
+      "url" : "http://netty:8080/",
       "connectTimeout" : 5000,
       "readTimeout" : 5000
     }, {
       "name" : "exxy",
-      "url" : "http://localhost:8085/",
+      "url" : "http://exxy:8080/",
       "connectTimeout" : 5000,
       "readTimeout" : 5000
     } ]
+  },
+  "market" : {
+    "useStub" : false,
+    "marketUrl" : "http://82.196.13.251/api",
+    "email" : "batty@fritzy.nl",
+    "password" : "batty"
   }
 }

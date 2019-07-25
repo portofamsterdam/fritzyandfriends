@@ -162,9 +162,8 @@ public class ExxyConfig extends FritzyAppConfig {
         c.setMarket(market);
 
         ApiConfig apiConfig = new ApiConfig();
-        ApiConfigRecord netty = new ApiConfigRecord(EApiNames.NETTY.getName(), "http://localhost:8083/", 5000, 5000);
-        ApiConfigRecord exxy = new ApiConfigRecord(EApiNames.EXXY.getName(), "http://localhost:8085/", 5000, 5000);
-        apiConfig.setApis(Lists.newArrayList(netty, exxy));
+        ApiConfigRecord netty = new ApiConfigRecord(EApiNames.NETTY.getName(), "http://netty:8080/", 5000, 5000);
+        apiConfig.setApis(Lists.newArrayList(netty));
         c.setApiConfig(apiConfig);
 
         mapper.writerWithDefaultPrettyPrinter().writeValue(System.out, c);

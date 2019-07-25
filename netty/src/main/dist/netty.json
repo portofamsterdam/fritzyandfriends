@@ -3,7 +3,7 @@
   "apiConfig" : {
     "apis" : [ {
       "name" : "exxy",
-      "url" : "http://localhost:8085/",
+      "url" : "http://exxy:8080/",
       "connectTimeout" : 5000,
       "readTimeout" : 5000
     } ]

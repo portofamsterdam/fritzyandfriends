@@ -91,8 +91,8 @@ public class SunnyConfig extends FritzyAppConfig {
         c.solarEdgeModbusPort = 502;
         c.solarEdgeModbusDeviceId = 2;
         ApiConfig apiConfig = new ApiConfig();
-        ApiConfigRecord netty = new ApiConfigRecord(EApiNames.NETTY.getName(), "http://localhost:8083/", 5000, 5000);
-        ApiConfigRecord exxy = new ApiConfigRecord(EApiNames.EXXY.getName(), "http://localhost:8085/", 5000, 5000);
+        ApiConfigRecord netty = new ApiConfigRecord(EApiNames.NETTY.getName(), "http://netty:8080/", 5000, 5000);
+        ApiConfigRecord exxy = new ApiConfigRecord(EApiNames.EXXY.getName(), "http://exxy:8080/", 5000, 5000);
         apiConfig.setApis(Lists.newArrayList(netty, exxy));
         c.setApiConfig(apiConfig);
         c.setEnvironment("production");

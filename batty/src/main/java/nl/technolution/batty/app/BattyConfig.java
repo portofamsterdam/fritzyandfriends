@@ -16,9 +16,20 @@
  */
 package nl.technolution.batty.app;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import java.io.IOException;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.collect.Lists;
+
+import nl.technolution.apis.ApiConfig;
+import nl.technolution.apis.ApiConfigRecord;
+import nl.technolution.apis.EApiNames;
 import nl.technolution.dropwizard.FritzyAppConfig;
+import nl.technolution.dropwizard.MarketConfig;
+import nl.technolution.dropwizard.webservice.JacksonFactory;
 
 /**
  * Configuration for Fritzy
@@ -56,6 +67,42 @@ public class BattyConfig extends FritzyAppConfig {
 
     @JsonProperty("useStub")
     private boolean useStub;
+
+    /**
+     * Generate exxy config
+     * 
+     * @param args none
+     * @throws IOException
+     * @throws JsonMappingException
+     * @throws JsonGenerationException
+     */
+    public static void main(String[] args) throws JsonGenerationException, JsonMappingException, IOException {
+
+        ObjectMapper mapper = JacksonFactory.defaultMapper();
+        BattyConfig c = new BattyConfig();
+        c.deviceId = "batty";
+        c.setEnvironment("production");
+
+        c.host = "192.168.8.241";
+        c.username = "batty";
+        c.password = "batty";
+        c.truststore = "src/main/dist/truststore.jks";
+        c.truststorepass = "12345678";
+        c.buyMargin = 2;
+        c.sellMargin = 2;
+        c.useStub = false;
+
+        MarketConfig market = new MarketConfig(false, "http://82.196.13.251/api", "batty@fritzy.nl", "batty");
+        c.setMarket(market);
+
+        ApiConfig apiConfig = new ApiConfig();
+        ApiConfigRecord netty = new ApiConfigRecord(EApiNames.NETTY.getName(), "http://netty:8080/", 5000, 5000);
+        ApiConfigRecord exxy = new ApiConfigRecord(EApiNames.EXXY.getName(), "http://exxy:8080/", 5000, 5000);
+        apiConfig.setApis(Lists.newArrayList(netty, exxy));
+        c.setApiConfig(apiConfig);
+
+        mapper.writerWithDefaultPrettyPrinter().writeValue(System.out, c);
+    }
 
     public String getDeviceId() {
         return deviceId;

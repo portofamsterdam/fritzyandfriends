@@ -1,14 +1,36 @@
 {
-    "deviceId": "fritzy",
-    "host": "172.16.192.17",
-    "port": 80,
-    "serialPort": "/dev/ttyS3",
-    "stubTemparature": true,
-    "stubRelay": true,
-    "market": { "marketUrl": "https://localhost:8080/test" },
-    "minTemp": 2,
-    "maxTemp": 7,
-    "power": 100
-    "leakageRate" : 0.000278
-    "coolingSpeed" : 0.002222
+  "environment" : "production",
+  "deviceId" : "fritzy",
+  "host" : "10.0.0.201",
+  "port" : 80,
+  "serialPort" : "/dev/ttyUSB0",
+  "stubTemparature" : false,
+  "stubRelay" : false,
+  "minTemp" : 2.0,
+  "maxTemp" : 2.0,
+  "maxMargin" : 0,
+  "power" : 100.0,
+  "leakageRate" : 2.78E-4,
+  "coolingSpeed" : 0.002222,
+  
+  "apiConfig" : {
+    "apis" : [ {
+      "name" : "netty",
+      "url" : "http://netty:8080/",
+      "connectTimeout" : 5000,
+      "readTimeout" : 5000
+    }, {
+      "name" : "exxy",
+      "url" : "http://exxy:8080/",
+      "connectTimeout" : 5000,
+      "readTimeout" : 5000
+    } ]
+  },
+  
+  "market" : {
+    "useStub" : false,
+    "marketUrl" : "http://82.196.13.251/api",
+    "email" : "batty@fritzy.nl",
+    "password" : "batty"
+  }
 }

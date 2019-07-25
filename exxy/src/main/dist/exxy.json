@@ -40,12 +40,7 @@
   "apiConfig" : {
     "apis" : [ {
       "name" : "netty",
-      "url" : "http://localhost:8083/",
-      "connectTimeout" : 5000,
-      "readTimeout" : 5000
-    }, {
-      "name" : "exxy",
-      "url" : "http://localhost:8085/",
+      "url" : "http://netty:8080/",
       "connectTimeout" : 5000,
       "readTimeout" : 5000
     } ]

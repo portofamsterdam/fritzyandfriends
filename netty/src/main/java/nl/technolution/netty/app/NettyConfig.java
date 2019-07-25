@@ -87,7 +87,7 @@ public class NettyConfig extends FritzyAppConfig {
         c.setMarket(market);
 
         ApiConfig apiConfig = new ApiConfig();
-        ApiConfigRecord exxy = new ApiConfigRecord(EApiNames.EXXY.getName(), "http://localhost:8085/", 5000, 5000);
+        ApiConfigRecord exxy = new ApiConfigRecord(EApiNames.EXXY.getName(), "http://exxy:8080/", 5000, 5000);
         apiConfig.setApis(Lists.newArrayList(exxy));
         c.setApiConfig(apiConfig);
 
