@@ -17,7 +17,8 @@ before_script:
  
 stages:
   - build
-  - create_images
+  - build_docker
+  - push_images
   - quality
 
 build_fritzy:
@@ -107,9 +108,9 @@ create_openapi_docs:
   only:
     - /^release\/.*$/
 
-create_images:
+build_docker:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
-  stage: create_images
+  stage: build_docker
   script:
     - cd gradle
     - gradle copyArtifactsToDocker
@@ -123,7 +124,7 @@ create_images:
 push_images:
   # Use an image which has docker, for now use EDSN one.
   image: docker-proxy.intranet.technolution.nl/edsn/edsn_docker_aws:latest
-  stage: create_images
+  stage: push_images
   script: 
     - docker login -u fritzy2 -p 1upTNLP04
     - cd docker/build/fritzy
@@ -142,7 +143,7 @@ push_images:
     - docker build -t fritzy2/fritzy:exxy .
     - docker push fritzy2/fritzy:exxy
   dependencies:
-    - create_images
+    - build_docker
   only:
     - /^release\/.*$/
    
