@@ -108,14 +108,25 @@ create_openapi_docs:
     - /^release\/.*$/
 
 create_images:
-  # Use an image which has docker, for now use EDSN one.
-  image: docker-proxy.intranet.technolution.nl/edsn/edsn_docker_aws:latest
+  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
   stage: create_images
   script:
     - cd gradle
     - gradle copyArtifactsToDocker
+  cache:
+    key: "$CI_COMMIT_REF_NAME"
+    paths:
+      - docker/build/
+  only:
+    - /^release\/.*$/
+
+push_images:
+  # Use an image which has docker, for now use EDSN one.
+  image: docker-proxy.intranet.technolution.nl/edsn/edsn_docker_aws:latest
+  stage: create_images
+  script: 
     - docker login -u fritzy2 -p 1upTNLP04
-    - cd ../docker/build/fritzy
+    - cd docker/build/fritzy
     - docker build -t fritzy2/fritzy:fritzy .
     - docker push fritzy2/fritzy:fritzy
     - cd ../batty
@@ -132,7 +143,7 @@ create_images:
     - docker push fritzy2/fritzy:exxy
   only:
     - /^release\/.*$/
-
+   
 sonar_quality_check:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
   stage: quality
