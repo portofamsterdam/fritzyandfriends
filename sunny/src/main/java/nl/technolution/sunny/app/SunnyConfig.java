@@ -39,9 +39,6 @@ public class SunnyConfig extends FritzyAppConfig {
     @JsonProperty("deviceId")
     private String deviceId;
 
-    @JsonProperty("market")
-    private MarketConfig market;
-
     @JsonProperty("marketPriceStartOffset")
     private double marketPriceStartOffset;
 
@@ -82,7 +79,8 @@ public class SunnyConfig extends FritzyAppConfig {
         ObjectMapper mapper = JacksonFactory.defaultMapper();
         SunnyConfig c = new SunnyConfig();
         c.deviceId = "sunny";
-        c.market = new MarketConfig(false, "http://82.196.13.251/api", "sunny@fritzy.nl", "sunny");
+        MarketConfig market = new MarketConfig(false, "http://82.196.13.251/api", "sunny@fritzy.nl", "sunny");
+        c.setMarket(market);
         c.marketPriceStartOffset = 1;
         c.useStub = false;
         c.solarEdgeMonitoringBaseURL = "https://monitoringapi.solaredge.com/site/529405";
@@ -93,8 +91,8 @@ public class SunnyConfig extends FritzyAppConfig {
         c.solarEdgeModbusPort = 502;
         c.solarEdgeModbusDeviceId = 2;
         ApiConfig apiConfig = new ApiConfig();
-        ApiConfigRecord netty = new ApiConfigRecord(EApiNames.NETTY.getName(), "http://localhost:8083/", 5000, 5000);
-        ApiConfigRecord exxy = new ApiConfigRecord(EApiNames.EXXY.getName(), "http://localhost:8085/", 5000, 5000);
+        ApiConfigRecord netty = new ApiConfigRecord(EApiNames.NETTY.getName(), "http://netty:8080/", 5000, 5000);
+        ApiConfigRecord exxy = new ApiConfigRecord(EApiNames.EXXY.getName(), "http://exxy:8080/", 5000, 5000);
         apiConfig.setApis(Lists.newArrayList(netty, exxy));
         c.setApiConfig(apiConfig);
         c.setEnvironment("production");
@@ -107,14 +105,6 @@ public class SunnyConfig extends FritzyAppConfig {
 
     public void setDeviceId(String deviceId) {
         this.deviceId = deviceId;
-    }
-
-    public MarketConfig getMarket() {
-        return market;
-    }
-
-    public void setMarket(MarketConfig market) {
-        this.market = market;
     }
 
     public double getMarketPriceStartOffset() {

@@ -36,7 +36,6 @@ import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
-import nl.technolution.fritzy.wallet.order.Order;
 import nl.technolution.fritzy.wallet.order.Orders;
 import nl.technolution.fritzy.wallet.order.Record;
 import nl.technolution.marketnegotiator.AbstractCustomerEnergyManager;
@@ -173,13 +172,11 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
                 orderSize = totalOrderKwh;
             }
 
-            Order order = new Order();
-            order.setMakerToken("kWh");
-            order.setMakerAmount(Double.toString(orderSize));
-            order.setTakerToken("EUR");
-            order.setTakerAmount(Double.toString(myPrice));
-            market.createOrder(order);
-            market.log(EEventType.ORDER_OFFER, order.toString(), null);
+            market.createOrder(EContractAddress.KWH, EContractAddress.EUR, BigDecimal.valueOf(orderSize),
+                    BigDecimal.valueOf(myPrice));
+            String orderDescription = String.format("%f %s for %f %s", orderSize, EContractAddress.KWH, myPrice,
+                    EContractAddress.EUR);
+            market.log(EEventType.ORDER_OFFER, orderDescription, null);
 
             totalOrderKwh -= orderSize;
         }

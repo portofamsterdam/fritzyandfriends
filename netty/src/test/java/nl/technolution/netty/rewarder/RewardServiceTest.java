@@ -35,7 +35,6 @@ import nl.technolution.fritzy.wallet.FritzyApiFactory;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
-import nl.technolution.fritzy.wallet.order.Order;
 import nl.technolution.netty.app.NettyConfig;
 
 /**
@@ -97,12 +96,8 @@ public class RewardServiceTest {
 
         // Create an order as user b
         api.login(USERB, "");
-        Order order = new Order();
-        order.setMakerAmount("5");
-        order.setMakerToken(EContractAddress.KWH.name());
-        order.setTakerAmount("1");
-        order.setTakerToken(EContractAddress.EUR.name());
-        String orderHash = api.createOrder(order);
+        String orderHash = api.createOrder(EContractAddress.KWH, EContractAddress.EUR, new BigDecimal(5),
+                new BigDecimal(1));
 
         api.login(NETTY, "");
         reward = s.calculateReward(userA.getAddress(), orderHash);

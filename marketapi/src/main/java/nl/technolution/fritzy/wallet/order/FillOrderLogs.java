@@ -16,46 +16,39 @@
  */
 package nl.technolution.fritzy.wallet.order;
 
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * 
  */
-public class Order {
+public class FillOrderLogs {
 
-    private String makerToken;
-    private String takerToken;
-    private String makerAmount;
-    private String takerAmount;
+    @JsonProperty("logIndex")
+    private int logIndex;
 
-    public String getMakerToken() {
-        return makerToken;
-    }
+    @JsonProperty("transactionIndex")
+    private int transactionIndex;
 
-    public void setMakerToken(String makerToken) {
-        this.makerToken = makerToken;
-    }
+    @JsonProperty("transactionHash")
+    private String transactionHash;
 
-    public String getTakerToken() {
-        return takerToken;
-    }
+    @JsonProperty("blockHash")
+    private String blockHash;
 
-    public void setTakerToken(String takerToken) {
-        this.takerToken = takerToken;
-    }
+    @JsonProperty("blockNumber")
+    private long blockNumber;
 
-    public String getMakerAmount() {
-        return makerAmount;
-    }
+    @JsonProperty("address")
+    private String address;
 
-    public void setMakerAmount(String makerAmount) {
-        this.makerAmount = makerAmount;
-    }
+    @JsonProperty("data")
+    private String data;
 
-    public String getTakerAmount() {
-        return takerAmount;
-    }
+    @JsonProperty("topics")
+    private List<String> topics;
 
-    public void setTakerAmount(String takerAmount) {
-        this.takerAmount = takerAmount;
-    }
-
+    @JsonProperty("type")
+    private String type;
 }

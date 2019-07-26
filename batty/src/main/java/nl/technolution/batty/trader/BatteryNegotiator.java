@@ -21,9 +21,11 @@ import nl.technolution.apis.netty.DeviceCapacity;
 import nl.technolution.apis.netty.INettyApi;
 import nl.technolution.apis.netty.OrderReward;
 import nl.technolution.dashboard.EEventType;
+import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.webservice.Endpoints;
 import nl.technolution.fritzy.gen.model.WebOrder;
-import nl.technolution.fritzy.wallet.FritzyApi;
+import nl.technolution.fritzy.wallet.IFritzyApi;
+import nl.technolution.fritzy.wallet.IFritzyApiFactory;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.order.Orders;
 import nl.technolution.fritzy.wallet.order.Record;
@@ -43,7 +45,6 @@ import nl.technolution.protocols.efi.util.Efi;
 public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegistration, StorageUpdate> {
 
     private final BattyResourceManager resourceManager;
-    private final FritzyApi market;
 
     private Double fillLevel;
 
@@ -52,9 +53,8 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
      * @param config config used for trading
      * @param resourceManager to control devices
      */
-    public BatteryNegotiator(FritzyApi market, BattyResourceManager resourceManager) {
+    public BatteryNegotiator(BattyResourceManager resourceManager) {
         this.resourceManager = resourceManager;
-        this.market = market;
     }
 
     @Override
@@ -72,6 +72,7 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
     public void evaluate() {
 
         // Get balance
+        IFritzyApi market = Services.get(IFritzyApiFactory.class).build();
         FritzyBalance balance = market.balance();
         market.log(EEventType.BALANCE, balance.getEur().toPlainString(), null);
 
