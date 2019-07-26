@@ -123,13 +123,13 @@ public class FritzyApiStub implements IFritzyApi {
 
         BigDecimal takerGet = new BigDecimal(order.getTakerAssetAmount()).multiply(BigDecimal.valueOf(-1L));
         BigDecimal takerGive = new BigDecimal(order.getMakerAssetAmount());
-        incr(EContractAddress.valueOf(order.getTakerAssetData()), takerGet, order.getTakerAddress());
-        incr(EContractAddress.valueOf(order.getMakerAssetData()), takerGive, order.getTakerAddress());
+        incr(EContractAddress.valueOf(order.getTakerAssetData().toUpperCase()), takerGet, order.getTakerAddress());
+        incr(EContractAddress.valueOf(order.getMakerAssetData().toUpperCase()), takerGive, order.getTakerAddress());
 
         BigDecimal makerGet = new BigDecimal(order.getMakerAssetAmount()).multiply(BigDecimal.valueOf(-1L));
         BigDecimal makerGive = new BigDecimal(order.getTakerAssetAmount());
-        incr(EContractAddress.valueOf(order.getMakerAssetData()), makerGet, order.getMakerAddress());
-        incr(EContractAddress.valueOf(order.getTakerAssetData()), makerGive, order.getMakerAddress());
+        incr(EContractAddress.valueOf(order.getMakerAssetData().toUpperCase()), makerGet, order.getMakerAddress());
+        incr(EContractAddress.valueOf(order.getTakerAssetData().toUpperCase()), makerGive, order.getMakerAddress());
 
         return generateHash(Objects.hash(orderHash));
     }
