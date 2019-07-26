@@ -340,6 +340,13 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "contractAddress",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": "Specify which token to use (etiher the contract address eg 0x0000000000000000000000000000000000000000 or a symbol). The token symbols 'kwh' and 'eur' are automatically resolved to the token contract addresses"
           }
         ],
         "produces": [
@@ -384,6 +391,47 @@
             "in": "formData",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "contractAddress",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": "Specify which token to use (etiher the contract address eg 0x0000000000000000000000000000000000000000 or a symbol). The token symbols 'kwh' and 'eur' are automatically resolved to the token contract addresses"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns Ethereum transaction details",
+            "schema": {
+              "$ref": "#/definitions/Transaction"
+            }
+          }
+        }
+      }
+    },
+    "/me/token/burn": {
+      "post": {
+        "tags": [
+          "Authenticated"
+        ],
+        "description": "Burn a token from an authenticated user",
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "value",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "contractAddress",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": "Specify which token to use (etiher the contract address eg 0x0000000000000000000000000000000000000000 or a symbol). The token symbols 'kwh' and 'eur' are automatically resolved to the token contract addresses"
           }
         ],
         "responses": {
@@ -489,6 +537,13 @@
             "in": "formData",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "contractAddress",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": "Specify which token to use (etiher the contract address eg 0x0000000000000000000000000000000000000000 or a symbol). The token symbols 'kwh' and 'eur' are automatically resolved to the token contract addresses"
           }
         ],
         "responses": {
@@ -522,6 +577,13 @@
             "in": "formData",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "contractAddress",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": "Specify which token to use (etiher the contract address eg 0x0000000000000000000000000000000000000000 or a symbol). The token symbols 'kwh' and 'eur' are automatically resolved to the token contract addresses"
           },
           {
             "name": "signer",
@@ -561,6 +623,13 @@
             "in": "formData",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "contractAddress",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": "Specify which token to use (etiher the contract address eg 0x0000000000000000000000000000000000000000 or a symbol). The token symbols 'kwh' and 'eur' are automatically resolved to the token contract addresses"
           }
         ],
         "responses": {
@@ -594,6 +663,13 @@
             "in": "formData",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "contractAddress",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": "Specify which token to use (etiher the contract address eg 0x0000000000000000000000000000000000000000 or a symbol). The token symbols 'kwh' and 'eur' are automatically resolved to the token contract addresses"
           },
           {
             "name": "signer",
@@ -633,6 +709,13 @@
             "in": "formData",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "contractAddress",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": "Specify which token to use (etiher the contract address eg 0x0000000000000000000000000000000000000000 or a symbol). The token symbols 'kwh' and 'eur' are automatically resolved to the token contract addresses"
           }
         ],
         "responses": {
@@ -666,6 +749,13 @@
             "in": "formData",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "contractAddress",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": "Specify which token to use (etiher the contract address eg 0x0000000000000000000000000000000000000000 or a symbol). The token symbols 'kwh' and 'eur' are automatically resolved to the token contract addresses"
           },
           {
             "name": "signer",
@@ -705,6 +795,13 @@
             "in": "formData",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "contractAddress",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": "Specify which token to use (etiher the contract address eg 0x0000000000000000000000000000000000000000 or a symbol). The token symbols 'kwh' and 'eur' are automatically resolved to the token contract addresses"
           }
         ],
         "responses": {
@@ -740,6 +837,13 @@
             "type": "string"
           },
           {
+            "name": "contractAddress",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": "Specify which token to use (etiher the contract address eg 0x0000000000000000000000000000000000000000 or a symbol). The token symbols 'kwh' and 'eur' are automatically resolved to the token contract addresses"
+          },
+          {
             "name": "signer",
             "in": "formData",
             "required": true,
@@ -768,6 +872,13 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "contractAddress",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": "Specify which token to use (etiher the contract address eg 0x0000000000000000000000000000000000000000 or a symbol). The token symbols 'kwh' and 'eur' are automatically resolved to the token contract addresses"
           }
         ],
         "produces": [
@@ -806,6 +917,13 @@
             "in": "path",
             "required": true,
             "type": "string"
+          },
+          {
+            "name": "contractAddress",
+            "in": "formData",
+            "required": true,
+            "type": "string",
+            "description": "Specify which token to use (etiher the contract address eg 0x0000000000000000000000000000000000000000 or a symbol). The token symbols 'kwh' and 'eur' are automatically resolved to the token contract addresses"
           }
         ],
         "produces": [
@@ -923,6 +1041,26 @@
             }
           }
         }
+      },
+      "get": {
+        "tags": [
+          "Escrow"
+        ],
+        "description": "Get escrows of logged in user",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns escrows array",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Escrow"
+              }
+            }
+          }
+        }
       }
     },
     "/token/escrow": {
@@ -936,31 +1074,15 @@
         ],
         "parameters": [
           {
-            "name": "from",
+            "name": "transactionIndex",
+            "description": "The index of the escrow in the contract",
             "in": "formData",
             "required": true,
             "type": "string"
           },
           {
-            "name": "to",
-            "in": "formData",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "approver",
-            "in": "formData",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "value",
-            "in": "formData",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "signedMsg",
+            "name": "msg",
+            "description": "The message to verify signatures against",
             "in": "formData",
             "required": true,
             "type": "string"
@@ -971,6 +1093,89 @@
             "description": "Returns Ethereum transaction details",
             "schema": {
               "$ref": "#/definitions/Transaction"
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Escrow"
+        ],
+        "description": "Get all escrows",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns escrows array",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Escrow"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/token/escrow/{address}": {
+      "get": {
+        "tags": [
+          "Escrow"
+        ],
+        "description": "Get escrows for a specific address",
+        "produces": [
+          "application/json"
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns escrows array",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/Escrow"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/token/event": {
+      "get": {
+        "tags": [
+          "Event"
+        ],
+        "description": "Get token & blockchain related events",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "description": "The start time for the data in RFC 2822 Date time. For instance: 2010-06-09T15:20:00-07:00. Details: https://momentjs.com/docs/#/parsing/string/",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "to",
+            "description": "The end time for the data in in RFC 2822 Date time. For instance: 2010-06-09T15:20:00-07:00. Details: https://momentjs.com/docs/#/parsing/string/",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns an array of blockchain events",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/BlockchainEvent"
+              }
             }
           }
         }
@@ -993,6 +1198,113 @@
             "type": "string"
           }
         ]
+      }
+    },
+    "/event": {
+      "post": {
+        "tags": [
+          "Event"
+        ],
+        "description": "Create an event message",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "environment",
+            "description": "The environment for this event",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "actor",
+            "description": "The name of the actor",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "msg",
+            "description": "The message of the event",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "tag",
+            "description": "A tag to filter by",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "timestamp",
+            "description": "RFC 2822 Date time. For instance: 2010-06-09T15:20:00-07:00. Details: https://momentjs.com/docs/#/parsing/string/",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "data",
+            "description": "Json encoded extra data",
+            "in": "formData",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns an event",
+            "schema": {
+              "$ref": "#/definitions/SimEvent"
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Event"
+        ],
+        "description": "Get simulation events",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "produces": [
+          "application/json"
+        ],
+        "parameters": [
+          {
+            "name": "from",
+            "description": "The start time for the data in RFC 2822 Date time. For instance: 2010-06-09T15:20:00-07:00. Details: https://momentjs.com/docs/#/parsing/string/",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "to",
+            "description": "The end time for the data in in RFC 2822 Date time. For instance: 2010-06-09T15:20:00-07:00. Details: https://momentjs.com/docs/#/parsing/string/",
+            "in": "query",
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Returns an array of events",
+            "schema": {
+              "type": "array",
+              "items": {
+                "$ref": "#/definitions/SimEvent"
+              }
+            }
+          }
+        }
       }
     }
   },
@@ -1029,7 +1341,7 @@
         }
       }
     },
-    "Event": {
+    "BlockchainEvent": {
       "type": "object",
       "properties": {
         "tx": {
@@ -1037,6 +1349,26 @@
         },
         "logs": {
           "type": "object"
+        }
+      }
+    },
+    "SimEvent": {
+      "type": "object",
+      "properties": {
+        "environment": {
+          "type": "string"
+        },
+        "actor": {
+          "type": "string"
+        },
+        "msg": {
+          "type": "string"
+        },
+        "tag": {
+          "type": "string"
+        },
+        "timestamp": {
+          "type": "string"
         }
       }
     },
@@ -1067,6 +1399,9 @@
       "properties": {
         "signature": {
           "type": "string"
+        },
+        "metaData": {
+          "type": "object"
         },
         "senderAddress": {
           "type": "string"
@@ -1108,6 +1443,38 @@
           "type": "string"
         },
         "hash": {
+          "type": "string"
+        }
+      }
+    },
+    "Escrow": {
+      "type": "object",
+      "properties": {
+        "transactionIndex": {
+          "type": "string"
+        },
+        "contract": {
+          "type": "string"
+        },
+        "from": {
+          "type": "string"
+        },
+        "to": {
+          "type": "string"
+        },
+        "approver": {
+          "type": "string"
+        },
+        "needsSignature": {
+          "type": "string"
+        },
+        "signature": {
+          "type": "string"
+        },
+        "amount": {
+          "type": "string"
+        },
+        "status": {
           "type": "string"
         }
       }

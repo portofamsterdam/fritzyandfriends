@@ -13,10 +13,10 @@
 package nl.technolution.fritzy.gen.model;
 
 import java.util.Objects;
+
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonCreator;
+
 import io.swagger.v3.oas.annotations.media.Schema;
-import javax.validation.constraints.*;
 
 /**
  * WebOrder
@@ -24,6 +24,9 @@ import javax.validation.constraints.*;
 public class WebOrder   {
   @JsonProperty("signature")
   private String signature = null;
+
+  @JsonProperty("metaData")
+  private Object metaData = null;
 
   @JsonProperty("senderAddress")
   private String senderAddress = null;
@@ -84,6 +87,25 @@ public class WebOrder   {
 
   public void setSignature(String signature) {
     this.signature = signature;
+  }
+
+  public WebOrder metaData(Object metaData) {
+    this.metaData = metaData;
+    return this;
+  }
+
+  /**
+   * Get metaData
+   * @return metaData
+   **/
+  @JsonProperty("metaData")
+  @Schema(description = "")
+  public Object getMetaData() {
+    return metaData;
+  }
+
+  public void setMetaData(Object metaData) {
+    this.metaData = metaData;
   }
 
   public WebOrder senderAddress(String senderAddress) {
@@ -363,6 +385,7 @@ public class WebOrder   {
     }
     WebOrder order = (WebOrder) o;
     return Objects.equals(this.signature, order.signature) &&
+        Objects.equals(this.metaData, order.metaData) &&
         Objects.equals(this.senderAddress, order.senderAddress) &&
         Objects.equals(this.makerAddress, order.makerAddress) &&
         Objects.equals(this.takerAddress, order.takerAddress) &&
@@ -381,7 +404,7 @@ public class WebOrder   {
 
   @Override
   public int hashCode() {
-    return Objects.hash(signature, senderAddress, makerAddress, takerAddress, makerFee, takerFee, makerAssetAmount, takerAssetAmount, makerAssetData, takerAssetData, salt, exchangeAddress, feeRecipientAddress, expirationTimeSeconds, hash);
+    return Objects.hash(signature, metaData, senderAddress, makerAddress, takerAddress, makerFee, takerFee, makerAssetAmount, takerAssetAmount, makerAssetData, takerAssetData, salt, exchangeAddress, feeRecipientAddress, expirationTimeSeconds, hash);
   }
 
 
@@ -391,6 +414,7 @@ public class WebOrder   {
     sb.append("class WebOrder {\n");
     
     sb.append("    signature: ").append(toIndentedString(signature)).append("\n");
+    sb.append("    metaData: ").append(toIndentedString(metaData)).append("\n");
     sb.append("    senderAddress: ").append(toIndentedString(senderAddress)).append("\n");
     sb.append("    makerAddress: ").append(toIndentedString(makerAddress)).append("\n");
     sb.append("    takerAddress: ").append(toIndentedString(takerAddress)).append("\n");

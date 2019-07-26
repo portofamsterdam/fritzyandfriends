@@ -37,9 +37,6 @@ buildscript {
 
 // Configuration for all subprojects.
 subprojects {       
-    apply plugin: 'java'
-    apply plugin: 'io.swagger.core.v3.swagger-gradle-plugin'
-    apply plugin: 'com.github.johnrengelman.shadow'
      
     plugins.withType(JavaPlugin) {
     
@@ -50,47 +47,59 @@ subprojects {
 			// Force UTF-8 as the default character encoding (instead of the platform default, which may be CP1252 in Windows)
 			options.encoding = 'UTF-8'
 		}
+		// Standard libraries added to all projects
+        dependencies {
+            testCompile libraries.test_junit
+        }
     }
     
     plugins.withType(ApplicationPlugin) {
-        resolve {
-            outputFileName = project.name
-            outputFormat = 'JSONANDYAML'
-            prettyPrint = 'true'
-            classpath = sourceSets.main.runtimeClasspath
-            resourcePackages = ['nl.technolution']
-            outputPath = new java.io.File(project.buildDir, "/api")
-        }
-        task copyApiDocs(type: Copy) {
-            from(new java.io.File(project.buildDir, "/api")) {
-                include '*'
-            }
-            into new java.io.File(project(":docker").buildDir, "/api/" + project.name)
-        }
-        copyApiDocs.dependsOn resolve
-        
-        def jarName = project.name + '-app'   
-        shadowJar {
-            baseName = "${jarName}"
-            classifier = null
-            version = null
-            mergeServiceFiles()
-        }
-        task copyArtifactsToDocker(type: Copy) {
-            from (new java.io.File(project.buildDir, "/libs")) {
-                include "${jarName}.jar"
-            }
-            from ('src/main/dist/') {
-                include '*'
-            }
-            into new java.io.File(project(":docker").buildDir, "/" + project.name)
-        }
-        copyArtifactsToDocker.dependsOn shadowJar
-    }
-    
-    // Standard libraries added to all projects
-    dependencies {
-        testCompile libraries.test_junit
+        shadowJarForDockerTask(it.project,  project.name + '-app')
+        swaggerApiGenTask(it.project, sourceSets.main.runtimeClasspath)
     }
 }
+
+def shadowJarForDockerTask(aProject, jarName) {
+    aProject.apply(plugin: 'com.github.johnrengelman.shadow')
+    
+    aProject.shadowJar {
+        baseName = "${jarName}"
+        classifier = null
+        version = null
+        mergeServiceFiles()
+    }
+    
+    aProject.tasks.create(name: 'copyArtifactsToDocker', type: Copy) {
+        dependsOn('shadowJar')
+        from (new java.io.File(aProject.buildDir, "/libs")) {
+            include "${jarName}.jar"
+        }
+        from ('src/main/dist/') {
+            include '*'
+        }
+        into new java.io.File(project(":docker").buildDir, "/" + aProject.name)
+    }
+}
+
+def swaggerApiGenTask(aProject, runtimeClasspath) {
+    aProject.apply(plugin: 'io.swagger.core.v3.swagger-gradle-plugin')
+    
+    aProject.resolve {
+        outputFileName = project.name
+        outputFormat = 'JSONANDYAML'
+        prettyPrint = 'true'
+        classpath = runtimeClasspath
+        resourcePackages = ['nl.technolution']
+        outputPath = new java.io.File(project.buildDir, "/api")
+    }
+    
+    aProject.tasks.create(name: 'copyApiDocs', type: Copy) {
+        dependsOn('resolve')
+        from(new java.io.File(aProject.buildDir, "/api")) {
+            include '*'
+        }
+        into new java.io.File(project(":docker").buildDir, "/api/" + aProject.name)
+    }
+}
+
 

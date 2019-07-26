@@ -36,7 +36,6 @@ public final class Mode {
      * @return mode with both mode states
      */
     public static Mode getModeByInt(int mode) {
-        System.out.println("Parsing mode value " + mode);
         int mode1index = mode >> 16;
         int mode0index = mode & 0xFFFF;
         return new Mode(EModeByte0.fromIndex(mode0index), EModeByte1.fromIndex(mode1index));

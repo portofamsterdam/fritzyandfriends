@@ -35,4 +35,7 @@ public @interface TimedTask {
 
     /** offset of the given period */
     int offset() default 0;
+
+    /** timeunit for offset */
+    TimeUnit offsetUnit() default TimeUnit.SECONDS;
 }

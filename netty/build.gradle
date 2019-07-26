@@ -1,7 +1,10 @@
+apply plugin: 'java'
 apply plugin: 'application'
 
 dependencies {
     compile project(':common')
+    compile project(':marketapi')
+    compile project(':efi')
 }
 
 mainClassName = 'nl.technolution.netty.app.NettyApp'

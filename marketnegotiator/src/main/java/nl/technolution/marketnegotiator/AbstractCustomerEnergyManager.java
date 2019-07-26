@@ -16,13 +16,17 @@
  */
 package nl.technolution.marketnegotiator;
 
+import org.slf4j.Logger;
+
 import nl.technolution.DeviceId;
+import nl.technolution.Log;
 import nl.technolution.protocols.efi.FlexibilityRegistration;
 import nl.technolution.protocols.efi.FlexibilityRevoke;
 import nl.technolution.protocols.efi.FlexibilityUpdate;
 import nl.technolution.protocols.efi.InstructionStatusUpdate;
 import nl.technolution.protocols.efi.Measurement;
 import nl.technolution.protocols.efi.util.Efi;
+import nl.technolution.protocols.efi.util.ICustomerEnergyManager;
 
 /**
  * @param <T> FlexibilityRegistration
@@ -30,6 +34,8 @@ import nl.technolution.protocols.efi.util.Efi;
  */
 public abstract class AbstractCustomerEnergyManager<T extends FlexibilityRegistration, S extends FlexibilityUpdate>
         implements ICustomerEnergyManager<T, S> {
+
+    private final Logger log = Log.getLogger();
 
     private T registration;
     private DeviceId deviceId;
@@ -52,7 +58,8 @@ public abstract class AbstractCustomerEnergyManager<T extends FlexibilityRegistr
 
     @Override
     public void measurement(Measurement measurement) {
-        // NOTE MKE: Do nothing with measurement for now
+        log.debug("Received measurement but nothing is done with it: " +
+                measurement.getElectricityMeasurement().getPower());
     }
 
     public T getRegistration() {

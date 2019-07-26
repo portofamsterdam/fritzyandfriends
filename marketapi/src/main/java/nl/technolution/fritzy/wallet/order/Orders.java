@@ -16,8 +16,6 @@
  */
 package nl.technolution.fritzy.wallet.order;
 
-import nl.technolution.fritzy.gen.model.WebOrder;
-
 /**
  * 
  */
@@ -25,13 +23,13 @@ public class Orders {
     private int total;
     private int page;
     private int perPage;
-    private WebOrder[] records;
+    private Record[] records;
 
-    public WebOrder[] getRecords() {
+    public Record[] getRecords() {
         return records;
     }
 
-    public void setRecords(WebOrder[] records) {
+    public void setRecords(Record[] records) {
         this.records = records;
     }
 

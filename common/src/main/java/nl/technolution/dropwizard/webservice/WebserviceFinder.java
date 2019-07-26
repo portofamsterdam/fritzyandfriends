@@ -16,6 +16,7 @@
  */
 package nl.technolution.dropwizard.webservice;
 
+import java.lang.reflect.Modifier;
 import java.util.List;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -23,9 +24,10 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import org.glassfish.jersey.server.validation.internal.ValidationExceptionMapper;
 import org.slf4j.Logger;
 
-import io.dropwizard.setup.Environment;
 import nl.technolution.Log;
 import nl.technolution.core.resources.TypeFinder;
+
+import io.dropwizard.setup.Environment;
 
 /**
  * Find a register webservices to Dropwizard app
@@ -53,6 +55,10 @@ public final class WebserviceFinder {
         log.info("Found {} endpoints:", endpoints.size());
         endpoints.forEach(c -> log.info("{}", c.getSimpleName()));
         for (Class<? extends IEndpoint> clazz : endpoints) {
+            if (Modifier.isPrivate(clazz.getModifiers())) {
+                log.info("Skipping private endpoint class " + clazz.getSimpleName());
+                continue;
+            }
             try {
                 log.debug("Found endpoint: {}", clazz);
                 environment.jersey().register(clazz.newInstance());

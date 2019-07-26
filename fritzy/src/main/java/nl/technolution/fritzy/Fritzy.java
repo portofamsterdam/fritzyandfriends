@@ -21,7 +21,6 @@ import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 import nl.technolution.DeviceId;
-import nl.technolution.appliance.resourcemanager.IDeviceResourceHandler;
 import nl.technolution.protocols.efi.CommodityEnum;
 import nl.technolution.protocols.efi.DeviceClass;
 import nl.technolution.protocols.efi.DeviceDescription;
@@ -38,7 +37,7 @@ import nl.technolution.protocols.efi.util.Efi;
 /**
  * 
  */
-public class Fritzy implements IDeviceResourceHandler {
+public class Fritzy {
 
     private final DeviceId deviceId;
 
@@ -49,7 +48,6 @@ public class Fritzy implements IDeviceResourceHandler {
         this.deviceId = deviceId;
     }
 
-    @Override
     public FlexibilityRegistration getRegistration() {
         ShiftableRegistration reg = Efi.build(ShiftableRegistration.class, deviceId);
         SupportedCommodities commodity = new SupportedCommodities();
@@ -62,7 +60,6 @@ public class Fritzy implements IDeviceResourceHandler {
         return null;
     }
 
-    @Override
     public FlexibilityUpdate getFlexibility() {
         ShiftableUpdate shiftableUpdate = Efi.build(ShiftableUpdate.class, deviceId);
         shiftableUpdate.setEndBefore(Efi.calendarOfInstant(Instant.now().plus(1, ChronoUnit.DAYS)));
@@ -77,15 +74,9 @@ public class Fritzy implements IDeviceResourceHandler {
         return null;
     }
 
-    @Override
     public Measurement getMeasurement() {
         // TODO MKE, can this be measured?
         return null;
-    }
-
-    @Override
-    public DeviceId getDeviceId() {
-        return deviceId;
     }
 
 }

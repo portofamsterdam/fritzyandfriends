@@ -31,6 +31,6 @@ public enum ESunSpecUnit {
     A,
     Hz,
     SEC,
-    PCT, 
+    PCT,
     VAR;
 }

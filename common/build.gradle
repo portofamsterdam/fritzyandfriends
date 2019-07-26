@@ -3,4 +3,5 @@ apply plugin: 'java'
 dependencies {
     compile libraries.techno_core
     compile libraries.dropwizard
+    compile libraries.jersey
 }
