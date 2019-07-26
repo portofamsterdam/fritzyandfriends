@@ -16,7 +16,6 @@ task cleanIec62325Lib(type: Delete) {
 }
 
 dependencies {
-    compile libraries.techno_core
     compile libraries.dropwizard
 	compile files(generateIec62325Lib.outputLib)
     compile project(':common');
