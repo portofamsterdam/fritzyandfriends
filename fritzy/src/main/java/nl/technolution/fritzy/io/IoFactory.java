@@ -31,7 +31,7 @@ import gnu.io.UnsupportedCommOperationException;
 import nl.technolution.Log;
 import nl.technolution.fritzy.app.FritzyConfig;
 import nl.technolution.fritzy.io.tempsensor.ITemperatureSensor;
-import nl.technolution.fritzy.io.tempsensor.TemparatureStub;
+import nl.technolution.fritzy.io.tempsensor.TemperatureStub;
 import nl.technolution.fritzy.io.tempsensor.TemperatureSensor;
 import nl.technolution.fritzy.io.webrelay.IWebRelay;
 import nl.technolution.fritzy.io.webrelay.RelayStub;
@@ -49,7 +49,7 @@ public class IoFactory implements IIoFactory {
     
     @Override
     public void init(FritzyConfig config) {
-        tempSensor = config.isStubTemparature() ? new TemparatureStub() : getSerialSensor(config.getSerialPort());
+        tempSensor = config.isStubTemparature() ? new TemperatureStub() : getSerialSensor(config.getSerialPort());
         webRelay = config.isStubRelay() ? new RelayStub() : getWebRelay(config.getHost(), config.getPort());
     }
 
