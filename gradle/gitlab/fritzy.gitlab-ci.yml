@@ -17,7 +17,8 @@ before_script:
  
 stages:
   - build
-  - create_images
+  - build_docker
+  - push_images
   - quality
 
 build_fritzy:
@@ -26,8 +27,7 @@ build_fritzy:
   script: 
     - cd gradle
     - gradle :fritzy:build 
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
+  artifacts:
     paths:
       - fritzy/build/
       - .gradle
@@ -41,8 +41,7 @@ build_batty:
   script: 
     - cd gradle
     - gradle :batty:build
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
+  artifacts:
     paths:
       - .gradle
       - batty/build/
@@ -56,8 +55,7 @@ build_netty:
   script: 
     - cd gradle
     - gradle :netty:build
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
+  artifacts:
     paths:
       - netty/build/
       - .gradle
@@ -71,8 +69,7 @@ build_sunny:
   script: 
     - cd gradle
     - gradle :sunny:build
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
+  artifacts:
     paths:
       - sunny/build/
       - .gradle
@@ -86,8 +83,7 @@ build_exxy:
   script: 
     - cd gradle
     - gradle :exxy:build
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
+  artifacts:
     paths:
       - exxy/build/
       - .gradle
@@ -97,25 +93,47 @@ build_exxy:
 
 create_openapi_docs:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
-  stage: create_images
+  stage: build_docker
   script: 
     - cd gradle
     - gradle copyApiDocs
+  dependencies:
+    - build_fritzy
+    - build_batty
+    - build_netty
+    - build_sunny
+    - build_exxy
   artifacts:
     paths:
       - docker/build/api/
   only:
     - /^release\/.*$/
 
-create_images:
-  # Use an image which has docker, for now use EDSN one.
-  image: docker-proxy.intranet.technolution.nl/edsn/edsn_docker_aws:latest
-  stage: create_images
+build_docker:
+  image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
+  stage: build_docker
   script:
     - cd gradle
     - gradle copyArtifactsToDocker
+  dependencies:
+    - build_fritzy
+    - build_batty
+    - build_netty
+    - build_sunny
+    - build_exxy
+  artifacts:
+    paths:
+      - docker/build/
+  only:
+    - /^release\/.*$/
+
+push_images:
+  # Use an image which has docker, for now use EDSN one.
+  image: docker-proxy.intranet.technolution.nl/edsn/edsn_docker_aws:latest
+  stage: push_images
+  script: 
     - docker login -u fritzy2 -p 1upTNLP04
-    - cd ../docker/build/fritzy
+    - cd docker/build/fritzy
     - docker build -t fritzy2/fritzy:fritzy .
     - docker push fritzy2/fritzy:fritzy
     - cd ../batty
@@ -130,9 +148,11 @@ create_images:
     - cd ../exxy
     - docker build -t fritzy2/fritzy:exxy .
     - docker push fritzy2/fritzy:exxy
+  dependencies:
+    - build_docker
   only:
     - /^release\/.*$/
-
+   
 sonar_quality_check:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
   stage: quality
