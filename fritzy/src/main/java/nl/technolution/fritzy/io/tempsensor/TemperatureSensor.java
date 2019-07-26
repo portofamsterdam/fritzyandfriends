@@ -21,6 +21,8 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.TooManyListenersException;
 
+import org.slf4j.Logger;
+
 import gnu.io.CommPortIdentifier;
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
@@ -28,6 +30,7 @@ import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
 import gnu.io.UnsupportedCommOperationException;
+import nl.technolution.Log;
 
 /**
  * Temperature sensor of Fritzy
@@ -36,6 +39,7 @@ public class TemperatureSensor implements ITemperatureSensor {
 
     private static final int BAUD = 115200;
 
+    private final Logger log = Log.getLogger();
     private final String serialPort;
 
     private SerialPort commPort;
@@ -61,9 +65,6 @@ public class TemperatureSensor implements ITemperatureSensor {
     public void init() throws NoSuchPortException, PortInUseException, IOException, TooManyListenersException,
             UnsupportedCommOperationException {
 
-        String path = System.getProperty("java.library.path");
-        System.out.println(path);
-
         CommPortIdentifier portIdentifier = CommPortIdentifier.getPortIdentifier(serialPort);
         commPort = (SerialPort)portIdentifier.open("Temparature", 2000);
         in = commPort.getInputStream();
@@ -78,11 +79,16 @@ public class TemperatureSensor implements ITemperatureSensor {
                     try {
                         byte[] buffer = new byte[20];
                         while (in.available() > 0) {
-                            in.read(buffer);
+                            int bytecount = in.read(buffer);
+                            if (bytecount == 0) {
+                                log.debug("Failed to read temparatuur, set to minimal value");
+                                temparature = Double.MIN_VALUE;
+                            }
                         }
                         String stringValue = new String(buffer, StandardCharsets.UTF_8);
                         temparature = Double.parseDouble(stringValue.trim());
                     } catch (IOException e) {
+                        log.debug("Failed to read temparatuur, set to minimal value", e);
                         temparature = Double.MIN_VALUE;
                     }
                 }
