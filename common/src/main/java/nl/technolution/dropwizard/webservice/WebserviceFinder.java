@@ -24,10 +24,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import org.glassfish.jersey.server.validation.internal.ValidationExceptionMapper;
 import org.slf4j.Logger;
 
-import nl.technolution.Log;
-import nl.technolution.core.resources.TypeFinder;
-
 import io.dropwizard.setup.Environment;
+import nl.technolution.Log;
+import nl.technolution.dropwizard.services.TypeFinder;
 
 /**
  * Find a register webservices to Dropwizard app
