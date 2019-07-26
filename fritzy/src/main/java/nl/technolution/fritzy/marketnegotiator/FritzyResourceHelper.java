@@ -24,7 +24,7 @@ import java.time.Instant;
 import org.slf4j.Logger;
 
 import nl.technolution.DeviceId;
-import nl.technolution.core.Log;
+import nl.technolution.Log;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.fritzy.app.FritzyConfig;
 import nl.technolution.fritzy.io.IIoFactory;

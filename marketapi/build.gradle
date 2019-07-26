@@ -8,7 +8,6 @@ ext {
  
 dependencies {
     compile libraries.dropwizard
-    compile libraries.techno_core
     compile libraries.javax_validation
     compile libraries.jackson_annotations
     compile libraries.swagger_annotate

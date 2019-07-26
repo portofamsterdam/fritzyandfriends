@@ -39,9 +39,6 @@ libraries.test_junit = 'junit:junit:4.12'
 
 libraries.mockserver_netty = 'org.mock-server:mockserver-netty:5.5.4'
 
-// Technolution core
-libraries.techno_core = 'nl.technolution:techno-core:1.5.906'
-
 libraries.test_mockito = 'org.mockito:mockito-core:2.18.3'
 
 /* Dropwizard, jetty/jersey/jackson */

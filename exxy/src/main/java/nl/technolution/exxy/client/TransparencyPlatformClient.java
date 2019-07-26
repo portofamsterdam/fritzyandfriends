@@ -29,7 +29,7 @@ import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.slf4j.Logger;
 
-import nl.technolution.core.Log;
+import nl.technolution.Log;
 import nl.technolution.exxy.app.ExxyConfig;
 
 /**

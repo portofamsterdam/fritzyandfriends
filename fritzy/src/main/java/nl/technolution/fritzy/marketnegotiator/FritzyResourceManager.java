@@ -23,7 +23,7 @@ import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 
 import nl.technolution.DeviceId;
-import nl.technolution.core.Log;
+import nl.technolution.Log;
 import nl.technolution.fritzy.app.FritzyConfig;
 import nl.technolution.protocols.efi.ActuatorInstruction;
 import nl.technolution.protocols.efi.ActuatorInstructions;

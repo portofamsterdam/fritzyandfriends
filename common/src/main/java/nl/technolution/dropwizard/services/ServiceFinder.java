@@ -25,7 +25,6 @@ import com.google.common.base.Preconditions;
 import org.slf4j.Logger;
 
 import nl.technolution.Log;
-import nl.technolution.core.resources.TypeFinder;
 import nl.technolution.dropwizard.FritzyDropWizardApp;
 
 /**

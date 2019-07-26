@@ -23,11 +23,11 @@ import java.time.Instant;
 import org.slf4j.Logger;
 
 import nl.technolution.DeviceId;
+import nl.technolution.Log;
 import nl.technolution.apis.exxy.IAPXPricesApi;
 import nl.technolution.apis.netty.DeviceCapacity;
 import nl.technolution.apis.netty.INettyApi;
 import nl.technolution.apis.netty.OrderReward;
-import nl.technolution.core.Log;
 import nl.technolution.dashboard.EEventType;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.webservice.Endpoints;

@@ -27,12 +27,11 @@ import com.google.common.base.Preconditions;
 
 import org.slf4j.Logger;
 
+import io.dropwizard.lifecycle.Managed;
 import nl.technolution.Log;
-import nl.technolution.core.resources.TypeFinder;
 import nl.technolution.dropwizard.FritzyDropWizardApp;
 import nl.technolution.dropwizard.services.Services;
-
-import io.dropwizard.lifecycle.Managed;
+import nl.technolution.dropwizard.services.TypeFinder;
 
 /**
  * Manages task with @Timed annotation
