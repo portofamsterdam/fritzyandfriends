@@ -97,6 +97,12 @@ create_openapi_docs:
   script: 
     - cd gradle
     - gradle copyApiDocs
+  dependencies:
+    - build_fritzy
+    - build_batty
+    - build_netty
+    - build_sunny
+    - build_exxy
   artifacts:
     paths:
       - docker/build/api/
@@ -109,6 +115,12 @@ build_docker:
   script:
     - cd gradle
     - gradle copyArtifactsToDocker
+  dependencies:
+    - build_fritzy
+    - build_batty
+    - build_netty
+    - build_sunny
+    - build_exxy
   artifacts:
     paths:
       - docker/build/
