@@ -25,6 +25,9 @@ import javax.ws.rs.core.MediaType;
 
 import com.codahale.metrics.annotation.Timed;
 
+import org.slf4j.Logger;
+
+import nl.technolution.Log;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.webservice.IEndpoint;
 import nl.technolution.fritzy.io.IIoFactory;
@@ -35,6 +38,8 @@ import nl.technolution.fritzy.io.IIoFactory;
 @Path("/fritzy")
 @Produces(MediaType.APPLICATION_JSON)
 public class FritzyApi implements IEndpoint {
+
+    private final Logger log = Log.getLogger();
 
     /**
      * Retrieve state of Fritzy
@@ -51,6 +56,7 @@ public class FritzyApi implements IEndpoint {
         try {
             isCooling = fritzy.getWebRelay().getState().isRelaystate();
         } catch (IOException e) {
+            log.warn("Unable to read relay state", e);
             isCooling = false;
         }
 
