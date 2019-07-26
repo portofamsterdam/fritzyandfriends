@@ -98,7 +98,7 @@ build_exxy:
 
 create_openapi_docs:
   image: docker-proxy.intranet.technolution.nl/techno_gradle:4.9
-  stage: create_images
+  stage: build_docker
   script: 
     - cd gradle
     - gradle copyApiDocs
