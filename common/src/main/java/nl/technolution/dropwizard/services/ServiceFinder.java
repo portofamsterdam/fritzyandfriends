@@ -82,14 +82,19 @@ public final class ServiceFinder {
     private static void callInitMethod(IService<?> service, Object[] objects) {
         Class<?> instanceClazz = service.getClass();
         for (Object obj : objects) {
-            try {
-                Method m = instanceClazz.getMethod("init", obj.getClass());
-                LOG.info("Invoking init method {} with {}", m, obj.getClass());
-                m.invoke(service, obj);
-            } catch (NoSuchMethodException e) {
-                continue;
-            } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                throw new RuntimeException(e.getMessage(), e);
+            Class<?> calledClazz = obj.getClass();
+            while (!calledClazz.equals(Object.class)) {
+                try {
+                    Method m = instanceClazz.getMethod("init", calledClazz);
+                    LOG.debug("Calling {}", m);
+                    m.invoke(service, obj);
+                    break; // there can be only one
+                } catch (NoSuchMethodException e) {
+                    // do nothing;
+                } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+                    throw new RuntimeException(e.getMessage(), e);
+                }
+                calledClazz = calledClazz.getSuperclass();
             }
         }
     }
