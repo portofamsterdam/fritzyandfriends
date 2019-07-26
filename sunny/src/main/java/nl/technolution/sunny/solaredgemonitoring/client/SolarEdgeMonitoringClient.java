@@ -27,7 +27,7 @@ import javax.ws.rs.core.Response;
 import org.glassfish.jersey.client.ClientProperties;
 import org.slf4j.Logger;
 
-import nl.technolution.core.Log;
+import nl.technolution.Log;
 import nl.technolution.sunny.app.SunnyConfig;
 import nl.technolution.sunny.solaredgemonitoring.model.SiteEnergy;
 

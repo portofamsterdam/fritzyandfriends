@@ -28,7 +28,8 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 
-import nl.technolution.core.Log;
+import eu.entsoe.wgedi.codelists.StandardUnitOfMeasureTypeList;
+import nl.technolution.Log;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.exxy.app.ExxyConfig;
 import nl.technolution.exxy.client.ITransparencyPlatformClient;
@@ -36,8 +37,6 @@ import nl.technolution.exxy.client.Point;
 import nl.technolution.exxy.client.PublicationMarketDocument;
 import nl.technolution.exxy.client.SeriesPeriod;
 import nl.technolution.exxy.client.TimeSeries;
-
-import eu.entsoe.wgedi.codelists.StandardUnitOfMeasureTypeList;
 
 /**
  * APXPricesService

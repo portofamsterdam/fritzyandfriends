@@ -21,7 +21,7 @@ import java.util.concurrent.TimeUnit;
 
 import org.slf4j.Logger;
 
-import nl.technolution.core.Log;
+import nl.technolution.Log;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.tasks.TimedTask;
 import nl.technolution.exxy.client.ITransparencyPlatformClient;

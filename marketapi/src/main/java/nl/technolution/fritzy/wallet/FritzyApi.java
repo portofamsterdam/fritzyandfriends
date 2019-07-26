@@ -36,7 +36,7 @@ import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.slf4j.Logger;
 
 import nl.technolution.IJsonnable;
-import nl.technolution.core.Log;
+import nl.technolution.Log;
 import nl.technolution.dashboard.EEventType;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.gen.model.WebTransaction;

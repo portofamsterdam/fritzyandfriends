@@ -35,7 +35,7 @@ import org.glassfish.jersey.client.ClientProperties;
 import org.glassfish.jersey.logging.LoggingFeature;
 import org.slf4j.Logger;
 
-import nl.technolution.core.Log;
+import nl.technolution.Log;
 import nl.technolution.sunny.app.SunnyConfig;
 import nl.technolution.sunny.pvcast.model.Forecast;
 import nl.technolution.sunny.pvcast.model.Forecasts;
