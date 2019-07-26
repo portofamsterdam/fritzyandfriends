@@ -33,14 +33,23 @@ public class ServiceTest {
         assertTrue(Services.get(ITestService.class).getInit());
     }
 
+    /**
+     * Public for reflection
+     */
     public static class TestConfig extends FritzyAppConfig {
 
     }
 
+    /**
+     * Public for reflection
+     */
     public interface ITestService extends IService<FritzyAppConfig> {
         boolean getInit();
     }
 
+    /**
+     * Public for reflection
+     */
     public static class TestService implements ITestService {
 
         private boolean init = false;
