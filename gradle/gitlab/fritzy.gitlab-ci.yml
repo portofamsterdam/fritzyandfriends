@@ -141,6 +141,8 @@ push_images:
     - cd ../exxy
     - docker build -t fritzy2/fritzy:exxy .
     - docker push fritzy2/fritzy:exxy
+  dependencies:
+    - create_images
   only:
     - /^release\/.*$/
    
