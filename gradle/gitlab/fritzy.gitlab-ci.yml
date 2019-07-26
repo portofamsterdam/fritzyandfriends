@@ -27,8 +27,7 @@ build_fritzy:
   script: 
     - cd gradle
     - gradle :fritzy:build 
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
+  artifacts:
     paths:
       - fritzy/build/
       - .gradle
@@ -42,8 +41,7 @@ build_batty:
   script: 
     - cd gradle
     - gradle :batty:build
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
+  artifacts:
     paths:
       - .gradle
       - batty/build/
@@ -57,8 +55,7 @@ build_netty:
   script: 
     - cd gradle
     - gradle :netty:build
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
+  artifacts:
     paths:
       - netty/build/
       - .gradle
@@ -72,8 +69,7 @@ build_sunny:
   script: 
     - cd gradle
     - gradle :sunny:build
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
+  artifacts:
     paths:
       - sunny/build/
       - .gradle
@@ -87,8 +83,7 @@ build_exxy:
   script: 
     - cd gradle
     - gradle :exxy:build
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
+  artifacts:
     paths:
       - exxy/build/
       - .gradle
@@ -114,8 +109,7 @@ build_docker:
   script:
     - cd gradle
     - gradle copyArtifactsToDocker
-  cache:
-    key: "$CI_COMMIT_REF_NAME"
+  artifacts:
     paths:
       - docker/build/
   only:
