@@ -86,7 +86,7 @@ public class BattyConfig extends FritzyAppConfig {
         c.host = "192.168.8.241";
         c.username = "batty";
         c.password = "batty";
-        c.truststore = "src/main/dist/truststore.jks";
+        c.truststore = "/opt/config/batty/truststore.jks";
         c.truststorepass = "12345678";
         c.buyMargin = 2;
         c.sellMargin = 2;

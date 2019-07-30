@@ -5,7 +5,7 @@
   "host" : "192.168.8.241",
   "username" : "batty",
   "password" : "batty",
-  "truststore" : "src/main/dist/truststore.jks",
+  "truststore" : "/opt/config/batty/truststore.jks",
   "truststorepass" : "12345678",
   "buyMargin" : 2,
   "sellMargin" : 2,
