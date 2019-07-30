@@ -1,7 +1,6 @@
 FROM docker-proxy.intranet.technolution.nl/openjdk:8-jre-alpine3.9
 
 ADD ./librxtxSerial.so /usr/lib/librxtxSerial.so
-ADD ./librxtxParallel.so /usr/lib/librxtxParallel.so
 
 ADD ./fritzy-app.jar /opt/fritzy/fritzy-app.jar
 
