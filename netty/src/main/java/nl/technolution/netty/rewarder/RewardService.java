@@ -44,19 +44,17 @@ import nl.technolution.protocols.efi.util.Efi;
  */
 public final class RewardService implements IRewardService {
 
-    private IFritzyApiFactory marketFactory;
     private NettyConfig config;
     private Map<String, OrderReward> rewards = Maps.newHashMap();
 
     @Override
     public void init(NettyConfig config) {
-        marketFactory = Services.get(IFritzyApiFactory.class);
         this.config = config;
     }
 
     @Override
     public OrderReward calculateReward(String taker, String orderHash) {
-        IFritzyApi market = marketFactory.build();
+        IFritzyApi market = Services.get(IFritzyApiFactory.class).build();
         cleanOldReward();
         OrderReward existingReward = getExistingReward(taker, orderHash);
         if (existingReward != null) {
@@ -131,7 +129,7 @@ public final class RewardService implements IRewardService {
             return;
         }
 
-        IFritzyApi market = marketFactory.build();
+        IFritzyApi market = Services.get(IFritzyApiFactory.class).build();
         WebOrder order = market.order(orderHash);
 
         if (order.getTakerAddress() != null && order.getTakerAddress().equals(reward.getClaimTaker())) {
