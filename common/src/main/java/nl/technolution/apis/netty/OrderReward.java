@@ -33,8 +33,8 @@ public class OrderReward implements IJsonnable {
     @JsonProperty("reward")
     private double reward;
 
-    @JsonProperty("taker")
-    private String taker;
+    @JsonProperty("claimTaker")
+    private String claimTaker;
 
     @JsonProperty("orderHash")
     private String orderHash;
@@ -46,7 +46,7 @@ public class OrderReward implements IJsonnable {
      * Create a reward without any value
      * 
      * @param taker of the order
-     * @param txId of order where the reward is for
+     * @param orderHash of order where the reward is for
      * @return
      */
     public static OrderReward none(String taker, String orderHash) {
@@ -54,7 +54,7 @@ public class OrderReward implements IJsonnable {
         r.setExpireTs(LocalDateTime.now());
         r.setReward(0.0d);
         r.setRewardId("");
-        r.setTaker(taker);
+        r.setClaimTaker(taker);
         r.setOrderHash(orderHash);
         return r;
     }
@@ -75,12 +75,12 @@ public class OrderReward implements IJsonnable {
         this.reward = reward;
     }
 
-    public String getTaker() {
-        return taker;
+    public String getClaimTaker() {
+        return claimTaker;
     }
 
-    public void setTaker(String taker) {
-        this.taker = taker;
+    public void setClaimTaker(String claimTaker) {
+        this.claimTaker = claimTaker;
     }
 
     public String getOrderHash() {

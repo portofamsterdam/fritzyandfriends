@@ -16,6 +16,7 @@
  */
 package nl.technolution.netty.rewarder;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -34,6 +35,7 @@ import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.gen.model.WebUser;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
+import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.netty.app.NettyConfig;
 import nl.technolution.protocols.efi.util.Efi;
 
@@ -62,7 +64,7 @@ public final class RewardService implements IRewardService {
         }
         WebOrder order = market.order(orderHash);
         if (order == null) {
-            // Do not store empty orders, the order may exist later
+            // Do not store empty rewards, the order may exist later
             return OrderReward.none(taker, orderHash);
         }
         if (isLocal(taker, order, market)) {
@@ -73,7 +75,7 @@ public final class RewardService implements IRewardService {
 
     private OrderReward getExistingReward(String taker, String orderHash) {
         OrderReward existingReward = rewards.values().stream()
-                .filter(o -> o.getTaker().equals(taker))
+                .filter(o -> o.getClaimTaker().equals(taker))
                 .filter(o -> o.getOrderHash().equals(orderHash))
                 .findFirst().orElse(null);
         if (existingReward != null) {
@@ -96,7 +98,7 @@ public final class RewardService implements IRewardService {
         LocalDateTime localNextQuarter = LocalDateTime.ofInstant(nextQuarter, ZoneId.systemDefault());
         OrderReward order = new OrderReward();
         order.setExpireTs(localNextQuarter);
-        order.setTaker(taker);
+        order.setClaimTaker(taker);
         order.setOrderHash(weborder.getHash());
         order.setReward(config.getLocalReward());
         order.setRewardId(UUID.randomUUID().toString());
@@ -123,9 +125,22 @@ public final class RewardService implements IRewardService {
     }
 
     @Override
-    public void claim(String txHash, String rewardId) {
+    public void claim(String orderHash, String rewardId) {
+        OrderReward reward = rewards.get(orderHash);
+        if (reward == null) {
+            return;
+        }
 
-        // TODO MKE transfer reward to claimer
+        IFritzyApi market = marketFactory.build();
+        WebOrder order = market.order(orderHash);
 
+        if (order.getTakerAddress() != null && order.getTakerAddress().equals(reward.getClaimTaker())) {
+            payReward(market, reward);
+        }
+    }
+
+    private void payReward(IFritzyApi market, OrderReward reward) {
+        market.transfer(BigDecimal.valueOf(reward.getReward()), EContractAddress.EUR, reward.getClaimTaker());
+        rewards.remove(reward.getOrderHash());
     }
 }
