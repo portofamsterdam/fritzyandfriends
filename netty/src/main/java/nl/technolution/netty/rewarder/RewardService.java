@@ -126,9 +126,12 @@ public final class RewardService implements IRewardService {
 
     @Override
     public void claim(String orderHash, String rewardId) {
-        IFritzyApi market = marketFactory.build();
-        
         OrderReward reward = rewards.get(orderHash);
+        if (reward == null) {
+            return;
+        }
+
+        IFritzyApi market = marketFactory.build();
         WebOrder order = market.order(orderHash);
 
         if (order.getTakerAddress() != null && order.getTakerAddress().equals(reward.getClaimTaker())) {
