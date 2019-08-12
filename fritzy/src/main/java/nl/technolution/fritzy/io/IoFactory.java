@@ -25,17 +25,18 @@ import com.google.common.base.Preconditions;
 
 import org.slf4j.Logger;
 
-import gnu.io.NoSuchPortException;
-import gnu.io.PortInUseException;
-import gnu.io.UnsupportedCommOperationException;
 import nl.technolution.Log;
 import nl.technolution.fritzy.app.FritzyConfig;
 import nl.technolution.fritzy.io.tempsensor.ITemperatureSensor;
-import nl.technolution.fritzy.io.tempsensor.TemperatureStub;
 import nl.technolution.fritzy.io.tempsensor.TemperatureSensor;
+import nl.technolution.fritzy.io.tempsensor.TemperatureStub;
 import nl.technolution.fritzy.io.webrelay.IWebRelay;
 import nl.technolution.fritzy.io.webrelay.RelayStub;
 import nl.technolution.fritzy.io.webrelay.WebRelay;
+
+import gnu.io.NoSuchPortException;
+import gnu.io.PortInUseException;
+import gnu.io.UnsupportedCommOperationException;
 
 /**
  * 
@@ -46,11 +47,13 @@ public class IoFactory implements IIoFactory {
 
     private ITemperatureSensor tempSensor;
     private IWebRelay webRelay;
-    
+
     @Override
     public void init(FritzyConfig config) {
-        tempSensor = config.isStubTemparature() ? new TemperatureStub() : getSerialSensor(config.getSerialPort());
         webRelay = config.isStubRelay() ? new RelayStub() : getWebRelay(config.getHost(), config.getPort());
+        tempSensor = config.isStubTemparature() ? new TemperatureStub(webRelay)
+                                                : getSerialSensor(config.getSerialPort());
+
     }
 
     @Override
@@ -79,8 +82,8 @@ public class IoFactory implements IIoFactory {
         TemperatureSensor tempSensor = new TemperatureSensor(serialPort);
         try {
             tempSensor.init();
-        } catch (NoSuchPortException | PortInUseException | IOException | TooManyListenersException | 
-                UnsupportedCommOperationException e) {
+        } catch (NoSuchPortException | PortInUseException | IOException | TooManyListenersException
+                | UnsupportedCommOperationException e) {
             throw new IllegalStateException("Unable to reach temparature sensor", e);
         }
         return tempSensor;
