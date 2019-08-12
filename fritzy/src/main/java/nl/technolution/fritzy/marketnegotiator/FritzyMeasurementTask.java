@@ -16,40 +16,20 @@
  */
 package nl.technolution.fritzy.marketnegotiator;
 
-import nl.technolution.fritzy.app.FritzyConfig;
+import java.util.concurrent.TimeUnit;
+
+import nl.technolution.dropwizard.services.Services;
+import nl.technolution.dropwizard.tasks.ITaskRunner;
+import nl.technolution.dropwizard.tasks.TimedTask;
 
 /**
- * 
+ * Scheduled task for sending measurements.
  */
-public final class FritzyTrader implements IFritzyTrader {
-
-    private FritzyResourceManager resourceManager;
-    private FritzyNegotiator cem;
+@TimedTask(period = 30, unit = TimeUnit.SECONDS, offset = 10, offsetUnit = TimeUnit.SECONDS)
+public class FritzyMeasurementTask implements ITaskRunner {
 
     @Override
-    public void init(FritzyConfig config) {
-        resourceManager = new FritzyResourceManager(config);
-        cem = new FritzyNegotiator(config, resourceManager);
-        resourceManager.registerCustomerEnergyManager(cem);
-
-    }
-
-    @Override
-    public void evaluateMarket() {
-        cem.evaluate();
-    }
-
-    @Override
-    public void evaluateDevice() {
-        resourceManager.evaluate();
-    }
-
-    @Override
-    public void sendMeasurement() {
-        resourceManager.sendMeasurement();
-    }
-
-    public FritzyNegotiator getCem() {
-        return cem;
+    public void execute() {
+        Services.get(IFritzyTrader.class).sendMeasurement();
     }
 }
