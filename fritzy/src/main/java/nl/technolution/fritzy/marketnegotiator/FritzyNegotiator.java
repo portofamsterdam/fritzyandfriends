@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.slf4j.Logger;
 
+import nl.technolution.DeviceId;
 import nl.technolution.Log;
 import nl.technolution.apis.exxy.IAPXPricesApi;
 import nl.technolution.apis.netty.DeviceCapacity;
@@ -208,6 +209,7 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
             return;
         }
 
+        DeviceId deviceId = resourceManager.getDeviceId();
         IFritzyApi market = getMarket();
 
         // Get balance
@@ -216,16 +218,12 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
 
         // Get max grid capacity
         INettyApi netty = Endpoints.get(INettyApi.class);
-        // TODO WHO: not working, ask Martin...
-        // DeviceCapacity deviceCapacity = netty.getCapacity(deviceId.getDeviceId());
-        DeviceCapacity deviceCapacity = new DeviceCapacity(1000, 1000);
+        DeviceCapacity deviceCapacity = netty.getCapacity(deviceId.getDeviceId());
         market.log(EEventType.LIMIT_ACTOR, Double.toString(deviceCapacity.getGridConnectionLimit()), null);
 
         // use market price as base for my price
         IAPXPricesApi exxy = Endpoints.get(IAPXPricesApi.class);
-        // TODO WHO: not working, ask Martin...
-        // double marketPrice = exxy.getNextQuarterHourPrice().getPrice();
-        double marketPrice = 0.21;
+        double marketPrice = exxy.getNextQuarterHourPrice().getPrice();
 
         // TODO WHO: better way to detect which round this is? ==> Expect the round number to become available via the
         // market API.
@@ -240,9 +238,8 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
                 (fillLevel + runningModeElement.getFillingRate() * 60 * 15) > runningModeElement
                         .getFillLevelUpperBound())) {
             LOG.debug("Cooling needed, need to buy, increasing myPrice");
-            // Cooling is needed, increase price every round (for the last round remaining minutes is 0 so offset is 0
-            // => accept market price)
-            offset = (marketPriceStartOffset / 15) * remainingTime.toMinutes();
+            // Cooling is needed, increase price every round (for the last round offset is 0 => accept market price)
+            offset = (marketPriceStartOffset / 15) * (15 - round);
         }
 
         myPrice = marketPrice - offset;
