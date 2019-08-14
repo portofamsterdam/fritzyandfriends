@@ -25,6 +25,9 @@ import com.google.common.base.Preconditions;
 
 import org.slf4j.Logger;
 
+import gnu.io.NoSuchPortException;
+import gnu.io.PortInUseException;
+import gnu.io.UnsupportedCommOperationException;
 import nl.technolution.Log;
 import nl.technolution.fritzy.app.FritzyConfig;
 import nl.technolution.fritzy.io.tempsensor.ITemperatureSensor;
@@ -34,10 +37,6 @@ import nl.technolution.fritzy.io.webrelay.IWebRelay;
 import nl.technolution.fritzy.io.webrelay.RelayStub;
 import nl.technolution.fritzy.io.webrelay.WebRelay;
 
-import gnu.io.NoSuchPortException;
-import gnu.io.PortInUseException;
-import gnu.io.UnsupportedCommOperationException;
-
 /**
  * 
  */
@@ -45,26 +44,34 @@ public class IoFactory implements IIoFactory {
 
     private static final Logger LOG = Log.getLogger();
 
+    private FritzyConfig config;
+
     private ITemperatureSensor tempSensor;
     private IWebRelay webRelay;
 
     @Override
     public void init(FritzyConfig config) {
-        webRelay = config.isStubRelay() ? new RelayStub() : getWebRelay(config.getHost(), config.getPort());
-        tempSensor = config.isStubTemparature() ? new TemperatureStub(webRelay)
-                                                : getSerialSensor(config.getSerialPort());
-
+        this.config = config;
     }
 
     @Override
     public ITemperatureSensor getTemparatureSensor() {
-        Preconditions.checkNotNull(tempSensor, "IoFactory not initialised");
+        if (tempSensor != null) {
+            return tempSensor;
+        }
+        Preconditions.checkNotNull(config, "IoFactory not initialized");
+        tempSensor = config.isStubTemparature() ? new TemperatureStub(getWebRelay())
+                : getSerialSensor(config.getSerialPort());
         return tempSensor;
     }
 
     @Override
     public IWebRelay getWebRelay() {
-        Preconditions.checkNotNull(webRelay, "IoFactory not initialised");
+        if (webRelay != null) {
+            return webRelay;
+        }
+        Preconditions.checkNotNull(config, "IoFactory not initialized");
+        webRelay = config.isStubRelay() ? new RelayStub() : getWebRelay(config.getHost(), config.getPort());
         return webRelay;
     }
 
