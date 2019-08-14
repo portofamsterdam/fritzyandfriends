@@ -78,6 +78,9 @@ public class FritzyConfig extends FritzyAppConfig {
     // in °C per second
     private double coolingSpeed;
 
+    @JsonProperty("marketPriceStartOffset")
+    private double marketPriceStartOffset;
+
     public FritzyConfig() {
         // Empty constructor
     }
@@ -216,5 +219,13 @@ public class FritzyConfig extends FritzyAppConfig {
 
     public void setCoolingSpeed(double coolingSpeed) {
         this.coolingSpeed = coolingSpeed;
+    }
+
+    public double getMarketPriceStartOffset() {
+        return marketPriceStartOffset;
+    }
+
+    public void setMarketPriceStartOffset(double marketPriceStartOffset) {
+        this.marketPriceStartOffset = marketPriceStartOffset;
     }
 }

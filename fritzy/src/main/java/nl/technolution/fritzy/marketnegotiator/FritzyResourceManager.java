@@ -50,10 +50,13 @@ public class FritzyResourceManager implements IResourceManager {
     private ICustomerEnergyManager<StorageRegistration, StorageUpdate> cem;
     private FritzyConfig config;
 
+    private DeviceId deviceId;
+
     public FritzyResourceManager(FritzyConfig config) {
         this.helper = new FritzyResourceHelper(config);
         this.controller = new FritzyController();
         this.config = config;
+        deviceId = new DeviceId(config.getDeviceId());
     }
 
     @Override
@@ -90,7 +93,11 @@ public class FritzyResourceManager implements IResourceManager {
      * Evaluate current state and update CEM.
      */
     public void evaluate() {
-        cem.flexibilityUpdate(helper.getFlexibilityUpdate(controller));
+        StorageInstruction instruction = (StorageInstruction)cem
+                .flexibilityUpdate(helper.getFlexibilityUpdate(controller));
+        if (instruction != null) {
+            handleActuatorInstruction(instruction.getActuatorInstructions().getActuatorInstruction().get(0));
+        }
     }
 
     /**
@@ -101,18 +108,32 @@ public class FritzyResourceManager implements IResourceManager {
     public void registerCustomerEnergyManager(FritzyNegotiator cem) {
         this.cem = cem;
         cem.flexibilityRegistration(helper.getRegistration());
-        cem.flexibilityUpdate(helper.getStorageSystemDescription());
+        cem.storageSystemDescription(helper.getStorageSystemDescription());
     }
 
     /**
      * Send measurement
      */
     public void sendMeasurement() {
-        Measurement measurement = Efi.build(Measurement.class, new DeviceId(config.getDeviceId()));
+        Measurement measurement = Efi.build(Measurement.class, deviceId);
         measurement.setMeasurementTimestamp(Efi.calendarOfInstant(Instant.now()));
         ElectricityMeasurement value = new ElectricityMeasurement();
-        value.setPower(helper.getPower());
+
+        // No power measurement available so use current state and configured power
+        if (controller.getState()) {
+            value.setPower(config.getPower());
+        } else {
+            value.setPower(0);
+        }
+
         measurement.setElectricityMeasurement(value);
         cem.measurement(measurement);
+    }
+
+    /**
+     * @return
+     */
+    public DeviceId getDeviceId() {
+        return deviceId;
     }
 }

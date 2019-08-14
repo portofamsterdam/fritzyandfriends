@@ -41,7 +41,7 @@ public abstract class AbstractCustomerEnergyManager<T extends FlexibilityRegistr
     private DeviceId deviceId;
 
     @Override
-    public final void flexibilityRegistration(T flexibilityRegistration) {
+    public void flexibilityRegistration(T flexibilityRegistration) {
         this.deviceId = Efi.getDeviceId(flexibilityRegistration);
         this.registration = flexibilityRegistration;
     }

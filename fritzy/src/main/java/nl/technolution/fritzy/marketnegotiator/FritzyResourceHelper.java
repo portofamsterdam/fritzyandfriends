@@ -18,7 +18,6 @@ package nl.technolution.fritzy.marketnegotiator;
 
 import java.io.IOException;
 import java.math.BigDecimal;
-import java.time.Duration;
 import java.time.Instant;
 
 import org.slf4j.Logger;
@@ -32,6 +31,7 @@ import nl.technolution.protocols.efi.Actuator;
 import nl.technolution.protocols.efi.ActuatorBehaviour;
 import nl.technolution.protocols.efi.ActuatorBehaviours;
 import nl.technolution.protocols.efi.ActuatorStatus;
+import nl.technolution.protocols.efi.ActuatorStatuses;
 import nl.technolution.protocols.efi.Actuators;
 import nl.technolution.protocols.efi.CommodityEnum;
 import nl.technolution.protocols.efi.DeviceClass;
@@ -56,21 +56,6 @@ public class FritzyResourceHelper {
 
     private FritzyConfig config;
     private DeviceId deviceId;
-    private double coolingDegreesPerSecond = 0;
-    private double heatingDegreesPerSecond = 0;
-
-    private class State {
-        double temperature;
-        boolean isCooling;
-        Instant instant;
-
-        State() {
-            instant = Instant.now();
-        }
-    }
-
-    private State previousState;
-    private State newState;
 
     /**
      * Constructor for {@link FritzyResourceHelper} objects
@@ -129,7 +114,7 @@ public class FritzyResourceHelper {
 
         DiscreteRunningModeElement onElement = new DiscreteRunningModeElement();
         onElement.setFillLevelLowerBound(config.getMinTemp());
-        onElement.setFillLevelUpperBound(config.getMaxTemp());
+        onElement.setFillLevelUpperBound(Integer.MAX_VALUE);
         onElement.setElectricalPower(config.getPower());
         onElement.setRunningCost(BigDecimal.valueOf(0)); // assume running device is free
         onElement.setFillingRate(config.getCoolingSpeed());
@@ -141,7 +126,7 @@ public class FritzyResourceHelper {
         offRunningMode.setLabel(EFritzyRunningMode.OFF.name());
 
         DiscreteRunningModeElement offElement = new DiscreteRunningModeElement();
-        offElement.setFillLevelLowerBound(config.getMinTemp());
+        offElement.setFillLevelLowerBound(Integer.MIN_VALUE);
         offElement.setFillLevelUpperBound(config.getMaxTemp());
         offElement.setElectricalPower(0d);
         offElement.setRunningCost(BigDecimal.valueOf(0)); // assume running device is free
@@ -160,90 +145,29 @@ public class FritzyResourceHelper {
         return update;
     }
 
-    private void updateState() {
-        // update internal state
-        newState = new State();
-
-        IIoFactory fritzy = Services.get(IIoFactory.class);
-        try {
-            newState.isCooling = fritzy.getWebRelay().getState().isRelaystate();
-        } catch (IOException e) {
-            newState.isCooling = false;
-        }
-        newState.temperature = fritzy.getTemparatureSensor().getTemparature();
-
-        // check if state change and recalculate cooling / heating speed
-        if (previousState.isCooling != newState.isCooling) {
-            if (previousState.isCooling) {
-                double newCoolingDegreesPerSecond = (previousState.temperature - newState.temperature) /
-                        Duration.between(previousState.instant, newState.instant).getSeconds();
-                if (coolingDegreesPerSecond == 0) {
-                    coolingDegreesPerSecond = newCoolingDegreesPerSecond;
-                } else {
-                    coolingDegreesPerSecond = (coolingDegreesPerSecond + newCoolingDegreesPerSecond) / 2;
-                }
-            } else {
-                double newHeatingDegreesPerSecond = (newState.temperature - previousState.temperature) /
-                        Duration.between(previousState.instant, newState.instant).getSeconds();
-                if (heatingDegreesPerSecond == 0) {
-                    heatingDegreesPerSecond = newHeatingDegreesPerSecond;
-                } else {
-                    heatingDegreesPerSecond = (heatingDegreesPerSecond + newHeatingDegreesPerSecond) / 2;
-                }
-            }
-        }
-
-        LOG.info(String.format(
-                "isCooling: %b (previous: %b)  temperature: %.6f °C  cooling: %.6f °C/s heatup: %.6f °C/s",
-                newState.isCooling, previousState.isCooling, newState.temperature, coolingDegreesPerSecond,
-                heatingDegreesPerSecond));
-
-        previousState = newState;
-    }
-
-    private void outOflimitsProtection(FritzyController controller) {
-        if (newState.temperature > (config.getMaxTemp() + 0.5) && !newState.isCooling) {
-            controller.on();
-            updateState();
-            LOG.warn("OutOflimitsProtection: turned Fritzy on without instruction because too hot and not cooling.");
-        }
-        if (newState.temperature < (config.getMinTemp() - 0.5) && newState.isCooling) {
-            controller.off();
-            updateState();
-            LOG.warn("OutOflimitsProtection: turned Fritzy off without instruction because too cold and still " +
-                    "cooling.");
-        }
-    }
-
     /**
      * @param controller
      * @return
      */
     public StorageUpdate getFlexibilityUpdate(FritzyController controller) {
+        IIoFactory ioFactory = Services.get(IIoFactory.class);
+        boolean isCooling;
+        try {
+            isCooling = ioFactory.getWebRelay().getState().isRelaystate();
+        } catch (IOException e) {
+            LOG.warn("Unable to read relay state", e);
+            isCooling = false;
+        }
         StorageStatus update = Efi.build(StorageStatus.class, deviceId);
-
-        updateState();
-        outOflimitsProtection(controller);
-
         update.setValidFrom(Efi.calendarOfInstant(Instant.now()));
-        update.setCurrentFillLevel(newState.temperature);
+        update.setCurrentFillLevel(ioFactory.getTemparatureSensor().getTemparature());
         ActuatorStatus status = new ActuatorStatus();
         status.setActuatorId(ACTUATOR_ID);
-        status.setCurrentRunningMode(EFritzyRunningMode.fromIsCooling(newState.isCooling).getRunningModeId());
+        status.setCurrentRunningMode(EFritzyRunningMode.fromIsCooling(isCooling).getRunningModeId());
+        update.setActuatorStatuses(new ActuatorStatuses());
         update.getActuatorStatuses().getActuatorStatus().add(status);
+        LOG.debug("Flex update created based on fillLevel: {}, isCooling: {} ", update.getCurrentFillLevel(),
+                isCooling);
         return update;
-    }
-
-    /**
-     * It would have been nice to actual measure this but for now it is a configurable value
-     * 
-     * @return
-     */
-    public double getPower() {
-        updateState();
-        if (newState.isCooling) {
-            return config.getPower();
-        }
-        return 0;
     }
 }

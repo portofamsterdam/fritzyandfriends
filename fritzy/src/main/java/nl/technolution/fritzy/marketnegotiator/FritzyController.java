@@ -51,4 +51,16 @@ public class FritzyController {
             LOG.error("Error powering off fritzy:", e);
         }
     }
+
+    /**
+     * Get state (on or off)
+     */
+    public Boolean getState() {
+        try {
+            return Services.get(IIoFactory.class).getWebRelay().getState().isRelaystate();
+        } catch (IOException e) {
+            LOG.error("Error powering off fritzy:", e);
+        }
+        return null;
+    }
 }
