@@ -126,7 +126,7 @@ public class ExxyConfig extends FritzyAppConfig {
         ObjectMapper mapper = JacksonFactory.defaultMapper();
         ExxyConfig c = new ExxyConfig();
         c.deviceId = "exxy";
-        c.setEnvironment("production");
+        c.setEnvironment("live");
 
         c.baseURL = "https://transparency.entsoe.eu/api";
         c.securityToken = "0b1d9ae3-d9a6-4c6b-8dc1-c62a18387ac5";

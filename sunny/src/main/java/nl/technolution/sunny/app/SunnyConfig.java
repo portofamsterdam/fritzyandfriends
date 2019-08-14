@@ -95,7 +95,7 @@ public class SunnyConfig extends FritzyAppConfig {
         ApiConfigRecord exxy = new ApiConfigRecord(EApiNames.EXXY.getName(), "http://exxy:8080/", 5000, 5000);
         apiConfig.setApis(Lists.newArrayList(netty, exxy));
         c.setApiConfig(apiConfig);
-        c.setEnvironment("production");
+        c.setEnvironment("live");
         mapper.writerWithDefaultPrettyPrinter().writeValue(System.out, c);
     }
 

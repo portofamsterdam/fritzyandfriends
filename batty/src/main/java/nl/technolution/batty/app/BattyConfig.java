@@ -81,7 +81,7 @@ public class BattyConfig extends FritzyAppConfig {
         ObjectMapper mapper = JacksonFactory.defaultMapper();
         BattyConfig c = new BattyConfig();
         c.deviceId = "batty";
-        c.setEnvironment("production");
+        c.setEnvironment("live");
 
         c.host = "192.168.8.241";
         c.username = "batty";

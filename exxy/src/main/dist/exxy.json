@@ -1,5 +1,5 @@
 {
-  "environment" : "production",
+  "environment" : "live",
   "deviceId" : "exxy",
   "baseURL" : "https://transparency.entsoe.eu/api",
   "securityToken" : "0b1d9ae3-d9a6-4c6b-8dc1-c62a18387ac5",
