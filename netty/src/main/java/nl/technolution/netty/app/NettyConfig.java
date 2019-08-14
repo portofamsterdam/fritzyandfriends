@@ -71,7 +71,7 @@ public class NettyConfig extends FritzyAppConfig {
         ObjectMapper mapper = JacksonFactory.defaultMapper();
         NettyConfig c = new NettyConfig();
         c.deviceId = "netty";
-        c.setEnvironment("production");
+        c.setEnvironment("live");
 
         c.defaultGridConnectionLimit = 16;
         c.groupConnectionLimit = 32;

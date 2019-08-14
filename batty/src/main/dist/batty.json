@@ -1,5 +1,5 @@
 {
-  "environment" : "production",
+  "environment" : "live",
   
   "deviceId" : "batty",
   "host" : "192.168.8.241",

@@ -95,7 +95,7 @@ public class FritzyConfig extends FritzyAppConfig {
         ObjectMapper mapper = JacksonFactory.defaultMapper();
         FritzyConfig c = new FritzyConfig();
         c.deviceId = "fritzy";
-        c.setEnvironment("production");
+        c.setEnvironment("live");
 
         c.host = "10.0.0.201";
         c.port = 80;
