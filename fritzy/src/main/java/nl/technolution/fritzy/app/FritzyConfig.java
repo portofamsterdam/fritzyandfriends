@@ -113,7 +113,7 @@ public class FritzyConfig extends FritzyAppConfig {
         c.leakageRate = 0.000278d;
         c.coolingSpeed = 0.002222d;
 
-        MarketConfig market = new MarketConfig(false, "http://82.196.13.251/api", "batty@fritzy.nl", "batty");
+        MarketConfig market = new MarketConfig(false, "http://82.196.13.251/api", "fritzy@fritzy.nl", "fritzy");
         c.setMarket(market);
 
         ApiConfig apiConfig = new ApiConfig();
