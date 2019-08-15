@@ -331,7 +331,7 @@ public class FritzyApi implements IFritzyApi {
         WebTarget target = client.target(url + "/event");
         Builder request = target.request();
         Form form = new Form();
-        form.param("environment ", "test");
+        form.param("environment ", environment);
         form.param("actor", actor);
         form.param("msg ", msg);
         form.param("tag ", tag.getTag());
