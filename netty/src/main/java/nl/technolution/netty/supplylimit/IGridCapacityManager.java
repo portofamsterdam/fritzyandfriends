@@ -36,8 +36,7 @@ public interface IGridCapacityManager extends IService<NettyConfig> {
     /**
      * Get the supply limit for the group the device is in
      * 
-     * @param id of device
      * @return supply limit in amps
      */
-    double getGroupConnectionLimit(DeviceId id);
+    double getGroupConnectionLimit();
 }

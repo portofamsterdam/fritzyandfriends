@@ -17,6 +17,7 @@
 package nl.technolution.fritzy.wallet;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 
 import nl.technolution.IJsonnable;
 import nl.technolution.dashboard.EEventType;
@@ -24,6 +25,7 @@ import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.gen.model.WebUser;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
+import nl.technolution.fritzy.wallet.model.GetEventResponse;
 import nl.technolution.fritzy.wallet.order.GetOrdersResponse;
 
 /**
@@ -144,5 +146,9 @@ public interface IFritzyApi {
      */
     String getAddress();
 
+    /**
+     * 
+     */
+    GetEventResponse getEvents(Instant from, Instant till);
 
 }
