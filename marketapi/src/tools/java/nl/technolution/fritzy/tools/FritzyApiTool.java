@@ -17,6 +17,8 @@
 package nl.technolution.fritzy.tools;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -34,6 +36,7 @@ import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.FritzyApi;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
+import nl.technolution.fritzy.wallet.model.GetEventResponse;
 import nl.technolution.fritzy.wallet.order.Record;
 
 /**
@@ -116,6 +119,10 @@ public class FritzyApiTool {
         api.log(EEventType.LIMIT_ACTOR, "8A", null);
         api.log(EEventType.CHAT, "chat text", new ApxPrice(1d));
 
+
+        GetEventResponse events = api.getEvents(Instant.now().minus(2, ChronoUnit.DAYS), Instant.now());
+        LOG.info("Found {} events", events.getEvents().size());
+        events.getEvents().forEach(e -> LOG.info("Event: {}", e));
     }
 
     private static void setMinters(String adminUser, String adminpass, List<String> newMinter) {

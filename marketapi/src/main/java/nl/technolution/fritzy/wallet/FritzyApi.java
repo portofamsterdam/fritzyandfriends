@@ -17,6 +17,8 @@
 package nl.technolution.fritzy.wallet;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
 
@@ -46,6 +48,7 @@ import nl.technolution.fritzy.wallet.login.LoginResponse;
 import nl.technolution.fritzy.wallet.model.Balance;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
+import nl.technolution.fritzy.wallet.model.GetEventResponse;
 import nl.technolution.fritzy.wallet.order.CreateOrderResponse;
 import nl.technolution.fritzy.wallet.order.FillOrderResponse;
 import nl.technolution.fritzy.wallet.order.GetOrdersResponse;
@@ -346,6 +349,25 @@ public class FritzyApi implements IFritzyApi {
     @Override
     public String getAddress() {
         return address;
+    }
+
+    @Override
+    public GetEventResponse getEvents(Instant from, Instant to) {
+        LOG.info("Getting events from {} till {}", from, to);
+
+        DateTimeFormatter fromatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+        String fromParam = ZonedDateTime.ofInstant(from, ZoneId.of("UTC")).format(fromatter);
+        String toParam = ZonedDateTime.ofInstant(to, ZoneId.of("UTC")).format(fromatter);
+        String targetUrl = String.format("%s/event?to=%s&from=%s", url, toParam, fromParam);
+        WebTarget target = client.target(targetUrl);
+
+        Builder request = target.request();
+        Response response = request.get();
+        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
+            LOG.error("log event failed: {}", response);
+            return null;
+        }
+        return response.readEntity(GetEventResponse.class);
     }
 
 }

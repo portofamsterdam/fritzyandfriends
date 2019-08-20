@@ -41,6 +41,7 @@ import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.gen.model.WebUser;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
+import nl.technolution.fritzy.wallet.model.GetEventResponse;
 import nl.technolution.fritzy.wallet.order.GetOrdersResponse;
 import nl.technolution.fritzy.wallet.order.Orders;
 import nl.technolution.fritzy.wallet.order.Record;
@@ -270,5 +271,10 @@ public class FritzyApiStub implements IFritzyApi {
         ordersList.add(e);
         orders.setRecords(ordersList.toArray(new Record[ordersList.size()]));
         return generateHash;
+    }
+
+    @Override
+    public GetEventResponse getEvents(Instant from, Instant till) {
+        return new GetEventResponse();
     }
 }
