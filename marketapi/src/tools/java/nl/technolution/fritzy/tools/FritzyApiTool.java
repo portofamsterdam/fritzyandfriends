@@ -120,9 +120,14 @@ public class FritzyApiTool {
         api.log(EEventType.CHAT, "chat text", new ApxPrice(1d));
 
 
-        GetEventResponse events = api.getEvents(Instant.now().minus(2, ChronoUnit.DAYS), Instant.now());
+        GetEventResponse events = api.getEvents(Instant.now().minus(2, ChronoUnit.HOURS),
+                Instant.now().plus(2, ChronoUnit.HOURS));
         LOG.info("Found {} events", events.getEvents().size());
-        events.getEvents().forEach(e -> LOG.info("Event: {}", e));
+        events.getEvents().forEach(e -> {
+            if (e.getEnvironment() != null) {
+                LOG.info("Event: {}", e);
+            }
+        });
     }
 
     private static void setMinters(String adminUser, String adminpass, List<String> newMinter) {

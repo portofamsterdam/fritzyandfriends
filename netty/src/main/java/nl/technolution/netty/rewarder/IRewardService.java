@@ -38,4 +38,13 @@ public interface IRewardService extends IService<NettyConfig> {
      */
     void claim(String txHash, String rewardId);
 
+    /**
+     * Check if a transaction is local by check the users
+     * 
+     * @param makerUsername to check
+     * @param takerUsername to check
+     * @return true if local
+     */
+    boolean isLocal(String makerUsername, String takerUsername);
+
 }

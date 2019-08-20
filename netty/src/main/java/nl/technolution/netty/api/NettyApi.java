@@ -54,7 +54,7 @@ public class NettyApi implements INettyApi {
         DeviceId id = new DeviceId(deviceId);
         IGridCapacityManager gridCapacityManager = Services.get(IGridCapacityManager.class);
         double gridConnectionLimit = gridCapacityManager.getGridConnectionLimit(id);
-        double groupConnectionLimit = gridCapacityManager.getGroupConnectionLimit(id);
+        double groupConnectionLimit = gridCapacityManager.getGroupConnectionLimit();
         return new DeviceCapacity(gridConnectionLimit, groupConnectionLimit);
     }
 

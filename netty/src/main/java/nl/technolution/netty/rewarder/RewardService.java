@@ -117,9 +117,14 @@ public final class RewardService implements IRewardService {
                 continue;
             }
         }
+        return isLocal(uMaker.getName(), uTaker.getName());
+    }
+
+    @Override
+    public boolean isLocal(String makerUsername, String takerUsername) {
         Set<String> localusers = config.getLocalusers();
-        return uMaker != null && uTaker != null 
-                && localusers.contains(uTaker.getName()) && localusers.contains(uMaker.getName());
+        return makerUsername != null && takerUsername != null && localusers.contains(takerUsername) &&
+                localusers.contains(makerUsername);
     }
 
     @Override

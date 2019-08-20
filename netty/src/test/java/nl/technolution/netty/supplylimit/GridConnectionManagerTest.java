@@ -42,14 +42,14 @@ public class GridConnectionManagerTest {
         gcm.init(config);
         DeviceId id = new DeviceId("Test");
         assertEquals(8.0d, gcm.getGridConnectionLimit(id), 0.0001d);
-        assertEquals(20.0d, gcm.getGroupConnectionLimit(id), 0.0001d);
+        assertEquals(20.0d, gcm.getGroupConnectionLimit(), 0.0001d);
         deviceLimits.put(id.getDeviceId(), 6.0d);
 
         config = new NettyConfig(defaultGridLimit, groupLimit, deviceLimits);
         gcm = new GridConnectionManager();
         gcm.init(config);
         assertEquals(6.0d, gcm.getGridConnectionLimit(id), 0.0001d);
-        assertEquals(20.0d, gcm.getGroupConnectionLimit(id), 0.0001d);
+        assertEquals(20.0d, gcm.getGroupConnectionLimit(), 0.0001d);
         assertEquals(8.0d, gcm.getGridConnectionLimit(new DeviceId("Test2")), 0.0001d);
     }
 }
