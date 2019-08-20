@@ -20,18 +20,13 @@ import java.util.Map;
 
 import com.google.common.collect.Maps;
 
-import org.slf4j.Logger;
-
 import nl.technolution.DeviceId;
-import nl.technolution.core.Log;
 import nl.technolution.netty.app.NettyConfig;
 
 /**
  * 
  */
 public class GridConnectionManager implements IGridCapacityManager {
-
-    private final Logger LOG = Log.getLogger();
 
     private Map<DeviceId, Double> griConnectionLimitRegister = Maps.newHashMap();
 
