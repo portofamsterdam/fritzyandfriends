@@ -9,7 +9,9 @@
   "truststorepass" : "12345678",
   "buyMargin" : 2,
   "sellMargin" : 2,
+  "capacity" : 4.6,
   "useStub" : false,
+  
   
   "apiConfig" : {
     "apis" : [ {

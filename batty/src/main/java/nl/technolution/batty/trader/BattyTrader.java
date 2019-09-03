@@ -32,7 +32,7 @@ public class BattyTrader implements IBattyTrader {
     @Override
     public void init(BattyConfig config) {
         resourceManager = new BattyResourceManager(new DeviceId(config.getDeviceId()));
-        cem = new BatteryNegotiator(resourceManager);
+        cem = new BatteryNegotiator(resourceManager, config);
         resourceManager.registerCustomerEnergyManager(cem);
     }
 
