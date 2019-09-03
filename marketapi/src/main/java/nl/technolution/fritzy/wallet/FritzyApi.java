@@ -119,8 +119,9 @@ public class FritzyApi implements IFritzyApi {
         registerParameters.setEmail(email);
         registerParameters.setName(user);
         registerParameters.setPassword(password);
-
-        return request.post(Entity.entity(registerParameters, MediaType.APPLICATION_JSON), WebUser.class);
+        String post = request.post(Entity.entity(registerParameters, MediaType.APPLICATION_JSON), String.class);
+        System.out.println(post);
+        return null;
     }
 
 
@@ -129,6 +130,7 @@ public class FritzyApi implements IFritzyApi {
         LOG.info("Adding minter {}", address);
         WebTarget target = client.target(url + "/node/addMinter");
         Builder request = target.request();
+        request.header("Authorization", "Bearer " + accessToken);
         Form form = new Form();
         form.param("address", address);
         form.param("contractAddress", contractAddress.getContractName());
@@ -334,11 +336,11 @@ public class FritzyApi implements IFritzyApi {
         WebTarget target = client.target(url + "/event");
         Builder request = target.request();
         Form form = new Form();
-        form.param("environment ", environment);
+        form.param("environment", environment);
         form.param("actor", actor);
-        form.param("msg ", msg);
-        form.param("tag ", tag.getTag());
-        form.param("timestamp ", ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        form.param("msg", msg);
+        form.param("tag", tag.getTag());
+        form.param("timestamp", ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
         form.param("data", dataString);
         Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
         if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
