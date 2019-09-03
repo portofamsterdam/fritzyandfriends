@@ -16,7 +16,6 @@
  */
 package nl.technolution.batty.trader;
 
-import java.math.BigDecimal;
 import java.time.Instant;
 
 import nl.technolution.DeviceId;
@@ -32,8 +31,10 @@ import nl.technolution.protocols.efi.DeviceClass;
 import nl.technolution.protocols.efi.DeviceDescription;
 import nl.technolution.protocols.efi.LeakageElement;
 import nl.technolution.protocols.efi.LeakageFunction;
-import nl.technolution.protocols.efi.StorageDiscreteRunningMode;
-import nl.technolution.protocols.efi.StorageDiscreteRunningMode.DiscreteRunningModeElement;
+import nl.technolution.protocols.efi.StorageContinuousRunningMode;
+import nl.technolution.protocols.efi.StorageContinuousRunningMode.ContinuousRunningModeElement;
+import nl.technolution.protocols.efi.StorageContinuousRunningMode.ContinuousRunningModeElement.LowerBound;
+import nl.technolution.protocols.efi.StorageContinuousRunningMode.ContinuousRunningModeElement.UpperBound;
 import nl.technolution.protocols.efi.StorageRegistration;
 import nl.technolution.protocols.efi.StorageRunningModes;
 import nl.technolution.protocols.efi.StorageStatus;
@@ -45,9 +46,12 @@ import nl.technolution.protocols.efi.util.Efi;
  */
 public class BattyResourceHelper {
 
+
     public static final int ACTUATOR_ID = 1;
 
     static final double CAPACITY = 10000;
+    static final String CHARGE_LABEL = "CHARGE";
+    static final String DISCHARGE_LABEL = "DISCHARGE";
 
     private final DeviceId deviceId;
 
@@ -79,10 +83,7 @@ public class BattyResourceHelper {
     StorageStatus getFlexibilityUpdate() {
         StorageStatus update = Efi.build(StorageStatus.class, deviceId);
         update.setValidFrom(Efi.calendarOfInstant(Instant.now()));
-        int percFilled = getMachineData().getSoc();
-
-        double fillLevel = ((double)percFilled / 100d) * CAPACITY;
-        update.setCurrentFillLevel(fillLevel);
+        update.setCurrentFillLevel(getMachineData().getSoc());
         return update;
     }
 
@@ -98,40 +99,19 @@ public class BattyResourceHelper {
         leakage.getLeakageElement().add(element);
         update.setLeakageBehaviour(leakage);
 
+        // one actuator with two runningmodes, charge and discharge
         ActuatorBehaviours actuatorBehaviours = new ActuatorBehaviours();
         ActuatorBehaviour battyBehaviour = new ActuatorBehaviour();
         battyBehaviour.setActuatorId(ACTUATOR_ID);
 
+        // Battery can charge fast when empty and slow when full
+        StorageContinuousRunningMode chargeRunningMode = getContinuousRunningMode(CHARGE_LABEL,
+                EBattyInstruction.CHARGE.getRunningModeId(), 7000d, 3000d);
+        // Battery can discharge slow when empty and fast when full
+        StorageContinuousRunningMode dischargeRunningMode = getContinuousRunningMode(DISCHARGE_LABEL,
+                EBattyInstruction.DISCHARGE.getRunningModeId(), 3000d, 7000d);
+
         StorageRunningModes runningModes = new StorageRunningModes();
-
-        // Charge running mode
-        StorageDiscreteRunningMode chargeRunningMode = new StorageDiscreteRunningMode();
-        chargeRunningMode.setId(1);
-        chargeRunningMode.setLabel(EBattyInstruction.CHARGE.name());
-
-        double chargeRate = 1000d;
-        DiscreteRunningModeElement chargeElement = new DiscreteRunningModeElement();
-        chargeElement.setFillLevelLowerBound(0);
-        chargeElement.setFillLevelUpperBound(CAPACITY);
-        chargeElement.setElectricalPower(chargeRate); // TODO MKE implement charge rate
-        chargeElement.setRunningCost(BigDecimal.valueOf(0)); // assume running device is free
-        chargeElement.setFillingRate(chargeRate / 3600d); // NOTE MKE: for now assume 100% efficiency
-        chargeRunningMode.getDiscreteRunningModeElement().add(chargeElement);
-
-        // Discharge running mode
-        StorageDiscreteRunningMode dischargeRunningMode = new StorageDiscreteRunningMode();
-        dischargeRunningMode.setId(2);
-        dischargeRunningMode.setLabel(EBattyInstruction.DISCHARGE.name());
-
-        double dischargeRate = -1000d;
-        DiscreteRunningModeElement dischargeElement = new DiscreteRunningModeElement();
-        dischargeElement.setFillLevelLowerBound(0);
-        dischargeElement.setFillLevelLowerBound(CAPACITY);
-        dischargeElement.setElectricalPower(dischargeRate); // TODO MKE implement discharge rate
-        dischargeElement.setRunningCost(BigDecimal.valueOf(0)); // assume running device is free
-        dischargeElement.setFillingRate(dischargeRate / 3600d); // NOTE MKE: for now assume 100% efficiency
-        dischargeRunningMode.getDiscreteRunningModeElement().add(dischargeElement);
-
         runningModes.getDiscreteRunningModeOrContinuousRunningMode().add(chargeRunningMode);
         runningModes.getDiscreteRunningModeOrContinuousRunningMode().add(dischargeRunningMode);
 
@@ -139,5 +119,26 @@ public class BattyResourceHelper {
         actuatorBehaviours.getActuatorBehaviour().add(battyBehaviour);
         update.setActuatorBehaviours(actuatorBehaviours);
         return update;
+    }
+
+    private static StorageContinuousRunningMode getContinuousRunningMode(String label, int id, double low,
+            double high) {
+        StorageContinuousRunningMode continuousRunningMode = new StorageContinuousRunningMode();
+        continuousRunningMode.setLabel(label);
+        continuousRunningMode.setId(id);
+        // Charge
+        ContinuousRunningModeElement chargeRunningMode = new ContinuousRunningModeElement();
+        // Used for complete SoC range of battery
+        chargeRunningMode.setFillLevelLowerBound(0);
+        chargeRunningMode.setFillLevelLowerBound(100);
+        LowerBound lowBound = new LowerBound();
+        lowBound.setElectricalPower(low);
+        UpperBound highBound = new UpperBound();
+        highBound.setElectricalPower(high);
+        chargeRunningMode.setLowerBound(lowBound);
+        chargeRunningMode.setUpperBound(highBound);
+
+        continuousRunningMode.getContinuousRunningModeElement().add(chargeRunningMode);
+        return continuousRunningMode;
     }
 }

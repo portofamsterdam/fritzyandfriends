@@ -46,7 +46,7 @@ public class GridConnectionManager implements IGridCapacityManager {
     }
 
     @Override
-    public double getGroupConnectionLimit(DeviceId id) {
+    public double getGroupConnectionLimit() {
         return groupConnectionLimit;
     }
 }

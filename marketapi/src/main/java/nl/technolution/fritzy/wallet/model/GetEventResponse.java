@@ -14,37 +14,25 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.netty.rewarder;
+package nl.technolution.fritzy.wallet.model;
 
-import nl.technolution.apis.netty.OrderReward;
-import nl.technolution.dropwizard.services.IService;
-import nl.technolution.netty.app.NettyConfig;
+import java.util.List;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * 
  */
-public interface IRewardService extends IService<NettyConfig> {
+public class GetEventResponse {
 
-    /**
-     * @param taker of the reward
-     * @param orderHash on public market to find
-     * @return offered reward
-     */
-    OrderReward calculateReward(String taker, String orderHash);
+    @JsonProperty("events")
+    private List<ApiEvent> events;
 
-    /**
-     * @param txHash taker reward
-     * @param rewardId identifier of reward promis created earlier
-     */
-    void claim(String txHash, String rewardId);
+    public List<ApiEvent> getEvents() {
+        return events;
+    }
 
-    /**
-     * Check if a transaction is local by check the users
-     * 
-     * @param makerUsername to check
-     * @param takerUsername to check
-     * @return true if local
-     */
-    boolean isLocal(String makerUsername, String takerUsername);
-
+    public void setEvents(List<ApiEvent> events) {
+        this.events = events;
+    }
 }

@@ -20,15 +20,16 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
@@ -39,8 +40,10 @@ import nl.technolution.dashboard.EEventType;
 import nl.technolution.dropwizard.webservice.JacksonFactory;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.gen.model.WebUser;
+import nl.technolution.fritzy.wallet.model.ApiEvent;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
+import nl.technolution.fritzy.wallet.model.GetEventResponse;
 import nl.technolution.fritzy.wallet.order.GetOrdersResponse;
 import nl.technolution.fritzy.wallet.order.Orders;
 import nl.technolution.fritzy.wallet.order.Record;
@@ -48,12 +51,13 @@ import nl.technolution.fritzy.wallet.order.Record;
 /**
  * Stub the Fritsy API
  */
-public class FritzyApiStub implements IFritzyApi {
+public final class FritzyApiStub implements IFritzyApi {
 
     private static FritzyApiStub stubbedApi;
 
-    private final ObjectMapper MAPPER = JacksonFactory.defaultMapper();
-    private final List<DashboardEvent> events = new ArrayList<>();
+    private final AtomicInteger id = new AtomicInteger(0);
+    private final ObjectMapper mapper = JacksonFactory.defaultMapper();
+    private final List<ApiEvent> events = new ArrayList<>();
     private final List<WebUser> users = new ArrayList<>();
     private final Map<String, FritzyBalance> balances = new HashMap<>();
     private final Orders orders;
@@ -160,16 +164,27 @@ public class FritzyApiStub implements IFritzyApi {
         orders.setRecords(ordersList.toArray(new Record[ordersList.size()]));
     }
 
+
     @Override
     public void log(EEventType tag, String msg, IJsonnable data) {
         String username = loginInUser != null ? loginInUser.getName() : "unknown";
         String dataStr;
         try {
-            dataStr = data != null ? MAPPER.writeValueAsString(data) : "";
+            dataStr = data != null ? mapper.writeValueAsString(data) : "";
         } catch (JsonProcessingException e) {
             dataStr = "<eventdata unparsable>";
         }
-        events.add(new DashboardEvent("test", username, msg, tag.getTag(), new Date(), dataStr));
+        ApiEvent e = new ApiEvent();
+        e.setId(id.getAndIncrement());
+        e.setEnvironment(FritzyApiStub.class.getSimpleName());
+        e.setActor(username);
+        e.setMsg(msg);
+        e.setTag(tag.getTag());
+        e.setData(dataStr);
+        e.setTimestamp(Instant.now().toString());
+        e.setCreatedAt(Instant.now().toString());
+        e.setUpdatedAt(Instant.now().toString());
+        events.add(e);
     }
 
     @Override
@@ -261,6 +276,38 @@ public class FritzyApiStub implements IFritzyApi {
         String generateHash = generateHash(Instant.now().hashCode());
         webOrder.setHash(generateHash);
         webOrder.setMakerAddress(loginInUser.getAddress());
+        webOrder.setMakerAssetAmount(makerAmount.toPlainString());
+        webOrder.setMakerAssetData(makerToken.getContractName());
+        webOrder.setTakerAssetAmount(takerAmount.toPlainString());
+        webOrder.setTakerAssetData(takerToken.getContractName());
+        Record e = new Record();
+        e.setOrder(webOrder);
+        ordersList.add(e);
+        orders.setRecords(ordersList.toArray(new Record[ordersList.size()]));
+        return generateHash;
+    }
+
+    @Override
+    public GetEventResponse getEvents(Instant from, Instant till) {
+        GetEventResponse getEventResponse = new GetEventResponse();
+        getEventResponse.setEvents(events);
+        return getEventResponse;
+    }
+
+    @VisibleForTesting
+    public List<ApiEvent> getAllEvents() {
+        return events;
+    }
+
+    @VisibleForTesting
+    public String mockCompleteOrder(String makerAddress, String takerAddress, BigDecimal makerAmount,
+            EContractAddress makerToken, BigDecimal takerAmount, EContractAddress takerToken) {
+        List<Record> ordersList = Lists.newArrayList(Arrays.asList(orders.getRecords()));
+        WebOrder webOrder = new WebOrder();
+        String generateHash = generateHash(Instant.now().hashCode());
+        webOrder.setHash(generateHash);
+        webOrder.setMakerAddress(makerAddress);
+        webOrder.setTakerAddress(takerAddress);
         webOrder.setMakerAssetAmount(makerAmount.toPlainString());
         webOrder.setMakerAssetData(makerToken.getContractName());
         webOrder.setTakerAssetAmount(takerAmount.toPlainString());

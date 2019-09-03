@@ -17,12 +17,14 @@
 package nl.technolution.batty.trader;
 
 import java.time.Instant;
+import java.util.Iterator;
+import java.util.List;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 
 import nl.technolution.DeviceId;
 import nl.technolution.protocols.efi.ActuatorInstruction;
-import nl.technolution.protocols.efi.ActuatorInstructions;
 import nl.technolution.protocols.efi.Instruction;
 import nl.technolution.protocols.efi.InstructionRevoke;
 import nl.technolution.protocols.efi.Measurement;
@@ -45,6 +47,9 @@ public class BattyResourceManager implements IResourceManager {
 
     private ICustomerEnergyManager<StorageRegistration, StorageUpdate> cem;
 
+    private List<ActuatorInstruction> actuatorInstructions = Lists.newArrayList();
+    private ActuatorInstruction activeInstruction;
+
     public BattyResourceManager(DeviceId deviceId) {
         this.deviceId = deviceId;
         this.helper = new BattyResourceHelper(deviceId);
@@ -55,8 +60,7 @@ public class BattyResourceManager implements IResourceManager {
     public void instruct(Instruction instruction) {
         Preconditions.checkArgument(instruction instanceof StorageInstruction, "Expected storage instruction");
         StorageInstruction storageInstruction = StorageInstruction.class.cast(instruction);
-        ActuatorInstructions actuatorInstructions = storageInstruction.getActuatorInstructions();
-        actuatorInstructions.getActuatorInstruction().forEach(this::handleActuatorInstruction);
+        storageInstruction.getActuatorInstructions().getActuatorInstruction().forEach(actuatorInstructions::add);
     }
 
     @Override
@@ -65,6 +69,15 @@ public class BattyResourceManager implements IResourceManager {
     }
 
     private void handleActuatorInstruction(ActuatorInstruction instruction) {
+        if (instruction == null) {
+            controller.stop();
+        }
+
+        if (instruction.getStartTime().toGregorianCalendar().toInstant().plusSeconds(900).isAfter(Instant.now())) {
+            activeInstruction = null;
+            controller.stop();
+        }
+
         // NOTE assume one actuatorId exists
         EBattyInstruction battyInstruction = EBattyInstruction.fromRunningModeId(instruction.getRunningModeId());
         switch (battyInstruction) {
@@ -87,6 +100,19 @@ public class BattyResourceManager implements IResourceManager {
      */
     public void evaluate() {
         cem.flexibilityUpdate(helper.getFlexibilityUpdate());
+
+        // Set next active instruction
+        Iterator<ActuatorInstruction> itr = actuatorInstructions.iterator();
+        while (itr.hasNext()) {
+            ActuatorInstruction instruction = itr.next();
+            if (instruction.getStartTime().toGregorianCalendar().toInstant().isAfter(Instant.now())) {
+                activeInstruction = instruction;
+                itr.remove();
+            }
+        }
+
+        handleActuatorInstruction(activeInstruction);
+
     }
 
     /**
