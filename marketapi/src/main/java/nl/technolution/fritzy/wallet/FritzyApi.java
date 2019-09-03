@@ -340,7 +340,11 @@ public class FritzyApi implements IFritzyApi {
         form.param("actor", actor);
         form.param("msg", msg);
         form.param("tag", tag.getTag());
-        form.param("timestamp", ZonedDateTime.now().format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        ZonedDateTime now = ZonedDateTime.now();
+        form.param("timestamp", now.format(DateTimeFormatter.ISO_OFFSET_DATE_TIME));
+        long epoch = now.toEpochSecond();
+        long roundId = epoch - (epoch % 9000);
+        form.param("roundId", "" + roundId);
         form.param("data", dataString);
         Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
         if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
