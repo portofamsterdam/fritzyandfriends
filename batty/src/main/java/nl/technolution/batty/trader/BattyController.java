@@ -16,6 +16,9 @@
  */
 package nl.technolution.batty.trader;
 
+import org.slf4j.Logger;
+
+import nl.technolution.Log;
 import nl.technolution.batty.xstorage.connection.IXStorageConnection;
 import nl.technolution.batty.xstorage.connection.IXStorageFactory;
 import nl.technolution.dropwizard.services.Services;
@@ -24,6 +27,8 @@ import nl.technolution.dropwizard.services.Services;
  * 
  */
 class BattyController {
+
+    private final Logger log = Log.getLogger();
 
     private double maxChargeRate;
     private double maxDischargeRate;
@@ -40,6 +45,7 @@ class BattyController {
     }
 
     void init() {
+        log.debug("init batty controller");
         IXStorageConnection connection = Services.get(IXStorageFactory.class).getConnection();
         connection.powerOff();
     }
@@ -51,6 +57,7 @@ class BattyController {
         IXStorageConnection connection = Services.get(IXStorageFactory.class).getConnection();
         connection.powerOn();
         double chargeRatePercentage = chargeRate / maxChargeRate * 100d;
+        log.debug("charging at {} ({}%)", chargeRate, chargeRatePercentage);
         connection.charge((int)chargeRatePercentage);
     }
 
@@ -61,10 +68,12 @@ class BattyController {
         IXStorageConnection connection = Services.get(IXStorageFactory.class).getConnection();
         connection.powerOn();
         double dischargeRatePercentage = dischargeRate / maxDischargeRate * 100d;
+        log.debug("discharging at {} ({}%)", dischargeRate, dischargeRatePercentage);
         connection.discharge((int)dischargeRatePercentage);
     }
 
     void stop() {
+        log.debug("stopping batty");
         IXStorageConnection connection = Services.get(IXStorageFactory.class).getConnection();
         connection.powerOff();
     }
