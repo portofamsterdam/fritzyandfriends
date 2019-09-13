@@ -130,7 +130,7 @@ public class BattyResourceHelper {
         ContinuousRunningModeElement chargeRunningMode = new ContinuousRunningModeElement();
         // Used for complete SoC range of battery
         chargeRunningMode.setFillLevelLowerBound(0);
-        chargeRunningMode.setFillLevelLowerBound(100);
+        chargeRunningMode.setFillLevelUpperBound(100);
         LowerBound lowBound = new LowerBound();
         lowBound.setElectricalPower(low);
         UpperBound highBound = new UpperBound();

@@ -17,6 +17,11 @@
 package nl.technolution.batty.trader;
 
 import java.math.BigDecimal;
+import java.util.List;
+
+import javax.xml.datatype.XMLGregorianCalendar;
+
+import com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
 
@@ -66,6 +71,10 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
 
     private StorageSystemDescription systemDescription;
 
+    private List<OrderExecutor> activeBattyOrders = Lists.newArrayList();
+    private String openBuyOrderHash;
+    private String openSellOrderHash;
+
     /**
      *
      * @param config config used for trading
@@ -95,6 +104,14 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
      */
     public void evaluate() {
 
+        // Can only do something if we know our capabilities
+        if (fillLevel == null || systemDescription == null) {
+            log.warn("Waiting for state of charge");
+            return;
+        }
+
+        checkOpenOrders();
+
         // Get balance
         IFritzyApi market = Services.get(IFritzyApiFactory.class).build();
         FritzyBalance balance = market.balance();
@@ -109,6 +126,10 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
         Orders orders = market.orders().getOrders();
         for (Record record : orders.getRecords()) {
             WebOrder order = record.getOrder();
+            if (order.getHash().equals(openBuyOrderHash) || order.getHash().equals(openSellOrderHash)) {
+                continue;
+            }
+
             if (!isInterestingOrder(order, balance, deviceCapacity)) {
                 continue;
             }
@@ -120,52 +141,146 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
             }
             log.debug("Reward {} is adequate at {}, accepting order", reward.getRewardId(), reward.getReward());
 
+            if (order.getTakerAssetData().equals(EContractAddress.EUR.getContractName())) {
+                if (balance.getEur().doubleValue() < new BigDecimal(order.getTakerAssetAmount()).doubleValue()) {
+                    log.warn("Can't afford {} for order, balance is {}", order.getTakerAssetAmount(), balance.getEur());
+                    continue;
+                }
+            } else if (order.getTakerAssetData().equals(EContractAddress.KWH.getContractName())) {
+                log.warn("minting {}{}", order.getTakerAssetAmount(), order.getTakerAssetData());
+                market.mint(market.getAddress(), new BigDecimal(order.getTakerAssetAmount()), EContractAddress.KWH);
+            }
+            
             String txId = market.fillOrder(order.getHash());
             netty.claim(txId, reward.getRewardId());
 
-            log.debug("Instructing device");
-            instructDevice(order);
+            activeBattyOrders.add(new OrderExecutor(order.getHash()));
+            cancelExistingOrders(market);
+            return;
+        }
+
+        createOrder(market, balance, deviceCapacity);
+    }
+
+    private void checkOpenOrders() {
+        for (OrderExecutor activeBattyOrder : activeBattyOrders) {
+            activeBattyOrder.evaluate(resourceManager, systemDescription, fillLevel);
+        }
+
+    }
+
+    private void createOrder(IFritzyApi market, FritzyBalance balance, DeviceCapacity deviceCapacity) {
+        ApxPrice apxPrice = Endpoints.get(IAPXPricesApi.class).getNextQuarterHourPrice();
+        createBuyOrder(market, balance, deviceCapacity, apxPrice);
+        createSellOrder(market, balance, deviceCapacity, apxPrice);
+    }
+
+    private void createSellOrder(IFritzyApi market, FritzyBalance balance, DeviceCapacity deviceCapacity,
+            ApxPrice apxPrice) {
+        if (openSellOrderHash != null) {
+            WebOrder sellOrder = market.order(openSellOrderHash);
+            if (sellOrder != null) {
+                return;
+            }
+        }
+        if (fillLevel < 20) {
+            log.debug("Battery level too low to sell energy");
+        }
+        double wq = getWattPerQuarterFromRunningMode(BattyResourceHelper.DISCHARGE_LABEL, systemDescription,
+                fillLevel);
+
+        // check maximum usage on grid
+        double maxWq = deviceCapacity.getGridConnectionLimit() * 230d / 4;
+        if (maxWq > wq) {
+            wq = maxWq;
+        }
+
+        double kWhPrice = apxPrice.getPrice() + config.getBuyMargin();
+        double orderPrice = wq * kWhPrice;
+
+        openSellOrderHash = market.createOrder(EContractAddress.EUR, EContractAddress.KWH, new BigDecimal(wq),
+                new BigDecimal(orderPrice));
+        activeBattyOrders.add(new OrderExecutor(openSellOrderHash));
+    }
+
+    private void createBuyOrder(IFritzyApi market, FritzyBalance balance, DeviceCapacity deviceCapacity,
+            ApxPrice apxPrice) {
+        if (openBuyOrderHash != null) {
+            WebOrder buyOrder = market.order(openSellOrderHash);
+            if (buyOrder != null) {
+                return;
+            }
+        }
+        double wq = getWattPerQuarterFromRunningMode(BattyResourceHelper.CHARGE_LABEL, systemDescription,
+                fillLevel);
+
+        // check maximum usage on grid
+        double maxWq = deviceCapacity.getGridConnectionLimit() * 230d / 4;
+        if (maxWq > wq) {
+            wq = maxWq;
+        }
+
+        double kWhPrice = apxPrice.getPrice() - config.getBuyMargin();
+        double orderPrice = wq * 1000 * kWhPrice;
+
+        openBuyOrderHash = market.createOrder(EContractAddress.KWH, EContractAddress.EUR, new BigDecimal(wq),
+                new BigDecimal(orderPrice));
+        activeBattyOrders.add(new OrderExecutor(openBuyOrderHash));
+    }
+
+    static double getWattPerQuarterFromRunningMode(String runningModeLabel,
+            StorageSystemDescription storageSystemDescription, double fillLevel) {
+        for (ActuatorBehaviour act : storageSystemDescription.getActuatorBehaviours().getActuatorBehaviour()) {
+            for (RunningMode rm : act.getRunningModes().getDiscreteRunningModeOrContinuousRunningMode()) {
+                if (!rm.getLabel().equals(runningModeLabel)) {
+                    continue;
+                }
+                StorageContinuousRunningMode scrm = StorageContinuousRunningMode.class.cast(rm);
+                for (ContinuousRunningModeElement crm : scrm.getContinuousRunningModeElement()) {
+                    return getKiloWattPerQuarterFromRunningMode(crm, fillLevel);
+                }
+            }
+        }
+        throw new IllegalStateException();
+    }
+
+    /**
+     * @param market
+     */
+    private void cancelExistingOrders(IFritzyApi market) {
+        // Cancel existing orders
+        if (openBuyOrderHash != null) {
+            market.cancelOrder(openBuyOrderHash);
+        }
+        if (openSellOrderHash != null) {
+            market.cancelOrder(openSellOrderHash);
         }
     }
 
     private boolean isInterestingOrder(WebOrder order, FritzyBalance balance, DeviceCapacity deviceCapacity) {
         log.debug("Checking order {}", order.getHash());
         // Charging order
-        if (order.getTakerAssetData().equals(EContractAddress.KWH.getContractName())) {
+        if (order.getMakerAssetData().equals(EContractAddress.KWH.getContractName())) {
 
-            BigDecimal kWh = new BigDecimal(order.getTakerAssetAmount());
+            BigDecimal kWh = new BigDecimal(order.getMakerAssetAmount());
             log.debug("Order for buying {} kWh (Charing)", kWh);
 
-            if (isRoomForKWh(config.getCapactity(), fillLevel, kWh.doubleValue())) {
-                return calculateOrder(order, balance, deviceCapacity, kWh);
-            }
-
+            return calculateOrder(order, balance, deviceCapacity, kWh);
         }
         // Discharging order
-        if (order.getMakerAssetData().equals(EContractAddress.KWH.getContractName())) {
+        if (order.getTakerAssetData().equals(EContractAddress.KWH.getContractName())) {
             // Discharge with negative kWh's
-            BigDecimal kWh = new BigDecimal(order.getTakerAssetAmount()).multiply(new BigDecimal(-1));
+            BigDecimal kWh = new BigDecimal(order.getTakerAssetAmount());
             log.debug("Order for selling {} kWh (Discharing)", kWh);
 
-            if (isRoomForKWh(config.getCapactity(), fillLevel, kWh.doubleValue())) {
-                return calculateOrder(order, balance, deviceCapacity, kWh);
-            }
+            return calculateOrder(order, balance, deviceCapacity, kWh);
+
         }
         return false;
     }
 
-    private boolean isRoomForKWh(double capacity, double fillLevel, double kWh) {
-        double fillLevelKwh = capacity * (fillLevel / 100d);
-        double newFillLevel = fillLevelKwh + kWh;
-        if (newFillLevel > capacity || newFillLevel < 0) {
-            log.debug("Can't fit {} kWh, already charged to {}/{}", kWh, fillLevelKwh, config.getCapactity());
-            return false;
-        }
-        return true;
-    }
-
     private boolean calculateOrder(WebOrder order, FritzyBalance balance, DeviceCapacity devCapacity, BigDecimal kWh) {
-        BigDecimal kWq = kWh.multiply(BigDecimal.valueOf(4));
+        BigDecimal kWq = kWh.multiply(BigDecimal.valueOf(4)); // kWh to be generated in 1/4 hour so multiply by 4
         double maxAmps = kWq.doubleValue() * 1000d / 230d;
         if (maxAmps > devCapacity.getGridConnectionLimit()) {
             // not allowed use this much energy
@@ -173,20 +288,24 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
             return false;
         }
         for (ActuatorBehaviour act : systemDescription.getActuatorBehaviours().getActuatorBehaviour()) {
-            if (kWq.doubleValue() > 0 &&
+            if (order.getMakerAssetData().equals(EContractAddress.KWH.getContractName()) &&
                     checkBehavious(kWq.doubleValue(), act, fillLevel, BattyResourceHelper.CHARGE_LABEL)) {
+                log.debug("Charging {}{} fits ", kWq.doubleValue(), order.getMakerAssetData());
                 return true;
             }
-            if (kWq.doubleValue() < 0 &&
-                    checkBehavious(kWq.doubleValue(), act, fillLevel, BattyResourceHelper.CHARGE_LABEL)) {
+
+            if (order.getTakerAssetData().equals(EContractAddress.KWH.getContractName()) &&
+                    checkBehavious(kWq.doubleValue(), act, fillLevel, BattyResourceHelper.DISCHARGE_LABEL)) {
+                log.debug("Discharging {}{} fits ", kWq.doubleValue(), order.getMakerAssetData());
                 return true;
             }
 
         }
+        log.debug("No runningmode found that fits handling {}{}", kWq.doubleValue(), order.getMakerAssetData());
         return false;
     }
 
-    static boolean checkBehavious(double kileWattPerQuarter, ActuatorBehaviour act, double fillLevel, String rmLabel) {
+    static boolean checkBehavious(double kiloWattPerQuarter, ActuatorBehaviour act, double fillLevel, String rmLabel) {
         for (RunningMode rm : act.getRunningModes().getDiscreteRunningModeOrContinuousRunningMode()) {
             if (rm.getLabel().equals(rmLabel) && rm instanceof StorageContinuousRunningMode) {
                 StorageContinuousRunningMode scrm = StorageContinuousRunningMode.class.cast(rm);
@@ -197,12 +316,8 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
                     }
                     // capacity of runningmode is negative when discharging
                     double capacityWq = getKiloWattPerQuarterFromRunningMode(m, fillLevel);
-
-                    if (kileWattPerQuarter < 0 && kileWattPerQuarter < capacityWq) {
+                    if (kiloWattPerQuarter > capacityWq) {
                         continue; // Cannot discharge this fast at this charge level
-                    }
-                    if (kileWattPerQuarter > 0 && kileWattPerQuarter > capacityWq) {
-                        continue; // Cannot charge this fast at this charge level
                     }
                     return true;
                 }
@@ -224,7 +339,7 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
     }
 
     private boolean checkAcceptOffer(WebOrder order, OrderReward reward) {
-        IAPXPricesApi pricesApi = Services.get(IAPXPricesApi.class);
+        IAPXPricesApi pricesApi = Endpoints.get(IAPXPricesApi.class);
         ApxPrice apxPriceObj = pricesApi.getNextQuarterHourPrice();
         double marketPrice = apxPriceObj.getPrice();
         log.debug("Market price is {}, reward is {}", marketPrice, reward.getReward());
@@ -232,7 +347,7 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
         if (order.getTakerAssetData().equals(EContractAddress.EUR.getContractName())) {
             double orderPrice = new BigDecimal(order.getTakerAssetAmount()).doubleValue();
             double totalIncome = orderPrice + reward.getReward();
-            if (totalIncome > marketPrice + config.getSellMargin()) {
+            if (totalIncome > marketPrice + (config.getSellMargin() / 100d)) {
                 log.debug("Selling energy is worth it (sellMargin is {}), receiving {}", config.getSellMargin(),
                         totalIncome);
                 return true;
@@ -247,7 +362,7 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
             double totalPrice = orderPrice - reward.getReward();
             log.debug("Market price is {}, reward is {}", marketPrice, reward.getReward());
 
-            if (totalPrice < marketPrice - config.getBuyMargin()) {
+            if (totalPrice < marketPrice - (config.getBuyMargin() / 100d)) {
                 log.debug("Buying energy is worth it (buyMargin is {}), spending {}", config.getBuyMargin(),
                         totalPrice);
                 return true;
@@ -261,16 +376,38 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
     private void instructDevice(WebOrder order) {
         StorageInstruction instruction = Efi.build(StorageInstruction.class, getDeviceId());
         ActuatorInstructions actInstuctions = new ActuatorInstructions();
+
+        // Charge instruction
         ActuatorInstruction actInstruction = new ActuatorInstruction();
         actInstruction.setActuatorId(BattyResourceHelper.ACTUATOR_ID);
-        actInstruction.setRunningModeId(EBattyInstruction.CHARGE.getRunningModeId());
-        actInstruction.setStartTime(Efi.calendarOfInstant(Efi.getNextQuarter()));
+        for (ActuatorBehaviour ab : systemDescription.getActuatorBehaviours().getActuatorBehaviour()) {
+            for (RunningMode mode : ab.getRunningModes().getDiscreteRunningModeOrContinuousRunningMode()) {
+                if (order.getTakerAssetData().equals(EContractAddress.KWH.getContractName()) &&
+                        mode.getLabel().equals(BattyResourceHelper.CHARGE_LABEL)) {
+                    actInstruction.setRunningModeId(mode.getId());
+                }
+                if (order.getMakerAssetData().equals(EContractAddress.KWH.getContractName()) &&
+                        mode.getLabel().equals(BattyResourceHelper.DISCHARGE_LABEL)) {
+                    actInstruction.setRunningModeId(mode.getId());
+                }
+            }
+        }
+        XMLGregorianCalendar battyActStartTs = Efi.calendarOfInstant(Efi.getNextQuarter());
+        actInstruction.setStartTime(battyActStartTs);
         actInstuctions.getActuatorInstruction().add(actInstruction);
+
+        // Stop instruction
+
         instruction.setActuatorInstructions(actInstuctions);
         resourceManager.instruct(instruction);
     }
 
     public Double getFillLevel() {
         return fillLevel;
+    }
+
+    @Override
+    public DeviceId getDeviceId() {
+        return new DeviceId(config.getDeviceId());
     }
 }
