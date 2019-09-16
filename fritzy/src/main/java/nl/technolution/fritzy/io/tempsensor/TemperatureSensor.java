@@ -87,8 +87,12 @@ public class TemperatureSensor implements ITemperatureSensor {
                             }
                         }
                         String stringValue = new String(buffer, StandardCharsets.UTF_8);
-                        log.debug("stringValue read from temp sensor: " + stringValue);
-                        temparature = Double.parseDouble(stringValue.trim());
+                        try {
+                            temparature = Double.parseDouble(stringValue.trim());
+                        } catch (NumberFormatException nfe) {
+                            log.warn("Failed to parse temparatuur, set to minimal value", nfe);
+                            temparature = Double.MIN_VALUE;
+                        }
                         log.debug("temperature: " + temparature);
                     } catch (IOException e) {
                         log.warn("Failed to read temparatuur, set to minimal value", e);
