@@ -17,6 +17,7 @@
 package nl.technolution.batty.trader;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.math.BigDecimal;
@@ -124,7 +125,7 @@ public class NegotiatorTest {
     }
 
     @Test 
-    public void acceptExistingOrder() {
+    public void acceptExistingOrderCharge() {
         FritzyApiStub market = FritzyApiStub.instance();
         BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
         bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
@@ -136,13 +137,219 @@ public class NegotiatorTest {
         market.login(sunny, PASSWORD);
         BigDecimal eur = new BigDecimal(1);
         BigDecimal kWh = new BigDecimal(0.125d);
+        market.mint(market.getAddress(), kWh, EContractAddress.KWH);
         market.createOrder(EContractAddress.KWH, EContractAddress.EUR, kWh, eur);
 
         market.login(BATTY, PASSWORD);
         market.mint(market.getAddress(), eur, EContractAddress.EUR);
         netty.rewardToGive = 2;
         bn.evaluate();
+        assertTrue(netty.orderRewardRequested);
         assertTrue(netty.claimed);
+    }
+
+    @Test
+    public void acceptExistingOrderDischarge() {
+        FritzyApiStub market = FritzyApiStub.instance();
+        BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
+        bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
+        bn.flexibilityUpdate(resourceHelper.getStorageSystemDescription());
+
+        String sunny = "sunny";
+        market.register(sunny, sunny, PASSWORD);
+        market.login(sunny, PASSWORD);
+        BigDecimal eur = new BigDecimal(1);
+        BigDecimal kWh = new BigDecimal(0.125d);
+        market.mint(market.getAddress(), eur, EContractAddress.EUR);
+        market.createOrder(EContractAddress.EUR, EContractAddress.KWH, eur, kWh);
+
+        market.login(BATTY, PASSWORD);
+        netty.rewardToGive = 2;
+        bn.evaluate();
+        assertTrue(netty.orderRewardRequested);
+        assertTrue(netty.claimed);
+    }
+
+    @Test
+    public void almostEmptyBattery() {
+        FritzyApiStub market = FritzyApiStub.instance();
+        XStorageStub.instance().setStateOfCharge(10);
+        Services.get(IMachineDataCacher.class).update();
+        BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
+        bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
+        bn.flexibilityUpdate(resourceHelper.getStorageSystemDescription());
+
+        BigDecimal eur = new BigDecimal(10);
+        market.login(BATTY, PASSWORD);
+        market.mint(market.getAddress(), eur, EContractAddress.EUR);
+        netty.rewardToGive = 2;
+        bn.evaluate();
+        assertFalse(netty.orderRewardRequested);
+        assertFalse(netty.claimed);
+
+        // Only buy kWh order made
+        assertEquals(1, market.orders().getOrders().getRecords().length);
+        assertEquals(EContractAddress.KWH.getContractName(),
+                market.orders().getOrders().getRecords()[0].getOrder().getTakerAssetData());
+    }
+
+    @Test
+    public void acceptExistingOrderNoReward() {
+        FritzyApiStub market = FritzyApiStub.instance();
+        BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
+        bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
+        bn.flexibilityUpdate(resourceHelper.getStorageSystemDescription());
+
+        String sunny = "sunny";
+        market.register(sunny, sunny, PASSWORD);
+        market.login(sunny, PASSWORD);
+        BigDecimal eur = new BigDecimal(1);
+        BigDecimal kWh = new BigDecimal(0.125d);
+        market.mint(market.getAddress(), eur, EContractAddress.EUR);
+        market.createOrder(EContractAddress.EUR, EContractAddress.KWH, eur, kWh);
+
+        market.login(BATTY, PASSWORD);
+        netty.rewardToGive = 0;
+        bn.evaluate();
+        assertTrue(netty.orderRewardRequested);
+        assertFalse(netty.claimed);
+    }
+
+    @Test
+    public void acceptExistingOrderChargeBroke() {
+        FritzyApiStub market = FritzyApiStub.instance();
+        BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
+        bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
+        bn.flexibilityUpdate(resourceHelper.getStorageSystemDescription());
+
+        String sunny = "sunny";
+        market.register(sunny, sunny, PASSWORD);
+        market.login(sunny, PASSWORD);
+        BigDecimal eur = new BigDecimal(1);
+        BigDecimal kWh = new BigDecimal(0.125d);
+        market.mint(market.getAddress(), kWh, EContractAddress.KWH);
+        market.createOrder(EContractAddress.KWH, EContractAddress.EUR, kWh, eur);
+
+        market.login(BATTY, PASSWORD);
+        netty.rewardToGive = 2;
+        bn.evaluate();
+        assertFalse(netty.claimed);
+        assertFalse(netty.orderRewardRequested);
+    }
+
+    @Test
+    public void onlyChargeOrderByBatty() {
+        FritzyApiStub market = FritzyApiStub.instance();
+        BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
+        bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
+        bn.flexibilityUpdate(resourceHelper.getStorageSystemDescription());
+
+        market.login(BATTY, PASSWORD);
+        BigDecimal eur = new BigDecimal(1);
+        BigDecimal kWh = new BigDecimal(0.125d);
+        market.mint(market.getAddress(), kWh, EContractAddress.KWH);
+        market.createOrder(EContractAddress.KWH, EContractAddress.EUR, kWh, eur);
+
+        netty.rewardToGive = 2;
+        bn.evaluate();
+        assertFalse(netty.claimed);
+        assertFalse(netty.orderRewardRequested);
+
+        // check created orders
+        assertEquals(3, market.orders().getOrders().getRecords().length);
+    }
+
+    @Test
+    public void onlyDischargeOrderByBatty() {
+        FritzyApiStub market = FritzyApiStub.instance();
+        BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
+        bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
+        bn.flexibilityUpdate(resourceHelper.getStorageSystemDescription());
+
+        market.login(BATTY, PASSWORD);
+        BigDecimal eur = new BigDecimal(1);
+        BigDecimal kWh = new BigDecimal(0.125d);
+        market.mint(market.getAddress(), eur, EContractAddress.EUR);
+        market.createOrder(EContractAddress.EUR, EContractAddress.KWH, eur, kWh);
+
+        netty.rewardToGive = 2;
+        bn.evaluate();
+        assertFalse(netty.claimed);
+        assertFalse(netty.orderRewardRequested);
+
+        // check created orders
+        assertEquals(3, market.orders().getOrders().getRecords().length);
+    }
+
+    @Test
+    public void chargeOrderTooLargeForGrid() {
+        FritzyApiStub market = FritzyApiStub.instance();
+        BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
+        bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
+        bn.flexibilityUpdate(resourceHelper.getStorageSystemDescription());
+
+        String sunny = "sunny";
+        market.register(sunny, sunny, PASSWORD);
+        market.login(sunny, PASSWORD);
+        BigDecimal eur = new BigDecimal(2d);
+        BigDecimal kWh = new BigDecimal(10d);
+        market.mint(market.getAddress(), kWh, EContractAddress.KWH);
+        market.createOrder(EContractAddress.KWH, EContractAddress.EUR, kWh, eur);
+
+        market.login(BATTY, PASSWORD);
+        netty.rewardToGive = 2;
+        bn.evaluate();
+        assertFalse(netty.claimed);
+        assertFalse(netty.orderRewardRequested);
+    }
+
+    @Test
+    public void dischargeOrderTooLargeForGrid() {
+        FritzyApiStub market = FritzyApiStub.instance();
+        BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
+        bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
+        bn.flexibilityUpdate(resourceHelper.getStorageSystemDescription());
+
+        String sunny = "sunny";
+        market.register(sunny, sunny, PASSWORD);
+        market.login(sunny, PASSWORD);
+        BigDecimal eur = new BigDecimal(2d);
+        BigDecimal kWh = new BigDecimal(10d);
+        market.mint(market.getAddress(), eur, EContractAddress.EUR);
+        market.createOrder(EContractAddress.EUR, EContractAddress.KWH, eur, kWh);
+
+        market.login(BATTY, PASSWORD);
+        netty.rewardToGive = 2;
+        bn.evaluate();
+        assertFalse(netty.claimed);
+        assertFalse(netty.orderRewardRequested);
+    }
+
+    @Test
+    public void dischargeOrderTooLargeForBatty() {
+        FritzyApiStub market = FritzyApiStub.instance();
+        BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
+        bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
+        bn.flexibilityUpdate(resourceHelper.getStorageSystemDescription());
+
+        String sunny = "sunny";
+        market.register(sunny, sunny, PASSWORD);
+        market.login(sunny, PASSWORD);
+        BigDecimal eur = new BigDecimal(2d);
+        BigDecimal kWh = new BigDecimal(10d);
+        market.mint(market.getAddress(), eur, EContractAddress.EUR);
+        market.createOrder(EContractAddress.EUR, EContractAddress.KWH, eur, kWh);
+
+        // Much capacity but device still cant handle 10kWh in 15 minutes
+        NettyApiImpl impl = (NettyApiImpl)Endpoints.get(INettyApi.class);
+        impl.gridCapacity = Double.MAX_VALUE;
+        impl.groupCapacity = Double.MAX_VALUE;
+
+        market.login(BATTY, PASSWORD);
+        netty.rewardToGive = 2;
+        bn.evaluate();
+        assertFalse(netty.claimed);
+        assertFalse(netty.orderRewardRequested);
     }
 
     private static class APXPricesApiStub implements IAPXPricesApi {
@@ -166,6 +373,7 @@ public class NegotiatorTest {
 
         private static final Logger LOG = Log.getLogger();
         private boolean claimed = false;
+        private boolean orderRewardRequested = false;
         private double gridCapacity = 16d;
         private double groupCapacity = 32d;
         private double rewardToGive = 0d;
@@ -185,6 +393,7 @@ public class NegotiatorTest {
         @Override
         public OrderReward getOrderReward(String taker, String orderHash) {
             LOG.debug("getOrderReward by {} returns {}", taker, rewardToGive);
+            orderRewardRequested = true;
             OrderReward reward = new OrderReward();
             reward.setClaimTaker(taker);
             reward.setExpireTs(LocalDateTime.MAX);
