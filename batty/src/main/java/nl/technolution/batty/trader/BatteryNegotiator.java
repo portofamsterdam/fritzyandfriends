@@ -409,8 +409,6 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
         if (order.getMakerAssetData().equals(EContractAddress.EUR.getContractName())) {
             double orderPrice = new BigDecimal(order.getMakerAssetAmount()).doubleValue();
             double totalPrice = orderPrice - reward.getReward();
-            log.debug("Market price is {}, reward is {}", marketPrice, reward.getReward());
-
             if (totalPrice < marketPrice - (config.getSellMargin() / 100d)) {
                 log.debug("Selling energy is worth it (buyMargin is {}), spending {}", config.getSellMargin(),
                         totalPrice);
