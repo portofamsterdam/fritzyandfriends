@@ -32,5 +32,10 @@
     "marketUrl" : "http://82.196.13.251/api",
     "email" : "fritzy@fritzy.nl",
     "password" : "fritzy"
-  }
+  },
+"logging": {
+    "level": "INFO"
+}  
 }
+
+
