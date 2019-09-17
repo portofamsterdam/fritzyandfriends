@@ -28,7 +28,7 @@ public class XStorageFactory implements IXStorageFactory {
     @Override
     public void init(BattyConfig config) {
         if (config.isUseStub()) {
-            this.connection = new XStorageStub();
+            this.connection = XStorageStub.instance();
             return;
         } else {
             XStorageConnection xStorageConnection = new XStorageConnection();

@@ -55,8 +55,12 @@ public class FritzyApiTool {
     private static FritzyApi api;
 
     public static void main(String[] args) {
-        String url = "http://82.196.13.251/api";
+        String url = "http://192.168.8.242/api";
         api = new FritzyApi(url, "FritzyApiTool");
+
+        // api.register(USER1, USER1, PASS);
+
+        // api.register(USER2, USER2, PASS);
 
         setMinters(ADMIN, ADMINPASS, Lists.newArrayList(USER1, USER2));
         resetUser(USER1, PASS);

@@ -59,9 +59,11 @@ public class BattyConfig extends FritzyAppConfig {
     @JsonProperty("truststorepass")
     private String truststorepass;
 
+    /** buy margin in cents */
     @JsonProperty("buyMargin")
     private int buyMargin;
 
+    /** sell margin in cents */
     @JsonProperty("sellMargin")
     private int sellMargin;
 
