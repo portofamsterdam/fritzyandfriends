@@ -196,6 +196,10 @@ public class OrderExecutor {
         return instruction;
     }
 
+    public Instant getStartTs() {
+        return startTs;
+    }
+
     public void setStartTs(Instant startTs) {
         this.startTs = startTs;
     }

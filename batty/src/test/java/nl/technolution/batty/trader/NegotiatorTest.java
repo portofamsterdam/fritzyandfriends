@@ -45,6 +45,7 @@ import nl.technolution.dashboard.EEventType;
 import nl.technolution.dropwizard.MarketConfig;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.webservice.Endpoints;
+import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.FritzyApiFactory;
 import nl.technolution.fritzy.wallet.FritzyApiStub;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
@@ -350,6 +351,78 @@ public class NegotiatorTest {
         bn.evaluate();
         assertFalse(netty.claimed);
         assertFalse(netty.orderRewardRequested);
+
+    }
+
+    @Test
+    public void cancelExistingOrders() {
+        FritzyApiStub market = FritzyApiStub.instance();
+        BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
+        bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
+        bn.flexibilityUpdate(resourceHelper.getStorageSystemDescription());
+
+        // Create orders by batty, market is empty
+        market.login(BATTY, PASSWORD);
+        netty.rewardToGive = 2;
+        bn.evaluate();
+        assertEquals(2, market.orders().getOrders().getRecords().length);
+
+        // Create order by sunny for batty to accept
+        String sunny = "sunny";
+        market.register(sunny, sunny, PASSWORD);
+        market.login(sunny, PASSWORD);
+        BigDecimal eur = new BigDecimal(0.04d);
+        BigDecimal kWh = new BigDecimal(0.125d);
+        market.mint(market.getAddress(), eur, EContractAddress.EUR);
+        market.createOrder(EContractAddress.EUR, EContractAddress.KWH, eur, kWh);
+
+        // Batty accepts the order from sunny
+        market.login(BATTY, PASSWORD);
+        bn.evaluate();
+        assertTrue(netty.claimed);
+        assertTrue(netty.orderRewardRequested);
+        // Existing orders by batty are gone, only accepted order is left
+        assertEquals(1, market.orders().getOrders().getRecords().length);
+        assertEquals(market.getAddress(), market.orders().getOrders().getRecords()[0].getOrder().getTakerAddress());
+
+        // This shouln't create new batty orders, there is an accepted order
+        bn.evaluate();
+        assertEquals(1, market.orders().getOrders().getRecords().length);
+    }
+
+    @Test
+    public void cancelExistingSunnyAcceptedBatty() {
+        FritzyApiStub market = FritzyApiStub.instance();
+        String sunny = "sunny";
+        market.register(sunny, sunny, PASSWORD);
+        BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
+        bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
+        bn.flexibilityUpdate(resourceHelper.getStorageSystemDescription());
+
+        market.login(BATTY, PASSWORD);
+        market.mint(market.getAddress(), new BigDecimal(10d), EContractAddress.EUR); // Give batty a bunch of money
+        bn.evaluate();
+        assertEquals(2, market.orders().getOrders().getRecords().length);
+        
+        WebOrder order = market.orders().getOrders().getRecords()[0].getOrder();
+        market.login(sunny, PASSWORD);
+        String sunnyAddr = market.getAddress();
+        market.mint(market.getAddress(), new BigDecimal(order.getTakerAssetAmount()),
+                EContractAddress.getByContractName(order.getTakerAssetData()));
+        market.fillOrder(order.getHash());
+
+        market.login(BATTY, PASSWORD);
+        bn.evaluate();
+
+        assertEquals(1, market.orders().getOrders().getRecords().length);
+        assertEquals(market.getAddress(), market.orders().getOrders().getRecords()[0].getOrder().getMakerAddress());
+        assertEquals(sunnyAddr, market.orders().getOrders().getRecords()[0].getOrder().getTakerAddress());
+        
+        assertFalse(netty.claimed);
+        assertFalse(netty.orderRewardRequested);
+
+        bn.evaluate();
+        assertEquals(1, market.orders().getOrders().getRecords().length);
     }
 
     private static class APXPricesApiStub implements IAPXPricesApi {

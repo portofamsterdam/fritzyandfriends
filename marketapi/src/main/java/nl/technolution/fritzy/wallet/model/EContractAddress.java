@@ -32,10 +32,25 @@ public enum EContractAddress {
      * @param contractName to set
      */
     EContractAddress(String contractName) {
-        this.contractName = contractName;
+        this.contractName = contractName.toLowerCase();
     }
 
     public String getContractName() {
         return contractName;
+    }
+
+    /**
+     * Get EContractAddress for gioven contract name
+     * 
+     * @param contractName
+     * @return
+     */
+    public static EContractAddress getByContractName(String contractName) {
+        for (EContractAddress addr : EContractAddress.values()) {
+            if (addr.contractName.equals(contractName.toLowerCase())) {
+                return addr;
+            }
+        }
+        throw new IllegalArgumentException("Unknown contract" + contractName);
     }
 }

@@ -17,8 +17,13 @@
 package nl.technolution.batty.trader;
 
 import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.Iterator;
 import java.util.List;
 
+import javax.annotation.Nullable;
+
+import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
@@ -70,6 +75,7 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
     private List<OrderExecutor> activeBattyOrders = Lists.newArrayList();
     private String openBuyOrderHash;
     private String openSellOrderHash;
+    private Instant nextTradeStart;
 
     /**
      *
@@ -106,12 +112,11 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
             return;
         }
 
-        checkOpenOrders();
-
         // Get balance
         IFritzyApi market = Services.get(IFritzyApiFactory.class).build();
         FritzyBalance balance = market.balance();
         market.log(EEventType.BALANCE, balance.getEur().toPlainString(), null);
+
 
         // Get max capacity
         INettyApi netty = Endpoints.get(INettyApi.class);
@@ -119,11 +124,22 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
         DeviceCapacity deviceCapacity = netty.getCapacity(deviceId.getDeviceId());
         market.log(EEventType.LIMIT_ACTOR, Double.toString(deviceCapacity.getGridConnectionLimit()), null);
 
+        checkOpenOrders(market);
+        // Note check open order may set nextTradeStart
+        if (nextTradeStart != null && Instant.now().isBefore(nextTradeStart)) {
+            log.debug("Trading done for this period");
+            return;
+        }
+
         Orders orders = market.orders().getOrders();
         for (Record record : orders.getRecords()) {
             WebOrder order = record.getOrder();
             if (order.getMakerAddress().equals(market.getAddress())) {
                 continue; // This is batty himself
+            }
+
+            if (!Strings.isNullOrEmpty(order.getTakerAddress())) {
+                continue; // order is already filled (shouldn't happen?)
             }
 
             if (!isInterestingOrder(order, balance, deviceCapacity)) {
@@ -142,31 +158,42 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
             if (!checkAcceptOffer(order, reward)) {
                 continue;
             }
-            log.debug("Reward {} is adequate at {}, accepting order", reward.getRewardId(), reward.getReward());
+            log.debug("Reward {} is adequate at {}ct, accepting order", reward.getRewardId(), reward.getReward());
 
             if (order.getTakerAssetData().equals(EContractAddress.KWH.getContractName())) {
-                log.warn("minting {}{}", order.getTakerAssetAmount(), order.getTakerAssetData());
+                log.warn("minting {}{} for order {}", order.getTakerAssetAmount(), order.getTakerAssetData(),
+                        order.getHash());
                 market.mint(market.getAddress(), new BigDecimal(order.getTakerAssetAmount()), EContractAddress.KWH);
             }
 
-            log.warn("accepting order {}", order.getHash());
+            log.warn("accepting order {} receiving {}{} spending {}{}", order.getHash(), order.getMakerAssetAmount(),
+                    order.getMakerAssetData(), order.getTakerAssetAmount(), order.getTakerAssetData());
             String txId = market.fillOrder(order.getHash());
             log.warn("claiming reward {}", reward.getRewardId());
             netty.claim(txId, reward.getRewardId());
 
             activeBattyOrders.add(new OrderExecutor(order.getHash()));
-            cancelExistingOrders(market);
+            cancelExistingBattyOrders(market);
             return;
         }
 
         createOrder(market, balance, deviceCapacity);
     }
 
-    private void checkOpenOrders() {
-        for (OrderExecutor activeBattyOrder : activeBattyOrders) {
-            activeBattyOrder.evaluate(resourceManager, systemDescription, fillLevel);
+    private void checkOpenOrders(IFritzyApi market) {
+        Iterator<OrderExecutor> itr = activeBattyOrders.iterator();
+        while (itr.hasNext()) {
+            OrderExecutor activeBattyOrder = itr.next();
+            EOrderCommand orderState = activeBattyOrder.evaluate(resourceManager, systemDescription, fillLevel);
+            if (orderState == EOrderCommand.FINISHED) {
+                itr.remove();
+            }
+            if (activeBattyOrder.getStartTs() != null && activeBattyOrder.getStartTs().isAfter(Instant.now())) {
+                // There is an accepted order pending. stop taking new orders
+                nextTradeStart = activeBattyOrder.getStartTs();
+                cancelExistingBattyOrders(market);
+            }
         }
-
     }
 
     private void createOrder(IFritzyApi market, FritzyBalance balance, DeviceCapacity deviceCapacity) {
@@ -199,8 +226,14 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
         double kWhPrice = apxPrice.getPrice() + (config.getBuyMargin() / 100);
         double orderPrice = (wq / 1000) * kWhPrice;
 
+        BigDecimal kWhToSell = new BigDecimal(wq / 1000);
+        if (market.balance().getKwh().doubleValue() < kWhToSell.doubleValue()) {
+            double kWhToMint = kWhToSell.doubleValue() - market.balance().getKwh().doubleValue();
+            market.mint(market.getAddress(), new BigDecimal(kWhToMint), EContractAddress.KWH);
+        }
+        
         openSellOrderHash = market.createOrder(EContractAddress.KWH, EContractAddress.EUR,
-                new BigDecimal(orderPrice), new BigDecimal(wq / 1000));
+                new BigDecimal(orderPrice), kWhToSell);
         activeBattyOrders.add(new OrderExecutor(openSellOrderHash));
     }
 
@@ -252,13 +285,21 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
     /**
      * @param market
      */
-    private void cancelExistingOrders(IFritzyApi market) {
+    private void cancelExistingBattyOrders(IFritzyApi market) {
         // Cancel existing orders
-        if (openBuyOrderHash != null) {
-            market.cancelOrder(openBuyOrderHash);
+        cancelOrder(market, openBuyOrderHash);
+        openBuyOrderHash = null;
+        cancelOrder(market, openSellOrderHash);
+        openSellOrderHash = null;
+    }
+
+    private static void cancelOrder(IFritzyApi market, @Nullable String hash) {
+        if (hash == null) {
+            return;
         }
-        if (openSellOrderHash != null) {
-            market.cancelOrder(openSellOrderHash);
+        WebOrder order = market.order(hash);
+        if (Strings.isNullOrEmpty(order.getTakerAddress())) {
+            market.cancelOrder(hash);
         }
     }
 
@@ -307,7 +348,8 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
             }
 
         }
-        log.debug("No runningmode found that fits handling {}{}", kWq.doubleValue(), order.getMakerAssetData());
+        log.debug("No runningmode found that fits handling {}{}", kWq.doubleValue(),
+                EContractAddress.KWH.getContractName());
         return false;
     }
 
@@ -322,6 +364,7 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
                     }
                     // capacity of runningmode is negative when discharging
                     double capacityWq = getKiloWattPerQuarterFromRunningMode(m, fillLevel);
+                    Log.getLogger().debug("Capacity for runningmode {} is {}", rm.getLabel(), capacityWq);
                     if (kiloWattPerQuarter > (capacityWq / 1000)) {
                         continue; // Cannot discharge this fast at this charge level
                     }

@@ -152,14 +152,18 @@ public final class FritzyApiStub implements IFritzyApi {
         Preconditions.checkArgument(order.getTakerAddress() == null);
         order.setTakerAddress(loginInUser.getAddress());
 
-        BigDecimal takerGet = new BigDecimal(order.getTakerAssetAmount()).multiply(BigDecimal.valueOf(-1L));
+        BigDecimal takerGet = new BigDecimal(order.getTakerAssetAmount());
         BigDecimal takerGive = new BigDecimal(order.getMakerAssetAmount());
-        incr(EContractAddress.valueOf(order.getTakerAssetData().toUpperCase()), takerGet, order.getTakerAddress());
+        log.debug("{} gives {}{}", loginInUser.getEmail(), takerGive, order.getMakerAssetData());
+        log.debug("{} gets  {}{}", loginInUser.getEmail(), takerGet, order.getTakerAssetData());
+
+        decr(EContractAddress.valueOf(order.getTakerAssetData().toUpperCase()), takerGet, order.getTakerAddress());
         incr(EContractAddress.valueOf(order.getMakerAssetData().toUpperCase()), takerGive, order.getTakerAddress());
 
-        BigDecimal makerGet = new BigDecimal(order.getMakerAssetAmount()).multiply(BigDecimal.valueOf(-1L));
+        BigDecimal makerGet = new BigDecimal(order.getMakerAssetAmount());
         BigDecimal makerGive = new BigDecimal(order.getTakerAssetAmount());
-        incr(EContractAddress.valueOf(order.getMakerAssetData().toUpperCase()), makerGet, order.getMakerAddress());
+        
+        decr(EContractAddress.valueOf(order.getMakerAssetData().toUpperCase()), makerGet, order.getMakerAddress());
         incr(EContractAddress.valueOf(order.getTakerAssetData().toUpperCase()), makerGive, order.getMakerAddress());
 
         return generateHash(Objects.hash(orderHash));
@@ -170,12 +174,28 @@ public final class FritzyApiStub implements IFritzyApi {
         switch (contractaddress) {
         case EUR:
             BigDecimal newBalenceEur = balance.getEur().add(takerAssetAmount);
+            balance.setEur(newBalenceEur);
+            break;
+        case KWH:
+            BigDecimal newBalenceKwh = balance.getKwh().add(takerAssetAmount);
+            balance.setKwh(newBalenceKwh);
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
+    }
+
+    private void decr(EContractAddress contractaddress, BigDecimal takerAssetAmount, String takerAddress) {
+        FritzyBalance balance = balances.computeIfAbsent(takerAddress, k -> new FritzyBalance());
+        switch (contractaddress) {
+        case EUR:
+            BigDecimal newBalenceEur = balance.getEur().subtract(takerAssetAmount);
             Preconditions.checkArgument(newBalenceEur.doubleValue() >= 0d,
                     "Insufficient funds " + balance.getEur() + " " + takerAssetAmount);
             balance.setEur(newBalenceEur);
             break;
         case KWH:
-            BigDecimal newBalenceKwh = balance.getKwh().add(takerAssetAmount);
+            BigDecimal newBalenceKwh = balance.getKwh().subtract(takerAssetAmount);
             Preconditions.checkArgument(newBalenceKwh.doubleValue() >= 0d,
                     "Insufficient kWh (" + balance.getKwh() + ") for " + takerAssetAmount);
             balance.setKwh(newBalenceKwh);
@@ -184,6 +204,7 @@ public final class FritzyApiStub implements IFritzyApi {
             throw new IllegalArgumentException();
         }
     }
+
 
     @Override
     public void cancelOrder(String hash) {
