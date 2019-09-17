@@ -37,6 +37,7 @@ import nl.technolution.fritzy.app.FritzyConfig;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
+import nl.technolution.fritzy.wallet.event.EventLogger;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.order.Orders;
@@ -211,15 +212,16 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
 
         DeviceId deviceId = resourceManager.getDeviceId();
         IFritzyApi market = getMarket();
+        EventLogger events = new EventLogger(market);
 
         // Get balance
         FritzyBalance balance = market.balance();
-        market.log(EEventType.BALANCE, balance.getEur().toPlainString(), null);
+        events.logBalance(balance);
 
         // Get max grid capacity
         INettyApi netty = Endpoints.get(INettyApi.class);
         DeviceCapacity deviceCapacity = netty.getCapacity(deviceId.getDeviceId());
-        market.log(EEventType.LIMIT_ACTOR, Double.toString(deviceCapacity.getGridConnectionLimit()), null);
+        events.logLimitActor(deviceCapacity.getGridConnectionLimit());
 
         // use market price as base for my price
         IAPXPricesApi exxy = Endpoints.get(IAPXPricesApi.class);

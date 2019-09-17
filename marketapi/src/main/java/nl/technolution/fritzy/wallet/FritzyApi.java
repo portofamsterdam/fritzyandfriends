@@ -30,14 +30,12 @@ import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 
 import org.glassfish.jersey.client.JerseyClientBuilder;
 import org.slf4j.Logger;
 
-import nl.technolution.IJsonnable;
 import nl.technolution.Log;
 import nl.technolution.dashboard.EEventType;
 import nl.technolution.fritzy.gen.model.WebOrder;
@@ -325,14 +323,8 @@ public class FritzyApi implements IFritzyApi {
      * @param data
      */
     @Override
-    public void log(EEventType tag, String msg, IJsonnable data) {
+    public void log(EEventType tag, String msg, String dataString) {
         LOG.info("Logging event {}: {}", tag, msg != null ? msg : "");
-        String dataString;
-        try {
-            dataString = data == null ? null : mapper.writeValueAsString(data);
-        } catch (JsonProcessingException e) {
-            dataString = "<eventdata not found>";
-        }
         WebTarget target = client.target(url + "/event");
         Builder request = target.request();
         Form form = new Form();

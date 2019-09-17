@@ -27,7 +27,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.base.Preconditions;
@@ -35,7 +34,6 @@ import com.google.common.collect.Lists;
 
 import org.apache.commons.lang3.StringUtils;
 
-import nl.technolution.IJsonnable;
 import nl.technolution.dashboard.EEventType;
 import nl.technolution.dropwizard.webservice.JacksonFactory;
 import nl.technolution.fritzy.gen.model.WebOrder;
@@ -166,14 +164,8 @@ public final class FritzyApiStub implements IFritzyApi {
 
 
     @Override
-    public void log(EEventType tag, String msg, IJsonnable data) {
+    public void log(EEventType tag, String msg, String dataStr) {
         String username = loginInUser != null ? loginInUser.getName() : "unknown";
-        String dataStr;
-        try {
-            dataStr = data != null ? mapper.writeValueAsString(data) : "";
-        } catch (JsonProcessingException e) {
-            dataStr = "<eventdata unparsable>";
-        }
         ApiEvent e = new ApiEvent();
         e.setId(id.getAndIncrement());
         e.setEnvironment(FritzyApiStub.class.getSimpleName());

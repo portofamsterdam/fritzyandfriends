@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Uninterruptibles;
@@ -32,6 +33,7 @@ import org.slf4j.Logger;
 import nl.technolution.Log;
 import nl.technolution.apis.exxy.ApxPrice;
 import nl.technolution.dashboard.EEventType;
+import nl.technolution.dropwizard.webservice.JacksonFactory;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.FritzyApi;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
@@ -54,7 +56,7 @@ public class FritzyApiTool {
 
     private static FritzyApi api;
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws JsonProcessingException {
         String url = "http://82.196.13.251/api";
         api = new FritzyApi(url, "FritzyApiTool");
 
@@ -117,7 +119,7 @@ public class FritzyApiTool {
 
         api.log(EEventType.BALANCE, currentBalance.toPlainString() + " eur", null);
         api.log(EEventType.LIMIT_ACTOR, "8A", null);
-        api.log(EEventType.CHAT, "chat text", new ApxPrice(1d));
+        api.log(EEventType.CHAT, "chat text", JacksonFactory.defaultMapper().writeValueAsString(new ApxPrice(1d)));
 
 
         GetEventResponse events = api.getEvents(Instant.now().minus(2, ChronoUnit.HOURS),

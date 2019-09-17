@@ -32,9 +32,9 @@ import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.gen.model.WebUser;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
+import nl.technolution.fritzy.wallet.event.EventLogger;
 import nl.technolution.fritzy.wallet.model.ApiEvent;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
-import nl.technolution.fritzy.wallet.model.GetEventResponse;
 import nl.technolution.netty.rewarder.IRewardService;
 import nl.technolution.netty.supplylimit.IGridCapacityManager;
 import nl.technolution.protocols.efi.util.Efi;
@@ -55,18 +55,36 @@ public class UsageScanner implements ITaskRunner {
         Instant previousQuarter = nextQuarter.minus(15, ChronoUnit.MINUTES);
 
         IFritzyApi fritzyApi = getFritzyApi();
-        GetEventResponse events = fritzyApi.getEvents(previousQuarter, nextQuarter);
+        EventLogger eventlogger = new EventLogger(fritzyApi);
+
+        double groupConnectionLimit = Services.get(IGridCapacityManager.class).getGroupConnectionLimit();
+        eventlogger.logLimitTotal(groupConnectionLimit);
+
         double badUsage = 0.0d;
-        for (ApiEvent event : events.getEvents()) {
+
+        for (ApiEvent event : fritzyApi.getEvents(previousQuarter, nextQuarter).getEvents()) {
             if (event.getTag().equals(EEventType.ORDER_ACCEPT.getTag())) {
                 badUsage += getUsage(event);
             }
+            if (badUsage > groupConnectionLimit) {
+                // Last order exceeded limit. This must be a nonlocal trade made by exxy and filled by our naughty actor
+                eventlogger.logLimitExceeded(getTakerName(event));
+            }
         }
-        double groupConnectionLimit = Services.get(IGridCapacityManager.class).getGroupConnectionLimit();
-        fritzyApi.log(EEventType.LIMIT_TOTAL, "" + groupConnectionLimit, null);
-        if (badUsage > groupConnectionLimit) {
-            fritzyApi.log(EEventType.LIMIT_EXCEEDED, "" + badUsage, null);
+    }
+
+    private String getTakerName(ApiEvent event) {
+        WebOrder order = getFritzyApi().order(event.getMsg());
+        if (order == null) {
+            log.error("Could not find order");
+            return "unknown";
         }
+        for (WebUser u : getFritzyApi().getUsers()) {
+            if (u.getAddress().equals(order.getTakerAddress())) {
+                return u.getName();
+            }
+        }
+        return "unknown";
     }
 
     private double getUsage(ApiEvent event) {

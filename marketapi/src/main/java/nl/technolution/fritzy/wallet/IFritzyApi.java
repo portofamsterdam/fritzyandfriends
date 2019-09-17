@@ -19,7 +19,6 @@ package nl.technolution.fritzy.wallet;
 import java.math.BigDecimal;
 import java.time.Instant;
 
-import nl.technolution.IJsonnable;
 import nl.technolution.dashboard.EEventType;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.gen.model.WebUser;
@@ -96,7 +95,7 @@ public interface IFritzyApi {
      * @param msg
      * @param data
      */
-    void log(EEventType tag, String msg, IJsonnable data);
+    void log(EEventType tag, String msg, String data);
 
     /**
      * mint tokens. E.g. kwh, eur or eth
