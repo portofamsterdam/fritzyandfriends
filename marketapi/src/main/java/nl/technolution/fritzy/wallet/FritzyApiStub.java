@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
@@ -282,13 +283,17 @@ public final class FritzyApiStub implements IFritzyApi {
     @Override
     public GetEventResponse getEvents(Instant from, Instant till) {
         GetEventResponse getEventResponse = new GetEventResponse();
-        getEventResponse.setEvents(events);
+        List<ApiEvent> filteredEvents = getAllEvents().stream()
+                .filter(e -> Instant.parse(e.getCreatedAt()).isAfter(from.minusNanos(1)))
+                .filter(e -> Instant.parse(e.getCreatedAt()).isBefore(till.plusNanos(1)))
+                .collect(Collectors.toList());
+        getEventResponse.setEvents(filteredEvents);
         return getEventResponse;
     }
 
     @VisibleForTesting
     public List<ApiEvent> getAllEvents() {
-        return events;
+        return Lists.newArrayList(events);
     }
 
     @VisibleForTesting

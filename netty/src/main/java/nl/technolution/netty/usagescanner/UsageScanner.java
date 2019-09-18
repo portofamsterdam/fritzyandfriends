@@ -35,6 +35,7 @@ import nl.technolution.fritzy.wallet.IFritzyApiFactory;
 import nl.technolution.fritzy.wallet.event.EventLogger;
 import nl.technolution.fritzy.wallet.model.ApiEvent;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
+import nl.technolution.fritzy.wallet.model.GetEventResponse;
 import nl.technolution.netty.rewarder.IRewardService;
 import nl.technolution.netty.supplylimit.IGridCapacityManager;
 import nl.technolution.protocols.efi.util.Efi;
@@ -62,7 +63,8 @@ public class UsageScanner implements ITaskRunner {
 
         double badUsage = 0.0d;
 
-        for (ApiEvent event : fritzyApi.getEvents(previousQuarter, nextQuarter).getEvents()) {
+        GetEventResponse events = fritzyApi.getEvents(previousQuarter, nextQuarter);
+        for (ApiEvent event : events.getEvents()) {
             if (event.getTag().equals(EEventType.ORDER_ACCEPT.getTag())) {
                 badUsage += getUsage(event);
             }
