@@ -26,7 +26,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.annotations.VisibleForTesting;
@@ -34,7 +33,9 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
 
+import nl.technolution.Log;
 import nl.technolution.dashboard.EEventType;
 import nl.technolution.dropwizard.webservice.JacksonFactory;
 import nl.technolution.fritzy.gen.model.WebOrder;
@@ -52,20 +53,22 @@ import nl.technolution.fritzy.wallet.order.Record;
  */
 public final class FritzyApiStub implements IFritzyApi {
 
+
     private static FritzyApiStub stubbedApi;
 
-    private final AtomicInteger id = new AtomicInteger(0);
     private final ObjectMapper mapper = JacksonFactory.defaultMapper();
-    private final List<ApiEvent> events = new ArrayList<>();
-    private final List<WebUser> users = new ArrayList<>();
-    private final Map<String, FritzyBalance> balances = new HashMap<>();
-    private final Orders orders;
+    private final Logger log = Log.getLogger();
+
+    private AtomicInteger id;
+    private List<ApiEvent> events;
+    private List<WebUser> users;
+    private Map<String, FritzyBalance> balances;
+    private Orders orders;
 
     private WebUser loginInUser;
 
     private FritzyApiStub() {
-        orders = new Orders();
-        orders.setRecords(new Record[0]);
+        // hide
     }
 
     /**
@@ -77,13 +80,32 @@ public final class FritzyApiStub implements IFritzyApi {
         synchronized (FritzyApiStub.class) {
             if (stubbedApi == null) {
                 stubbedApi = new FritzyApiStub();
+                FritzyApiStub.reset(); // init all registers
             }
         }
         return stubbedApi;
     }
 
+    /**
+     * 
+     */
+    public static void reset() {
+        synchronized (FritzyApiStub.class) {
+            if (stubbedApi == null) {
+                return;
+            }
+            stubbedApi.orders = new Orders();
+            stubbedApi.orders.setRecords(new Record[0]);
+            stubbedApi.users = new ArrayList<>();
+            stubbedApi.events = new ArrayList<>();
+            stubbedApi.balances = new HashMap<>();
+            stubbedApi.id = new AtomicInteger(0);
+        }
+    }
+
     @Override
     public void login(String user, String password) {
+        log.debug("login {}", user);
         this.loginInUser = users.stream()
                 .filter(u -> u.getEmail().equals(user))
                 .findFirst()
@@ -92,6 +114,7 @@ public final class FritzyApiStub implements IFritzyApi {
 
     @Override
     public WebUser register(String email, String username, String password) {
+        log.debug("register {} ({})", email, username);
         WebUser user = new WebUser();
         String address = generateHash(username.hashCode());
         user.setAddress(address);
@@ -103,6 +126,7 @@ public final class FritzyApiStub implements IFritzyApi {
 
     @Override
     public GetOrdersResponse orders() {
+        log.debug("orders");
         GetOrdersResponse getOrdersResponse = new GetOrdersResponse();
         getOrdersResponse.setOrders(orders);
         return getOrdersResponse;
@@ -110,6 +134,7 @@ public final class FritzyApiStub implements IFritzyApi {
 
     @Override
     public WebOrder order(String orderHash) {
+        log.debug("order {}", orderHash);
         return Arrays.asList(orders.getRecords()).stream()
                 .map(r -> r.getOrder())
                 .filter(o -> o.getHash().equals(orderHash))
@@ -119,19 +144,24 @@ public final class FritzyApiStub implements IFritzyApi {
 
     @Override
     public String fillOrder(String orderHash) {
+        log.debug("fillOrder {}", orderHash);
         WebOrder order = order(orderHash);
         Preconditions.checkNotNull(order);
         Preconditions.checkArgument(order.getTakerAddress() == null);
         order.setTakerAddress(loginInUser.getAddress());
 
-        BigDecimal takerGet = new BigDecimal(order.getTakerAssetAmount()).multiply(BigDecimal.valueOf(-1L));
+        BigDecimal takerGet = new BigDecimal(order.getTakerAssetAmount());
         BigDecimal takerGive = new BigDecimal(order.getMakerAssetAmount());
-        incr(EContractAddress.valueOf(order.getTakerAssetData().toUpperCase()), takerGet, order.getTakerAddress());
+        log.debug("{} gives {}{}", loginInUser.getEmail(), takerGive, order.getMakerAssetData());
+        log.debug("{} gets  {}{}", loginInUser.getEmail(), takerGet, order.getTakerAssetData());
+
+        decr(EContractAddress.valueOf(order.getTakerAssetData().toUpperCase()), takerGet, order.getTakerAddress());
         incr(EContractAddress.valueOf(order.getMakerAssetData().toUpperCase()), takerGive, order.getTakerAddress());
 
-        BigDecimal makerGet = new BigDecimal(order.getMakerAssetAmount()).multiply(BigDecimal.valueOf(-1L));
+        BigDecimal makerGet = new BigDecimal(order.getMakerAssetAmount());
         BigDecimal makerGive = new BigDecimal(order.getTakerAssetAmount());
-        incr(EContractAddress.valueOf(order.getMakerAssetData().toUpperCase()), makerGet, order.getMakerAddress());
+        
+        decr(EContractAddress.valueOf(order.getMakerAssetData().toUpperCase()), makerGet, order.getMakerAddress());
         incr(EContractAddress.valueOf(order.getTakerAssetData().toUpperCase()), makerGive, order.getMakerAddress());
 
         return generateHash(Objects.hash(orderHash));
@@ -141,18 +171,42 @@ public final class FritzyApiStub implements IFritzyApi {
         FritzyBalance balance = balances.computeIfAbsent(takerAddress, k -> new FritzyBalance());
         switch (contractaddress) {
         case EUR:
-            balance.setEur(balance.getEur().add(takerAssetAmount));
+            BigDecimal newBalenceEur = balance.getEur().add(takerAssetAmount);
+            balance.setEur(newBalenceEur);
             break;
         case KWH:
-            balance.setKwh(balance.getKwh().add(takerAssetAmount));
+            BigDecimal newBalenceKwh = balance.getKwh().add(takerAssetAmount);
+            balance.setKwh(newBalenceKwh);
             break;
         default:
             throw new IllegalArgumentException();
         }
     }
 
+    private void decr(EContractAddress contractaddress, BigDecimal takerAssetAmount, String takerAddress) {
+        FritzyBalance balance = balances.computeIfAbsent(takerAddress, k -> new FritzyBalance());
+        switch (contractaddress) {
+        case EUR:
+            BigDecimal newBalenceEur = balance.getEur().subtract(takerAssetAmount);
+            Preconditions.checkArgument(newBalenceEur.doubleValue() >= 0d,
+                    "Insufficient funds " + balance.getEur() + " " + takerAssetAmount);
+            balance.setEur(newBalenceEur);
+            break;
+        case KWH:
+            BigDecimal newBalenceKwh = balance.getKwh().subtract(takerAssetAmount);
+            Preconditions.checkArgument(newBalenceKwh.doubleValue() >= 0d,
+                    "Insufficient kWh (" + balance.getKwh() + ") for " + takerAssetAmount);
+            balance.setKwh(newBalenceKwh);
+            break;
+        default:
+            throw new IllegalArgumentException();
+        }
+    }
+
+
     @Override
     public void cancelOrder(String hash) {
+        log.debug("cancelOrder {}", hash);
         List<Record> ordersList = Lists.newArrayList(Arrays.asList(orders.getRecords()));
         Iterator<Record> itr = ordersList.iterator();
         while (itr.hasNext()) {
@@ -167,6 +221,7 @@ public final class FritzyApiStub implements IFritzyApi {
     @Override
     public void log(EEventType tag, String msg, String dataStr) {
         String username = loginInUser != null ? loginInUser.getName() : "unknown";
+        log.debug("log {} {} {}", tag, msg, dataStr);
         ApiEvent e = new ApiEvent();
         e.setId(id.getAndIncrement());
         e.setEnvironment(FritzyApiStub.class.getSimpleName());
@@ -182,11 +237,13 @@ public final class FritzyApiStub implements IFritzyApi {
 
     @Override
     public FritzyBalance balance() {
+        log.debug("balance");
         return balances.computeIfAbsent(loginInUser.getAddress(), k -> new FritzyBalance());
     }
 
     @Override
     public void mint(String address, BigDecimal value, EContractAddress contractAddress) {
+        log.debug("mint {} {} to {}", value, contractAddress, address);
         FritzyBalance balence = balances.computeIfAbsent(address, k -> new FritzyBalance());
         switch (contractAddress) {
         case ETH:
@@ -203,6 +260,7 @@ public final class FritzyApiStub implements IFritzyApi {
 
     @Override
     public void burn(BigDecimal value, EContractAddress contractAddress) {
+        log.debug("burn {} {}", value, contractAddress);
         FritzyBalance balence = balances.computeIfAbsent(loginInUser.getAddress(), k -> new FritzyBalance());
         switch (contractAddress) {
         case ETH:
@@ -219,6 +277,7 @@ public final class FritzyApiStub implements IFritzyApi {
 
     @Override
     public WebUser[] getUsers() {
+        log.debug("getUsers");
         return users.toArray(new WebUser[users.size()]);
     }
 
@@ -233,6 +292,7 @@ public final class FritzyApiStub implements IFritzyApi {
 
     @Override
     public String transfer(BigDecimal value, EContractAddress contractAddress, String toAddress) {
+        log.debug("transfer {} {} to {}", value, contractAddress, toAddress);
         FritzyBalance sender = balances.computeIfAbsent(loginInUser.getAddress(), k -> new FritzyBalance());
         FritzyBalance receiver = balances.computeIfAbsent(toAddress, k -> new FritzyBalance());
         switch (contractAddress) {
@@ -257,12 +317,14 @@ public final class FritzyApiStub implements IFritzyApi {
 
     @Override
     public String getAddress() {
+        log.debug("getAddress {}", loginInUser.getAddress());
         return loginInUser.getAddress();
     }
 
     @Override
     public String createOrder(EContractAddress makerToken, EContractAddress takerToken, BigDecimal makerAmount,
             BigDecimal takerAmount) {
+        log.debug("createOrder {} {} for {} {}", makerAmount, makerToken, takerAmount, takerToken);
 
         List<Record> ordersList = Lists.newArrayList(Arrays.asList(orders.getRecords()));
         WebOrder webOrder = new WebOrder();
@@ -282,6 +344,7 @@ public final class FritzyApiStub implements IFritzyApi {
 
     @Override
     public GetEventResponse getEvents(Instant from, Instant till) {
+        log.debug("getEvents {} to {} ", from, till);
         GetEventResponse getEventResponse = new GetEventResponse();
         List<ApiEvent> filteredEvents = getAllEvents().stream()
                 .filter(e -> Instant.parse(e.getCreatedAt()).isAfter(from.minusNanos(1)))
@@ -294,6 +357,11 @@ public final class FritzyApiStub implements IFritzyApi {
     @VisibleForTesting
     public List<ApiEvent> getAllEvents() {
         return Lists.newArrayList(events);
+    }
+
+    @VisibleForTesting
+    public ApiEvent getFirstEventOfType(EEventType type) {
+        return events.stream().filter(e -> type.getTag().equals(e.getTag())).findFirst().orElse(null);
     }
 
     @VisibleForTesting

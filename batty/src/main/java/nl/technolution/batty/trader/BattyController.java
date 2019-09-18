@@ -16,6 +16,11 @@
  */
 package nl.technolution.batty.trader;
 
+import java.util.concurrent.TimeUnit;
+
+import com.google.common.base.Preconditions;
+import com.google.common.util.concurrent.Uninterruptibles;
+
 import org.slf4j.Logger;
 
 import nl.technolution.Log;
@@ -30,20 +35,6 @@ class BattyController {
 
     private final Logger log = Log.getLogger();
 
-    private double maxChargeRate;
-    private double maxDischargeRate;
-
-    /**
-     * Constructor for {@link BattyController} objects
-     *
-     * @param maxChargeRate
-     * @param maxDischargeRate
-     */
-    BattyController(double maxChargeRate, double maxDischargeRate) {
-        this.maxChargeRate = maxChargeRate;
-        this.maxDischargeRate = maxDischargeRate;
-    }
-
     void init() {
         log.debug("init batty controller");
         IXStorageConnection connection = Services.get(IXStorageFactory.class).getConnection();
@@ -54,27 +45,30 @@ class BattyController {
      * @param chargeRate Wh charge.
      */
     void charge(double chargeRate) {
+        Preconditions.checkArgument(chargeRate >= 0d && chargeRate <= 100d);
         IXStorageConnection connection = Services.get(IXStorageFactory.class).getConnection();
         connection.powerOn();
-        double chargeRatePercentage = chargeRate / maxChargeRate * 100d;
-        log.debug("charging at {} ({}%)", chargeRate, chargeRatePercentage);
-        connection.charge((int)chargeRatePercentage);
+        Uninterruptibles.sleepUninterruptibly(500, TimeUnit.MILLISECONDS);
+        connection.charge((int)chargeRate);
+        log.debug("charging at {}%", chargeRate);
     }
 
     /**
      * @param dischargeRate Wh charge.
      */
     void discharge(double dischargeRate) {
+        Preconditions.checkArgument(dischargeRate >= 0d && dischargeRate <= 100d);
         IXStorageConnection connection = Services.get(IXStorageFactory.class).getConnection();
         connection.powerOn();
-        double dischargeRatePercentage = dischargeRate / maxDischargeRate * 100d;
-        log.debug("discharging at {} ({}%)", dischargeRate, dischargeRatePercentage);
-        connection.discharge((int)dischargeRatePercentage);
+        Uninterruptibles.sleepUninterruptibly(500, TimeUnit.MILLISECONDS);
+        connection.discharge((int)dischargeRate);
+        log.debug("discharging at {}%", dischargeRate);
     }
 
     void stop() {
         log.debug("stopping batty");
         IXStorageConnection connection = Services.get(IXStorageFactory.class).getConnection();
         connection.powerOff();
+        log.debug("stopped batty");
     }
 }

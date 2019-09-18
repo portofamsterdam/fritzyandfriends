@@ -17,11 +17,8 @@
 package nl.technolution.batty.trader;
 
 import java.time.Instant;
-import java.util.Iterator;
-import java.util.List;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 
 import nl.technolution.DeviceId;
 import nl.technolution.protocols.efi.ActuatorInstruction;
@@ -47,20 +44,17 @@ public class BattyResourceManager implements IResourceManager {
 
     private ICustomerEnergyManager<StorageRegistration, StorageUpdate> cem;
 
-    private List<ActuatorInstruction> actuatorInstructions = Lists.newArrayList();
-    private ActuatorInstruction activeInstruction;
-
     public BattyResourceManager(DeviceId deviceId) {
         this.deviceId = deviceId;
         this.helper = new BattyResourceHelper(deviceId);
-        this.controller = new BattyController(5000d, 5000d); // TODO MKE configurable max chargerate
+        this.controller = new BattyController();
     }
 
     @Override
     public void instruct(Instruction instruction) {
         Preconditions.checkArgument(instruction instanceof StorageInstruction, "Expected storage instruction");
         StorageInstruction storageInstruction = StorageInstruction.class.cast(instruction);
-        storageInstruction.getActuatorInstructions().getActuatorInstruction().forEach(actuatorInstructions::add);
+        storageInstruction.getActuatorInstructions().getActuatorInstruction().forEach(this::handleActuatorInstruction);
     }
 
     @Override
@@ -73,22 +67,16 @@ public class BattyResourceManager implements IResourceManager {
             controller.stop();
         }
 
-        if (instruction.getStartTime().toGregorianCalendar().toInstant().plusSeconds(900).isAfter(Instant.now())) {
-            activeInstruction = null;
-            controller.stop();
-        }
+        Preconditions.checkArgument(instruction.getActuatorId() == BattyResourceHelper.ACTUATOR_ID);
 
-        // NOTE assume one actuatorId exists
+        // NOTE: instruction start time not supported, always execute now
         EBattyInstruction battyInstruction = EBattyInstruction.fromRunningModeId(instruction.getRunningModeId());
         switch (battyInstruction) {
-        case IDLE:
-            controller.stop();
-            break;
         case CHARGE:
-            controller.charge(1000d); // TODO MKE dynamic charge rate
+            controller.charge(100d); // Always charge at full capacity
             break;
         case DISCHARGE:
-            controller.discharge(1000d); // TODO MKE dynamic discharge rate
+            controller.discharge(100d); // always charge at full capacity
             break;
         default:
             throw new IllegalStateException("Unknown instruction " + battyInstruction);
@@ -100,19 +88,6 @@ public class BattyResourceManager implements IResourceManager {
      */
     public void evaluate() {
         cem.flexibilityUpdate(helper.getFlexibilityUpdate());
-
-        // Set next active instruction
-        Iterator<ActuatorInstruction> itr = actuatorInstructions.iterator();
-        while (itr.hasNext()) {
-            ActuatorInstruction instruction = itr.next();
-            if (instruction.getStartTime().toGregorianCalendar().toInstant().isAfter(Instant.now())) {
-                activeInstruction = instruction;
-                itr.remove();
-            }
-        }
-
-        handleActuatorInstruction(activeInstruction);
-
     }
 
     /**

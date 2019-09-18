@@ -25,10 +25,9 @@ import nl.technolution.protocols.efi.StorageContinuousRunningMode.ContinuousRunn
 import nl.technolution.protocols.efi.StorageContinuousRunningMode.ContinuousRunningModeElement.UpperBound;
 
 /**
- * Test negotiator
+ * 
  */
-public class NagotiatorTest {
-
+public class NegotiaterLogicTest {
     /**
      * 
      */
