@@ -99,7 +99,7 @@ public class NegotiatorTest {
     public void emptyMarket() {
 
         FritzyApiStub market = FritzyApiStub.instance();
-        BigDecimal mintedEur = new BigDecimal(10);
+        BigDecimal mintedEur = BigDecimal.valueOf(10);
         market.mint(market.getAddress(), mintedEur, EContractAddress.EUR);
 
         BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
@@ -136,8 +136,8 @@ public class NegotiatorTest {
         String sunny = "sunny";
         market.register(sunny , sunny, PASSWORD);
         market.login(sunny, PASSWORD);
-        BigDecimal eur = new BigDecimal(1);
-        BigDecimal kWh = new BigDecimal(0.125d);
+        BigDecimal eur = BigDecimal.valueOf(1);
+        BigDecimal kWh = BigDecimal.valueOf(0.125d);
         market.mint(market.getAddress(), kWh, EContractAddress.KWH);
         market.createOrder(EContractAddress.KWH, EContractAddress.EUR, kWh, eur);
 
@@ -159,8 +159,8 @@ public class NegotiatorTest {
         String sunny = "sunny";
         market.register(sunny, sunny, PASSWORD);
         market.login(sunny, PASSWORD);
-        BigDecimal eur = new BigDecimal(1);
-        BigDecimal kWh = new BigDecimal(0.125d);
+        BigDecimal eur = BigDecimal.valueOf(1);
+        BigDecimal kWh = BigDecimal.valueOf(0.125d);
         market.mint(market.getAddress(), eur, EContractAddress.EUR);
         market.createOrder(EContractAddress.EUR, EContractAddress.KWH, eur, kWh);
 
@@ -180,7 +180,7 @@ public class NegotiatorTest {
         bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
         bn.flexibilityUpdate(resourceHelper.getStorageSystemDescription());
 
-        BigDecimal eur = new BigDecimal(10);
+        BigDecimal eur = BigDecimal.valueOf(10);
         market.login(BATTY, PASSWORD);
         market.mint(market.getAddress(), eur, EContractAddress.EUR);
         netty.rewardToGive = 2;
@@ -204,8 +204,8 @@ public class NegotiatorTest {
         String sunny = "sunny";
         market.register(sunny, sunny, PASSWORD);
         market.login(sunny, PASSWORD);
-        BigDecimal eur = new BigDecimal(1);
-        BigDecimal kWh = new BigDecimal(0.125d);
+        BigDecimal eur = BigDecimal.valueOf(1);
+        BigDecimal kWh = BigDecimal.valueOf(0.125d);
         market.mint(market.getAddress(), eur, EContractAddress.EUR);
         market.createOrder(EContractAddress.EUR, EContractAddress.KWH, eur, kWh);
 
@@ -226,8 +226,8 @@ public class NegotiatorTest {
         String sunny = "sunny";
         market.register(sunny, sunny, PASSWORD);
         market.login(sunny, PASSWORD);
-        BigDecimal eur = new BigDecimal(1);
-        BigDecimal kWh = new BigDecimal(0.125d);
+        BigDecimal eur = BigDecimal.valueOf(1);
+        BigDecimal kWh = BigDecimal.valueOf(0.125d);
         market.mint(market.getAddress(), kWh, EContractAddress.KWH);
         market.createOrder(EContractAddress.KWH, EContractAddress.EUR, kWh, eur);
 
@@ -246,8 +246,8 @@ public class NegotiatorTest {
         bn.flexibilityUpdate(resourceHelper.getStorageSystemDescription());
 
         market.login(BATTY, PASSWORD);
-        BigDecimal eur = new BigDecimal(1);
-        BigDecimal kWh = new BigDecimal(0.125d);
+        BigDecimal eur = BigDecimal.valueOf(1);
+        BigDecimal kWh = BigDecimal.valueOf(0.125d);
         market.mint(market.getAddress(), kWh, EContractAddress.KWH);
         market.createOrder(EContractAddress.KWH, EContractAddress.EUR, kWh, eur);
 
@@ -268,8 +268,8 @@ public class NegotiatorTest {
         bn.flexibilityUpdate(resourceHelper.getStorageSystemDescription());
 
         market.login(BATTY, PASSWORD);
-        BigDecimal eur = new BigDecimal(1);
-        BigDecimal kWh = new BigDecimal(0.125d);
+        BigDecimal eur = BigDecimal.valueOf(1);
+        BigDecimal kWh = BigDecimal.valueOf(0.125d);
         market.mint(market.getAddress(), eur, EContractAddress.EUR);
         market.createOrder(EContractAddress.EUR, EContractAddress.KWH, eur, kWh);
 
@@ -292,8 +292,8 @@ public class NegotiatorTest {
         String sunny = "sunny";
         market.register(sunny, sunny, PASSWORD);
         market.login(sunny, PASSWORD);
-        BigDecimal eur = new BigDecimal(2d);
-        BigDecimal kWh = new BigDecimal(10d);
+        BigDecimal eur = BigDecimal.valueOf(2d);
+        BigDecimal kWh = BigDecimal.valueOf(10d);
         market.mint(market.getAddress(), kWh, EContractAddress.KWH);
         market.createOrder(EContractAddress.KWH, EContractAddress.EUR, kWh, eur);
 
@@ -314,8 +314,8 @@ public class NegotiatorTest {
         String sunny = "sunny";
         market.register(sunny, sunny, PASSWORD);
         market.login(sunny, PASSWORD);
-        BigDecimal eur = new BigDecimal(2d);
-        BigDecimal kWh = new BigDecimal(10d);
+        BigDecimal eur = BigDecimal.valueOf(2d);
+        BigDecimal kWh = BigDecimal.valueOf(10d);
         market.mint(market.getAddress(), eur, EContractAddress.EUR);
         market.createOrder(EContractAddress.EUR, EContractAddress.KWH, eur, kWh);
 
@@ -336,8 +336,8 @@ public class NegotiatorTest {
         String sunny = "sunny";
         market.register(sunny, sunny, PASSWORD);
         market.login(sunny, PASSWORD);
-        BigDecimal eur = new BigDecimal(2d);
-        BigDecimal kWh = new BigDecimal(10d);
+        BigDecimal eur = BigDecimal.valueOf(2d);
+        BigDecimal kWh = BigDecimal.valueOf(10d);
         market.mint(market.getAddress(), eur, EContractAddress.EUR);
         market.createOrder(EContractAddress.EUR, EContractAddress.KWH, eur, kWh);
 
@@ -371,8 +371,8 @@ public class NegotiatorTest {
         String sunny = "sunny";
         market.register(sunny, sunny, PASSWORD);
         market.login(sunny, PASSWORD);
-        BigDecimal eur = new BigDecimal(0.04d);
-        BigDecimal kWh = new BigDecimal(0.125d);
+        BigDecimal eur = BigDecimal.valueOf(0.04d);
+        BigDecimal kWh = BigDecimal.valueOf(0.125d);
         market.mint(market.getAddress(), eur, EContractAddress.EUR);
         market.createOrder(EContractAddress.EUR, EContractAddress.KWH, eur, kWh);
 
@@ -400,7 +400,7 @@ public class NegotiatorTest {
         bn.flexibilityUpdate(resourceHelper.getStorageSystemDescription());
 
         market.login(BATTY, PASSWORD);
-        market.mint(market.getAddress(), new BigDecimal(10d), EContractAddress.EUR); // Give batty a bunch of money
+        market.mint(market.getAddress(), BigDecimal.valueOf(10d), EContractAddress.EUR); // Give batty a bunch of money
         bn.evaluate();
         assertEquals(2, market.orders().getOrders().getRecords().length);
         

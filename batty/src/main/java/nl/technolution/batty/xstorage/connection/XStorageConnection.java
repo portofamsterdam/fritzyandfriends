@@ -82,9 +82,9 @@ class XStorageConnection implements IXStorageConnection {
         this.username = config.getUsername();
         this.password = config.getPassword();
 
-        try {
+        try (InputStream inFile = new FileInputStream(truststorefile)) {
             KeyStore ks = KeyStore.getInstance("JKS");
-            ks.load(new FileInputStream(truststorefile), config.getTruststorepass().toCharArray());
+            ks.load(inFile, config.getTruststorepass().toCharArray());
 
             TrustManagerFactory tmf = TrustManagerFactory.getInstance(TrustManagerFactory.getDefaultAlgorithm());
             tmf.init(ks);
