@@ -356,12 +356,12 @@ public class NegotiatorTest {
     @Test
     public void cancelExistingOrders() {
         FritzyApiStub market = FritzyApiStub.instance();
+        market.login(BATTY, PASSWORD);
         BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
         bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
         bn.flexibilityUpdate(resourceHelper.getStorageSystemDescription());
 
         // Create orders by batty, market is empty
-        market.login(BATTY, PASSWORD);
         netty.rewardToGive = 2;
         bn.evaluate();
         assertEquals(2, market.orders().getOrders().getRecords().length);
@@ -377,6 +377,7 @@ public class NegotiatorTest {
 
         // Batty accepts the order from sunny
         market.login(BATTY, PASSWORD);
+
         bn.evaluate();
         assertTrue(netty.claimed);
         assertTrue(netty.orderRewardRequested);

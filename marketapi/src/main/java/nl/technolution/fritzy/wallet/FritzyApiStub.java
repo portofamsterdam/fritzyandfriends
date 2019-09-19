@@ -60,7 +60,8 @@ public final class FritzyApiStub implements IFritzyApi {
     private final ObjectMapper mapper = JacksonFactory.defaultMapper();
     private final Logger log = Log.getLogger();
 
-    private AtomicInteger id;
+    private AtomicInteger eventId;
+    private AtomicInteger orderCounter;
     private List<ApiEvent> events;
     private List<WebUser> users;
     private Map<String, FritzyBalance> balances;
@@ -100,7 +101,8 @@ public final class FritzyApiStub implements IFritzyApi {
             stubbedApi.users = new ArrayList<>();
             stubbedApi.events = new ArrayList<>();
             stubbedApi.balances = new HashMap<>();
-            stubbedApi.id = new AtomicInteger(0);
+            stubbedApi.eventId = new AtomicInteger(0);
+            stubbedApi.orderCounter = new AtomicInteger(0);
         }
     }
 
@@ -135,12 +137,20 @@ public final class FritzyApiStub implements IFritzyApi {
 
     @Override
     public WebOrder order(String orderHash) {
-        log.debug("order {}", orderHash);
-        return Arrays.asList(orders.getRecords()).stream()
+        WebOrder order = Arrays.asList(orders.getRecords()).stream()
                 .map(r -> r.getOrder())
                 .filter(o -> o.getHash().equals(orderHash))
                 .findFirst()
                 .orElse(null);
+        if (order != null) {
+            if (order.getTakerAddress() != null) {
+                log.debug("reading order from {} to {}", getEmail(order.getMakerAddress()),
+                        getEmail(order.getTakerAddress()));
+            } else {
+                log.debug("reading order by {}", getEmail(order.getMakerAddress()));
+            }
+        }
+        return order;
     }
 
     @Override
@@ -151,21 +161,46 @@ public final class FritzyApiStub implements IFritzyApi {
         Preconditions.checkArgument(order.getTakerAddress() == null);
         order.setTakerAddress(loginInUser.getAddress());
 
+        log.debug("maker {} is making {}{} and is taking {}{} from taker {}",
+                getEmail(order.getMakerAddress()),
+                order.getMakerAssetAmount(), order.getMakerAssetData(),
+                order.getTakerAssetAmount(), order.getTakerAssetData(),
+                getEmail(order.getTakerAddress()));
+
+        String otherUser;
+        if (order.getMakerAddress().equals(loginInUser.getAddress())) {
+            otherUser = getEmail(order.getTakerAddress());
+        } else {
+            otherUser = getEmail(order.getMakerAddress());
+        }
+
         BigDecimal takerGet = new BigDecimal(order.getTakerAssetAmount());
         BigDecimal takerGive = new BigDecimal(order.getMakerAssetAmount());
-        log.debug("{} gives {}{}", loginInUser.getEmail(), takerGive, order.getMakerAssetData());
-        log.debug("{} gets  {}{}", loginInUser.getEmail(), takerGet, order.getTakerAssetData());
 
+        log.debug("{} gives {}{}", loginInUser.getEmail(), takerGive, order.getMakerAssetData());
         decr(EContractAddress.valueOf(order.getTakerAssetData().toUpperCase()), takerGet, order.getTakerAddress());
+        
+        log.debug("{} gets  {}{}", loginInUser.getEmail(), takerGet, order.getTakerAssetData());
         incr(EContractAddress.valueOf(order.getMakerAssetData().toUpperCase()), takerGive, order.getTakerAddress());
 
         BigDecimal makerGet = new BigDecimal(order.getMakerAssetAmount());
         BigDecimal makerGive = new BigDecimal(order.getTakerAssetAmount());
-        
+
+        log.debug("{} gets  {}{}", otherUser, makerGet, order.getMakerAssetData());
         decr(EContractAddress.valueOf(order.getMakerAssetData().toUpperCase()), makerGet, order.getMakerAddress());
+        log.debug("{} gives {}{}", otherUser, makerGive, order.getTakerAssetData());
         incr(EContractAddress.valueOf(order.getTakerAssetData().toUpperCase()), makerGive, order.getMakerAddress());
+        
 
         return generateHash(Objects.hash(orderHash));
+    }
+
+    private String getEmail(String address) {
+        return users.stream()
+                .filter(u -> u.getAddress().equals(address))
+                .findFirst()
+                .orElseThrow(AssertionError::new)
+                .getEmail();
     }
 
     private void incr(EContractAddress contractaddress, BigDecimal takerAssetAmount, String takerAddress) {
@@ -224,7 +259,7 @@ public final class FritzyApiStub implements IFritzyApi {
         String username = loginInUser != null ? loginInUser.getName() : "unknown";
         log.debug("log {} {} {}", tag, msg, dataStr);
         ApiEvent e = new ApiEvent();
-        e.setId(id.getAndIncrement());
+        e.setId(eventId.getAndIncrement());
         e.setEnvironment(FritzyApiStub.class.getSimpleName());
         e.setActor(username);
         e.setMsg(msg);
@@ -329,7 +364,7 @@ public final class FritzyApiStub implements IFritzyApi {
 
         List<Record> ordersList = Lists.newArrayList(Arrays.asList(orders.getRecords()));
         WebOrder webOrder = new WebOrder();
-        String generateHash = generateHash(Instant.now().hashCode());
+        String generateHash = generateHash(orderCounter.getAndIncrement());
         webOrder.setHash(generateHash);
         webOrder.setMakerAddress(loginInUser.getAddress());
         webOrder.setMakerAssetAmount(makerAmount.toPlainString());
@@ -370,7 +405,7 @@ public final class FritzyApiStub implements IFritzyApi {
             EContractAddress makerToken, BigDecimal takerAmount, EContractAddress takerToken) {
         List<Record> ordersList = Lists.newArrayList(Arrays.asList(orders.getRecords()));
         WebOrder webOrder = new WebOrder();
-        String generateHash = generateHash(Instant.now().hashCode());
+        String generateHash = generateHash(orderCounter.getAndIncrement());
         webOrder.setHash(generateHash);
         webOrder.setMakerAddress(makerAddress);
         webOrder.setTakerAddress(takerAddress);

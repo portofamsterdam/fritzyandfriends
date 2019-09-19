@@ -70,7 +70,7 @@ public class OrderExecutor {
      */
     public EOrderCommand evaluate(BattyResourceManager resourceManager, StorageSystemDescription system,
             double fillLevel) {
-        log.info("Checking order {}", orderHash);
+        log.info("Processing order state {}", orderHash);
         IFritzyApi market = Services.get(IFritzyApiFactory.class).build();
         WebOrder order = market.order(orderHash);
         if (order == null) {
