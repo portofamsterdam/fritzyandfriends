@@ -14,38 +14,41 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.fritzy.wallet;
+package nl.technolution.fritzy.wallet.event;
 
-import nl.technolution.dropwizard.FritzyAppConfig;
-import nl.technolution.dropwizard.MarketConfig;
+import java.math.BigDecimal;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import nl.technolution.IJsonnable;
 
 /**
  * 
  */
-public class FritzyApiFactory implements IFritzyApiFactory {
+public class LimitData implements IJsonnable {
 
-    private FritzyAppConfig fritzyConfig;
-
-    @Override
-    public final void init(FritzyAppConfig fritzyConfig) {
-        this.fritzyConfig = fritzyConfig;
-    }
+    @JsonProperty("limit")
+    private BigDecimal limit;
 
     /**
-     * Build the market API
-     * 
-     * @return instance to call
+     * Constructor for {@link LimitData} objects
+     *
+     * @param limit to set
      */
-    @Override
-    public IFritzyApi build() {
-        MarketConfig marketConfig = fritzyConfig.getMarket();
-        IFritzyApi api;
-        if (marketConfig.isUseStub()) {
-            api = FritzyApiStub.instance();
-        } else {
-            api = new FritzyApi(marketConfig.getMarketUrl(), fritzyConfig.getEnvironment());
-            api.login(marketConfig.getEmail(), marketConfig.getPassword());
-        }
-        return api;
+    public LimitData(BigDecimal limit) {
+        this.limit = limit;
     }
+
+    public LimitData() {
+        // 
+    }
+
+    public BigDecimal getLimit() {
+        return limit;
+    }
+
+    public void setLimit(BigDecimal limit) {
+        this.limit = limit;
+    }
+
 }

@@ -14,38 +14,57 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.fritzy.wallet;
+package nl.technolution.fritzy.wallet.event;
 
-import nl.technolution.dropwizard.FritzyAppConfig;
-import nl.technolution.dropwizard.MarketConfig;
+import java.math.BigDecimal;
+
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import nl.technolution.IJsonnable;
 
 /**
  * 
  */
-public class FritzyApiFactory implements IFritzyApiFactory {
+public class BalanceData implements IJsonnable {
 
-    private FritzyAppConfig fritzyConfig;
+    @JsonProperty("kwh")
+    private BigDecimal kwh;
 
-    @Override
-    public final void init(FritzyAppConfig fritzyConfig) {
-        this.fritzyConfig = fritzyConfig;
+    @JsonProperty("eur")
+    private BigDecimal eur;
+
+    /**
+     * Constructor for {@link BalanceData} objects
+     *
+     * @param kwh
+     * @param eur
+     */
+    public BalanceData(BigDecimal kwh, BigDecimal eur) {
+        this.kwh = kwh;
+        this.eur = eur;
     }
 
     /**
-     * Build the market API
-     * 
-     * @return instance to call
+     * Constructor for {@link BalanceData} objects
+     *
      */
-    @Override
-    public IFritzyApi build() {
-        MarketConfig marketConfig = fritzyConfig.getMarket();
-        IFritzyApi api;
-        if (marketConfig.isUseStub()) {
-            api = FritzyApiStub.instance();
-        } else {
-            api = new FritzyApi(marketConfig.getMarketUrl(), fritzyConfig.getEnvironment());
-            api.login(marketConfig.getEmail(), marketConfig.getPassword());
-        }
-        return api;
+    public BalanceData() {
+        //
+    }
+
+    public BigDecimal getKwh() {
+        return kwh;
+    }
+
+    public void setKwh(BigDecimal kwh) {
+        this.kwh = kwh;
+    }
+
+    public BigDecimal getEur() {
+        return eur;
+    }
+
+    public void setEur(BigDecimal eur) {
+        this.eur = eur;
     }
 }

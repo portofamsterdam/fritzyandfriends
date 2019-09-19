@@ -114,12 +114,11 @@ public class NegotiatorTest {
 
         // check balance
         ApiEvent balanceEvent = market.getFirstEventOfType(EEventType.BALANCE);
-        assertEquals(mintedEur.toPlainString(), balanceEvent.getMsg());
+        assertEquals("Balance KWH: 0.00, EUR: 10.00", balanceEvent.getMsg());
 
         // check capacity
         ApiEvent limitActorEvent = market.getFirstEventOfType(EEventType.LIMIT_ACTOR);
-        assertEquals(Double.toString(netty.getCapacity(BATTY).getGridConnectionLimit()),
-                limitActorEvent.getMsg());
+        assertEquals("Limit actor update limit=16.00", limitActorEvent.getMsg());
 
         // check created orders
         assertEquals(2, market.orders().getOrders().getRecords().length);
@@ -357,12 +356,12 @@ public class NegotiatorTest {
     @Test
     public void cancelExistingOrders() {
         FritzyApiStub market = FritzyApiStub.instance();
+        market.login(BATTY, PASSWORD);
         BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
         bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
         bn.flexibilityUpdate(resourceHelper.getStorageSystemDescription());
 
         // Create orders by batty, market is empty
-        market.login(BATTY, PASSWORD);
         netty.rewardToGive = 2;
         bn.evaluate();
         assertEquals(2, market.orders().getOrders().getRecords().length);
@@ -378,6 +377,7 @@ public class NegotiatorTest {
 
         // Batty accepts the order from sunny
         market.login(BATTY, PASSWORD);
+
         bn.evaluate();
         assertTrue(netty.claimed);
         assertTrue(netty.orderRewardRequested);

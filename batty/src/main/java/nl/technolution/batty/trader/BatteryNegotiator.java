@@ -36,12 +36,12 @@ import nl.technolution.apis.netty.DeviceCapacity;
 import nl.technolution.apis.netty.INettyApi;
 import nl.technolution.apis.netty.OrderReward;
 import nl.technolution.batty.app.BattyConfig;
-import nl.technolution.dashboard.EEventType;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.webservice.Endpoints;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
+import nl.technolution.fritzy.wallet.event.EventLogger;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.order.Orders;
@@ -114,15 +114,16 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
 
         // Get balance
         IFritzyApi market = Services.get(IFritzyApiFactory.class).build();
+        EventLogger events = new EventLogger(market);
         FritzyBalance balance = market.balance();
-        market.log(EEventType.BALANCE, balance.getEur().toPlainString(), null);
+        events.logBalance(balance);
 
 
         // Get max capacity
         INettyApi netty = Endpoints.get(INettyApi.class);
         DeviceId deviceId = resourceManager.getDeviceId();
         DeviceCapacity deviceCapacity = netty.getCapacity(deviceId.getDeviceId());
-        market.log(EEventType.LIMIT_ACTOR, Double.toString(deviceCapacity.getGridConnectionLimit()), null);
+        events.logLimitActor(deviceCapacity.getGridConnectionLimit());
 
         checkOpenOrders(market);
         // Note check open order may set nextTradeStart
