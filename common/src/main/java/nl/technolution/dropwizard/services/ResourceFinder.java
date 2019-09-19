@@ -69,7 +69,7 @@ public final class ResourceFinder {
         // the set of resources the class loader uses for this package
         Enumeration<URL> resources = classLoader.getResources(JarUtil.nameToPath(thePackage));
         for (URL resource : Collections.list(resources)) {
-            LOG.trace("Found resource: " + resource);
+            LOG.trace("Found resource: {}", resource);
 
             if (VFS_PROTOCOLS.contains(resource.getProtocol())) {
                 // this resource resides in a vfszip
@@ -88,7 +88,7 @@ public final class ResourceFinder {
                     throw new IllegalStateException("Could not decode url: " + fileName, e);
                 }
             } else {
-                LOG.warn("Skipping classpath resource while finding resources: " + resource);
+                LOG.warn("Skipping classpath resource while finding resources: {}", resource);
                 // skip this resource
             }
         }

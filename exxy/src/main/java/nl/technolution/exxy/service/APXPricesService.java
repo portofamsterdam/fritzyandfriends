@@ -92,7 +92,8 @@ public class APXPricesService implements IAPXPricesService {
         if (useFixedPrices) {
             return getFixedPrice(requestedDateTime);
         }
-        PublicationMarketDocument prices = Services.get(ITransparencyPlatformClient.class).getDayAheadPrices(requestedDateTime);
+        PublicationMarketDocument prices = Services.get(ITransparencyPlatformClient.class)
+                .getDayAheadPrices(requestedDateTime);
         if (prices == null) {
             throw new NoPricesAvailableException("No prices available.");
         }
@@ -111,7 +112,7 @@ public class APXPricesService implements IAPXPricesService {
     private double getSinglePrice(Instant requestedDateTime, PublicationMarketDocument prices)
             throws NoPricesAvailableException {
         for (TimeSeries timeSeries : prices.getTimeSeries()) {
-            LOG.debug("Processing timeseries with mRID=" + timeSeries.getMRID());
+            LOG.debug("Processing timeseries with mRID={}", timeSeries.getMRID());
             long factor;
             StandardUnitOfMeasureTypeList unit = StandardUnitOfMeasureTypeList
                     .fromValue(timeSeries.getPriceMeasureUnitName());
@@ -126,13 +127,13 @@ public class APXPricesService implements IAPXPricesService {
                 factor = 1000L;
                 break;
             default:
-                throw new RuntimeException("Factor " + unit + " not expected.");
+                throw new IllegalStateException("Factor " + unit + " not expected.");
             }
             LOG.debug("Factor for unit " + unit + " is " + factor);
             for (SeriesPeriod period : timeSeries.getPeriod()) {
                 Instant periodStart = Instant.from(DATE_TIME_PARSER.parse(period.getTimeInterval().getStart()));
                 Instant periodEnd = Instant.from(DATE_TIME_PARSER.parse(period.getTimeInterval().getEnd()));
-                LOG.debug("Processing period " + periodStart + "-" + periodEnd);
+                LOG.debug("Processing period {}-{}", periodStart, periodEnd);
                 if (!requestedDateTime.isBefore(periodStart) && requestedDateTime.isBefore(periodEnd)) {
                     LOG.debug("requestedDatetime {} is in current period {}-{}", requestedDateTime, periodStart,
                             periodEnd);

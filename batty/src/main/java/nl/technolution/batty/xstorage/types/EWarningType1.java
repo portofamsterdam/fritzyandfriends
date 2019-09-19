@@ -23,23 +23,23 @@ import nl.technolution.IEnumBitset;
  */
 public enum EWarningType1 implements IEnumBitset {
     /** */
-    Reserved_0(0),
+    RESERVED_0(0),
     /** */
-    Reserved_1(1),
+    RESERVED_1(1),
     /** */
-    ErrorCode34(2),
+    ERRORCODE34(2),
     /** */
-    Reserved_3(3),
+    RESERVED_3(3),
     /** */
-    PvOverPower(4),
+    PVOVERPOWER(4),
     /** */
-    Reserved_5(5),
+    RESERVED_5(5),
     /** */
-    Reserved_6(6),
+    RESERVED_6(6),
     /** */
-    Reserved_7(7),
+    RESERVED_7(7),
     /** General BMS fault detected */
-    BmsFault(8);
+    BMSFAULT(8);
 
     private final long bitMask;
 

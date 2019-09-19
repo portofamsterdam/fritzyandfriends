@@ -92,6 +92,7 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
     /**
      * Extend abstract implementation.
      */
+    @Override
     public final void flexibilityRegistration(StorageRegistration flexibilityRegistration) {
         super.flexibilityRegistration(flexibilityRegistration);
 
@@ -270,7 +271,7 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
                     // TODO WHO: void method, what happens when cancel is impossible? (e.g. when it accepted by another
                     // party during this for loop...)
                     market.cancelOrder(order.getHash());
-                    LOG.debug("Order canceled: " + order);
+                    LOG.debug("Order canceled: {}", order);
                 }
                 continue;
             }

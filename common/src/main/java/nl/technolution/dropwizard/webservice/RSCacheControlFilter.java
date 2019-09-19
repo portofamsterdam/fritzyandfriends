@@ -64,10 +64,6 @@ public class RSCacheControlFilter implements ContainerResponseFilter {
         result.setNoStore(true); // don't store security sensitive info
         result.setMustRevalidate(true);
         result.setMaxAge(0);
-        // NOTE: Next settings control caching on proxy server
-        // result.setNoTransform(noTransform);
-        // result.setProxyRevalidate(proxyRevalidate);
-        // result.setSMaxAge(0);
         return result;
     }
 

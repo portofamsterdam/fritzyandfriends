@@ -41,7 +41,7 @@ public class MachineDataCache implements IMachineDataCacher {
         try {
             cachedSoc = connection.getMachineData();
         } catch (XStorageException ex) {
-            throw new IllegalStateException("Unable to retrieve state of charge");
+            throw new IllegalStateException("Unable to retrieve state of charge", ex);
         }
     }
 

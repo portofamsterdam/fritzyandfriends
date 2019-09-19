@@ -66,15 +66,15 @@ public class TransparencyPlatformClient implements ITransparencyPlatformClient {
                 .queryParam("out_Domain", "10YNL----------L")
                 .queryParam("TimeInterval", start + "/" + start.plus(Duration.ofHours(1)));
         Builder request = target.request();
-        LOG.debug("Composed URL: " + target.getUri());
+        LOG.debug("Composed URL: {}", target.getUri());
         Response response = request.get();
         response.bufferEntity();
         String output = response.readEntity(String.class);
         if (response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
-            LOG.debug("received XML:" + output);
+            LOG.debug("received XML: {}", output);
             return response.readEntity(PublicationMarketDocument.class);
         }
-        LOG.error("Error retriving day ahead pricing data: " + response);
+        LOG.error("Error retriving day ahead pricing data: {}", response);
         return null;
     }
 }

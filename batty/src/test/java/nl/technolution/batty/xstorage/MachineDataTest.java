@@ -100,7 +100,7 @@ public class MachineDataTest {
         assertEquals(0, data.getGFCIFaultValue(), 0.0001d);
         assertEquals(2.2, data.getETotal(), 0.0001d);
         assertEquals(1, data.getHTotal());
-        assertTrue(data.getWarning1().contains(EWarningType1.ErrorCode34));
+        assertTrue(data.getWarning1().contains(EWarningType1.ERRORCODE34));
         assertEquals(1, data.getWarning1().size());
         assertTrue(data.getWarning2().contains(EWarningType2.MSVERSIONFAIL));
         assertTrue(data.getWarning2().contains(EWarningType2.OVERPOWER));

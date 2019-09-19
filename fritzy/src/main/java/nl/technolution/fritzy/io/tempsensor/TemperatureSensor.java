@@ -23,8 +23,6 @@ import java.util.TooManyListenersException;
 
 import org.slf4j.Logger;
 
-import nl.technolution.Log;
-
 import gnu.io.CommPortIdentifier;
 import gnu.io.NoSuchPortException;
 import gnu.io.PortInUseException;
@@ -32,6 +30,7 @@ import gnu.io.SerialPort;
 import gnu.io.SerialPortEvent;
 import gnu.io.SerialPortEventListener;
 import gnu.io.UnsupportedCommOperationException;
+import nl.technolution.Log;
 
 /**
  * Temperature sensor of Fritzy
@@ -93,7 +92,7 @@ public class TemperatureSensor implements ITemperatureSensor {
                             log.warn("Failed to parse temparatuur, set to minimal value", nfe);
                             temparature = Double.MIN_VALUE;
                         }
-                        log.debug("temperature: " + temparature);
+                        log.debug("temperature: {}", temparature);
                     } catch (IOException e) {
                         log.warn("Failed to read temparatuur, set to minimal value", e);
                         temparature = Double.MIN_VALUE;

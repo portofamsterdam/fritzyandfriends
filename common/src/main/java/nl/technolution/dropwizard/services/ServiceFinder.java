@@ -89,9 +89,9 @@ public final class ServiceFinder {
                     m.invoke(service, obj);
                     break; // there can be only one
                 } catch (NoSuchMethodException e) {
-                    // do nothing;
+                    // nothing todo;
                 } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                    throw new RuntimeException(e.getMessage(), e);
+                    throw new IllegalStateException(e.getMessage(), e);
                 }
                 calledClazz = calledClazz.getSuperclass();
             }
