@@ -124,6 +124,28 @@ public class NegotiatorTest {
         assertEquals(2, market.orders().getOrders().getRecords().length);
     }
 
+    @Test
+    public void createOrderInEmptyMarket() {
+        FritzyApiStub market = FritzyApiStub.instance();
+        BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
+        bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
+        bn.flexibilityUpdate(resourceHelper.getStorageSystemDescription());
+
+        market.login(BATTY, PASSWORD);
+        netty.rewardToGive = 2;
+
+        bn.evaluate();
+        assertEquals(1, market.orders().getOrders().getRecords().length);
+
+        // Give batty some money to create a buy order
+        market.mint(market.getAddress(), BigDecimal.TEN, EContractAddress.EUR);
+        bn.evaluate();
+        assertEquals(2, market.orders().getOrders().getRecords().length);
+
+        assertFalse(netty.claimed);
+        assertFalse(netty.orderRewardRequested);
+    }
+
     @Test 
     public void acceptExistingOrderCharge() {
         FritzyApiStub market = FritzyApiStub.instance();
@@ -247,8 +269,10 @@ public class NegotiatorTest {
         market.login(BATTY, PASSWORD);
         BigDecimal eur = BigDecimal.valueOf(1);
         BigDecimal kWh = BigDecimal.valueOf(0.125d);
-        market.mint(market.getAddress(), kWh, EContractAddress.KWH);
         market.createOrder(EContractAddress.KWH, EContractAddress.EUR, kWh, eur);
+
+        // Give batty some money to create a buy order
+        market.mint(market.getAddress(), BigDecimal.TEN, EContractAddress.EUR);
 
         netty.rewardToGive = 2;
         bn.evaluate();
@@ -360,6 +384,9 @@ public class NegotiatorTest {
         BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
         bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
         bn.flexibilityUpdate(resourceHelper.getStorageSystemDescription());
+
+        // Give batty some money to create a buy order
+        market.mint(market.getAddress(), BigDecimal.TEN, EContractAddress.EUR);
 
         // Create orders by batty, market is empty
         netty.rewardToGive = 2;
