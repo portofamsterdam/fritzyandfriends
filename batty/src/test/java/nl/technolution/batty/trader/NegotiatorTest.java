@@ -114,12 +114,11 @@ public class NegotiatorTest {
 
         // check balance
         ApiEvent balanceEvent = market.getFirstEventOfType(EEventType.BALANCE);
-        assertEquals(mintedEur.toPlainString(), balanceEvent.getMsg());
+        assertEquals("Balance KWH: 0.00, EUR: 10.00", balanceEvent.getMsg());
 
         // check capacity
         ApiEvent limitActorEvent = market.getFirstEventOfType(EEventType.LIMIT_ACTOR);
-        assertEquals(Double.toString(netty.getCapacity(BATTY).getGridConnectionLimit()),
-                limitActorEvent.getMsg());
+        assertEquals("Limit actor update limit=16.00", limitActorEvent.getMsg());
 
         // check created orders
         assertEquals(2, market.orders().getOrders().getRecords().length);

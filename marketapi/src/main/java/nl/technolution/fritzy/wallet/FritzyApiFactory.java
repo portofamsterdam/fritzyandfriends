@@ -42,8 +42,6 @@ public class FritzyApiFactory implements IFritzyApiFactory {
         IFritzyApi api;
         if (marketConfig.isUseStub()) {
             api = FritzyApiStub.instance();
-            api.register(marketConfig.getEmail(), marketConfig.getEmail(), marketConfig.getPassword());
-            api.login(marketConfig.getEmail(), marketConfig.getPassword());
         } else {
             api = new FritzyApi(marketConfig.getMarketUrl(), fritzyConfig.getEnvironment());
             api.login(marketConfig.getEmail(), marketConfig.getPassword());
