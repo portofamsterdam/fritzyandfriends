@@ -118,6 +118,7 @@ public class OrderExecutorTest {
         apiStub.login(billy, password);
         apiStub.mint(apiStub.getAddress(), eur, EContractAddress.EUR);
         apiStub.fillOrder(hash);
+        apiStub.login(batty, password);
 
         OrderExecutor orderExecutor = new OrderExecutor(hash);
         assertEquals(EOrderCommand.NONE, orderExecutor.evaluate(resourceManager, system, 50d));
@@ -145,6 +146,7 @@ public class OrderExecutorTest {
         apiStub.login(billy, password);
         apiStub.mint(apiStub.getAddress(), eur, EContractAddress.EUR);
         apiStub.fillOrder(hash);
+        apiStub.login(batty, password);
 
         OrderExecutor orderExecutor = new OrderExecutor(hash);
         assertEquals(EOrderCommand.NONE, orderExecutor.evaluate(resourceManager, system, 50d));
@@ -172,6 +174,7 @@ public class OrderExecutorTest {
         apiStub.login(billy, password);
         apiStub.mint(apiStub.getAddress(), kWh, EContractAddress.KWH);
         apiStub.fillOrder(hash);
+        apiStub.login(batty, password);
 
         OrderExecutor orderExecutor = new OrderExecutor(hash);
         assertEquals(EOrderCommand.NONE, orderExecutor.evaluate(resourceManager, system, 50d));
