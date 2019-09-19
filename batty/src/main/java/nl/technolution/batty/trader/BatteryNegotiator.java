@@ -23,6 +23,7 @@ import java.util.List;
 
 import javax.annotation.Nullable;
 
+import com.google.common.base.Preconditions;
 import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
@@ -224,17 +225,17 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
             wq = maxWq;
         }
 
-        double kWhPrice = apxPrice.getPrice() + (config.getBuyMargin() / 100);
+        double kWhPrice = apxPrice.getPrice() + (config.getBuyMargin() / 100d);
         double orderPrice = (wq / 1000) * kWhPrice;
 
-        BigDecimal kWhToSell = new BigDecimal(wq / 1000);
+        BigDecimal kWhToSell = BigDecimal.valueOf(wq / 1000d);
         if (market.balance().getKwh().doubleValue() < kWhToSell.doubleValue()) {
             double kWhToMint = kWhToSell.doubleValue() - market.balance().getKwh().doubleValue();
-            market.mint(market.getAddress(), new BigDecimal(kWhToMint), EContractAddress.KWH);
+            market.mint(market.getAddress(), BigDecimal.valueOf(kWhToMint), EContractAddress.KWH);
         }
         
         openSellOrderHash = market.createOrder(EContractAddress.KWH, EContractAddress.EUR,
-                new BigDecimal(orderPrice), kWhToSell);
+                BigDecimal.valueOf(orderPrice), kWhToSell);
         activeBattyOrders.add(new OrderExecutor(openSellOrderHash));
     }
 
@@ -254,16 +255,16 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
                 fillLevel);
 
         // check maximum usage on grid
-        double maxWq = deviceCapacity.getGridConnectionLimit() * 230d / 4;
+        double maxWq = deviceCapacity.getGridConnectionLimit() * 230d / 4d;
         if (maxWq < wq) {
             wq = maxWq;
         }
 
-        double kWhPrice = apxPrice.getPrice() - (config.getBuyMargin() / 100);
-        double orderPrice = (wq / 1000) * kWhPrice;
+        double kWhPrice = apxPrice.getPrice() - (config.getBuyMargin() / 100d);
+        double orderPrice = (wq / 1000d) * kWhPrice;
 
         openBuyOrderHash = market.createOrder(EContractAddress.EUR, EContractAddress.KWH,
-                new BigDecimal(orderPrice), new BigDecimal(wq / 1000));
+                BigDecimal.valueOf(orderPrice), BigDecimal.valueOf(wq / 1000d));
         activeBattyOrders.add(new OrderExecutor(openBuyOrderHash));
     }
 
@@ -275,9 +276,9 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
                     continue;
                 }
                 StorageContinuousRunningMode scrm = StorageContinuousRunningMode.class.cast(rm);
-                for (ContinuousRunningModeElement crm : scrm.getContinuousRunningModeElement()) {
-                    return getKiloWattPerQuarterFromRunningMode(crm, fillLevel);
-                }
+                // NOTE only supports one running mode element for now
+                Preconditions.checkState(scrm.getContinuousRunningModeElement().size() == 1);
+                return getKiloWattPerQuarterFromRunningMode(scrm.getContinuousRunningModeElement().get(0), fillLevel);
             }
         }
         throw new IllegalStateException();

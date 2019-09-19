@@ -117,13 +117,13 @@ public class APXPricesService implements IAPXPricesService {
                     .fromValue(timeSeries.getPriceMeasureUnitName());
             switch (unit) {
             case GWH:
-                factor = 1000 * 1000;
+                factor = 1000L * 1000L;
                 break;
             case KWH:
-                factor = 1;
+                factor = 1L;
                 break;
             case MWH:
-                factor = 1000;
+                factor = 1000L;
                 break;
             default:
                 throw new RuntimeException("Factor " + unit + " not expected.");

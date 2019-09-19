@@ -86,8 +86,8 @@ public class OrderExecutorTest {
         // Create a user
         FritzyApiStub apiStub = FritzyApiStub.instance();
         apiStub.login(batty, password);
-        BigDecimal kWh = new BigDecimal(1);
-        BigDecimal eur = new BigDecimal(1);
+        BigDecimal kWh = BigDecimal.valueOf(1);
+        BigDecimal eur = BigDecimal.valueOf(1);
         String hash = apiStub.createOrder(EContractAddress.KWH, EContractAddress.EUR, kWh, eur);
 
         // Order not accepted yet
@@ -111,8 +111,8 @@ public class OrderExecutorTest {
 
         FritzyApiStub apiStub = FritzyApiStub.instance();
         apiStub.login(batty, password);
-        BigDecimal kWh = new BigDecimal(1);
-        BigDecimal eur = new BigDecimal(1);
+        BigDecimal kWh = BigDecimal.valueOf(1);
+        BigDecimal eur = BigDecimal.valueOf(1);
         apiStub.mint(apiStub.getAddress(), kWh, EContractAddress.KWH);
         String hash = apiStub.createOrder(EContractAddress.KWH, EContractAddress.EUR, kWh, eur);
         apiStub.login(billy, password);
@@ -139,8 +139,8 @@ public class OrderExecutorTest {
 
         FritzyApiStub apiStub = FritzyApiStub.instance();
         apiStub.login(batty, password);
-        BigDecimal kWh = new BigDecimal(2);
-        BigDecimal eur = new BigDecimal(2);
+        BigDecimal kWh = BigDecimal.valueOf(2);
+        BigDecimal eur = BigDecimal.valueOf(2);
         apiStub.mint(apiStub.getAddress(), kWh, EContractAddress.KWH);
         String hash = apiStub.createOrder(EContractAddress.KWH, EContractAddress.EUR, kWh, eur);
         apiStub.login(billy, password);
@@ -167,8 +167,8 @@ public class OrderExecutorTest {
 
         FritzyApiStub apiStub = FritzyApiStub.instance();
         apiStub.login(batty, password);
-        BigDecimal kWh = new BigDecimal(0.5d);
-        BigDecimal eur = new BigDecimal(0.5d);
+        BigDecimal kWh = BigDecimal.valueOf(0.5d);
+        BigDecimal eur = BigDecimal.valueOf(0.5d);
         apiStub.mint(apiStub.getAddress(), eur, EContractAddress.EUR);
         String hash = apiStub.createOrder(EContractAddress.EUR, EContractAddress.KWH, kWh, eur);
         apiStub.login(billy, password);
@@ -195,8 +195,8 @@ public class OrderExecutorTest {
 
         FritzyApiStub apiStub = FritzyApiStub.instance();
         apiStub.login(billy, password);
-        BigDecimal kWh = new BigDecimal(1d);
-        BigDecimal eur = new BigDecimal(1d);
+        BigDecimal kWh = BigDecimal.valueOf(1d);
+        BigDecimal eur = BigDecimal.valueOf(1d);
         apiStub.mint(apiStub.getAddress(), kWh, EContractAddress.KWH);
         String hash = apiStub.createOrder(EContractAddress.KWH, EContractAddress.EUR, kWh, eur);
         apiStub.login(batty, password);
@@ -223,8 +223,8 @@ public class OrderExecutorTest {
 
         FritzyApiStub apiStub = FritzyApiStub.instance();
         apiStub.login(billy, password);
-        BigDecimal kWh = new BigDecimal(1d);
-        BigDecimal eur = new BigDecimal(1d);
+        BigDecimal kWh = BigDecimal.valueOf(1d);
+        BigDecimal eur = BigDecimal.valueOf(1d);
         apiStub.mint(apiStub.getAddress(), eur, EContractAddress.EUR);
         String hash = apiStub.createOrder(EContractAddress.EUR, EContractAddress.KWH, kWh, eur);
         apiStub.login(batty, password);

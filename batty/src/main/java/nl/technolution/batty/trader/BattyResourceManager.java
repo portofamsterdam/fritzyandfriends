@@ -63,10 +63,7 @@ public class BattyResourceManager implements IResourceManager {
     }
 
     private void handleActuatorInstruction(ActuatorInstruction instruction) {
-        if (instruction == null) {
-            controller.stop();
-        }
-
+        Preconditions.checkNotNull(instruction);
         Preconditions.checkArgument(instruction.getActuatorId() == BattyResourceHelper.ACTUATOR_ID);
 
         // NOTE: instruction start time not supported, always execute now
