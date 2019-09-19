@@ -117,6 +117,9 @@ public final class RewardService implements IRewardService {
                 continue;
             }
         }
+        if (uMaker == null || uTaker == null) {
+            return false;
+        }
         return isLocal(uMaker.getName(), uTaker.getName());
     }
 

@@ -49,6 +49,9 @@ public final class DeviceId {
         if (obj == null) {
             return false;
         }
+        if (this.getClass() != obj.getClass()) {
+            return false;
+        }
         return deviceId.equals(((DeviceId)obj).deviceId);
     }
 
