@@ -17,6 +17,7 @@
 package nl.technolution.exxy.app;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -82,6 +83,12 @@ public class ExxyConfig extends FritzyAppConfig {
      */
     @JsonProperty("useFixedPrices")
     private boolean useFixedPrices;
+
+    /**
+     * For each size in the given list an order to buy and sell is created.
+     */
+    @JsonProperty("orderSizes")
+    private List<Double> orderSizes;
 
     /**
      * MArket properties
@@ -166,6 +173,8 @@ public class ExxyConfig extends FritzyAppConfig {
         apiConfig.setApis(Lists.newArrayList(netty));
         c.setApiConfig(apiConfig);
 
+        c.orderSizes = Lists.newArrayList(0.1d, 0.5d, 1d);
+
         mapper.writerWithDefaultPrettyPrinter().writeValue(System.out, c);
     }
 
@@ -202,4 +211,19 @@ public class ExxyConfig extends FritzyAppConfig {
         return useFixedPrices;
     }
 
+    public List<Double> getOrderSizes() {
+        return orderSizes;
+    }
+
+    public void setOrderSizes(List<Double> orderSizes) {
+        this.orderSizes = orderSizes;
+    }
+
+    public void setFixedPrices(Map<Integer, Double> fixedPrices) {
+        this.fixedPrices = fixedPrices;
+    }
+
+    public void setUseFixedPrices(boolean useFixedPrices) {
+        this.useFixedPrices = useFixedPrices;
+    }
 }
