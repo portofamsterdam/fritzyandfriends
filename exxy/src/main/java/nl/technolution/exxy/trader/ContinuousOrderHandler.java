@@ -18,9 +18,10 @@ package nl.technolution.exxy.trader;
 
 import java.math.BigDecimal;
 
+import com.google.common.base.Strings;
+
 import org.slf4j.Logger;
 
-import joptsimple.internal.Strings;
 import nl.technolution.Log;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.fritzy.gen.model.WebOrder;
