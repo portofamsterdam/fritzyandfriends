@@ -1,3 +1,24 @@
+// NOTE: the following is only needed for (Technolution) plugins.
+buildscript {
+    repositories {
+        maven {
+          url "https://plugins.gradle.org/m2/"
+        }
+    }
+    dependencies {        
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
+        classpath "gradle.plugin.org.hidetake:gradle-swagger-generator-plugin:2.17.0"
+        classpath "io.swagger.core.v3:swagger-gradle-plugin:2.0.8"
+    }
+}
+
+plugins {
+    id 'eclipse'
+}
+
+// Define all library dependencies in one file for clarity
+apply from:'dependencies.gradle'
+
 ext { 
     // The version number is appended automatically with a build number and revision number when building on the CI server. 
     // When building locally, the version number is appended with '-SNAPSHOT' to indicate a non-approved version.
@@ -18,25 +39,10 @@ version = '1.0'
 // NOTE: projects are listed in settings.gradle
 allprojects { group = 'fritzy' }
 
-// Define all library dependencies in one file for clarity
-apply from:'dependencies.gradle'
-
-// NOTE: the following is only needed for (Technolution) plugins.
-buildscript {
-    repositories {
-        maven {
-          url "https://plugins.gradle.org/m2/"
-        }
-    }
-    dependencies {        
-        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
-        classpath "gradle.plugin.org.hidetake:gradle-swagger-generator-plugin:2.17.0"
-        classpath "io.swagger.core.v3:swagger-gradle-plugin:2.0.8"
-    }
-}
 
 // Configuration for all subprojects.
-subprojects {       
+subprojects { 
+    apply plugin: 'eclipse'
      
     plugins.withType(JavaPlugin) {
     
@@ -108,5 +114,3 @@ def swaggerApiGenTask(aProject, runtimeClasspath) {
         into new java.io.File(project(":docker").buildDir, "/api/" + aProject.name)
     }
 }
-
-
