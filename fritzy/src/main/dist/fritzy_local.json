@@ -1,0 +1,41 @@
+{
+  "environment" : "live",
+  "deviceId" : "fritzy",
+  "host" : "10.0.0.201",
+  "port" : 80,
+  "serialPort" : "/dev/ttyUSB0",
+  "stubTemparature" : true,
+  "stubRelay" : true,
+  "minTemp" : 2.0,
+  "maxTemp" : 2.0,
+  "maxMargin" : 0,
+  "power" : 100.0,
+  "leakageRate" : 2.78E-4,
+  "coolingSpeed" : 0.002222,
+  
+  "apiConfig" : {
+    "apis" : [ {
+      "name" : "netty",
+      "url" : "http://localhost:8080/",
+      "connectTimeout" : 5000,
+      "readTimeout" : 5000
+    }, {
+      "name" : "exxy",
+      "url" : "http://localhost:8080/",
+      "connectTimeout" : 5000,
+      "readTimeout" : 5000
+    } ]
+  },
+  
+  "market" : {
+    "useStub" : true,
+    "marketUrl" : "",
+    "email" : "fritzy@fritzy.nl",
+    "password" : "fritzy"
+  },
+  "logging": {
+    "level": "INFO"
+  }  
+}
+
+
