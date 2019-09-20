@@ -86,7 +86,7 @@ public class OrderExecutor {
         // if taker is set, order is accepted
         if (!orderAccepted) {
             Instant nextQuarter = Efi.getNextQuarter();
-            log.info("order {} accepted, starting {}", orderHash, nextQuarter, startTs);
+            log.info("order {} accepted, starting {}", orderHash, nextQuarter);
             orderAccepted = true;
             startTs = nextQuarter;
         }

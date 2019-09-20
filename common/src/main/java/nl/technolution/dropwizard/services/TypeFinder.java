@@ -194,7 +194,7 @@ public final class TypeFinder {
             String pathToClass = JarUtil.nameToPath(className);
             try {
                 if (isExcluded(pathToClass)) {
-                    LOG.debug("Excluding class: " + className);
+                    LOG.debug("Excluding class: {}", className);
                     continue;
                 }
                 // NOTE: Can't use Class.forName to avoid problems with JBoss

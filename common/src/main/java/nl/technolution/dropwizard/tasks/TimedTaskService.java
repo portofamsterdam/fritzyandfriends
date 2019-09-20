@@ -80,7 +80,7 @@ public final class TimedTaskService implements Managed {
             Preconditions.checkNotNull(taskInterface, "TimedTask does not implement ITaskRunner");
 
             // Build an instance to run in scheduler
-            Class<? extends ITaskRunner> typedClazz = (Class<? extends ITaskRunner>)timedTaskAnnotatedClass;
+            Class<? extends ITaskRunner> typedClazz = timedTaskAnnotatedClass;
             ITaskRunner task = typedClazz.newInstance();
             executor.scheduleAtFixedRate(new SafeTaskRunnable(task), delay, periodMs, TimeUnit.MILLISECONDS);
             LOG.info("Starting task {} in {} seconds", typedClazz.getSimpleName(), delay / 1000);
@@ -134,7 +134,7 @@ public final class TimedTaskService implements Managed {
         public void run() {
             try {
                 task.execute();
-            } catch (Throwable e) {
+            } catch (Exception e) {
                 LOG.error("task encountered error {}", e.getMessage(), e);
                 // TODO WHO: schedule retry?
             }

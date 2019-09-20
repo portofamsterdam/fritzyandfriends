@@ -63,10 +63,7 @@ public final class Mode {
             return false;       
         }
         Mode other = (Mode)obj;
-        if (mode0 != other.mode0 || mode1 != other.mode1) {
-            return false;
-        }
-        return true;
+        return !(mode0 != other.mode0 || mode1 != other.mode1);
     }
 
     @Override

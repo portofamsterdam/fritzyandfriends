@@ -52,7 +52,7 @@ public class TemperatureStub implements ITemperatureSensor {
             }
             lastCall = now;
         } catch (IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new IllegalStateException(e.getMessage(), e);
         }
         return temperature;
 

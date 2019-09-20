@@ -60,7 +60,7 @@ public final class EventLogger {
         try {
             data = mapper.writeValueAsString(new BalanceData(balance.getKwh(), balance.getEur()));
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new IllegalArgumentException(e.getMessage(), e);
         }
         market.log(EEventType.BALANCE, msg, data);
     }
@@ -81,7 +81,7 @@ public final class EventLogger {
         try {
             data = mapper.writeValueAsString(Arrays.asList(states));
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new IllegalArgumentException(e.getMessage(), e);
         }
         market.log(EEventType.DEVICE_STATE, msg, data);
     }
@@ -94,9 +94,9 @@ public final class EventLogger {
         String msg = String.format("Limit actor update limit=%.2f", limit);
         String data;
         try {
-            data = mapper.writeValueAsString(new LimitData(new BigDecimal(limit)));
+            data = mapper.writeValueAsString(new LimitData(BigDecimal.valueOf(limit)));
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new IllegalArgumentException(e.getMessage(), e);
         }
         market.log(EEventType.LIMIT_ACTOR, msg, data);
     }
@@ -119,9 +119,9 @@ public final class EventLogger {
         String msg = String.format("Limit total update limit=%.2f", limit);
         String data;
         try {
-            data = mapper.writeValueAsString(new LimitData(new BigDecimal(limit)));
+            data = mapper.writeValueAsString(new LimitData(BigDecimal.valueOf(limit)));
         } catch (JsonProcessingException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new IllegalArgumentException(e.getMessage(), e);
         }
         market.log(EEventType.LIMIT_TOTAL, msg, data);
     }

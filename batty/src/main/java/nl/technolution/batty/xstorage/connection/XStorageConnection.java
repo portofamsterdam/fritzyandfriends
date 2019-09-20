@@ -95,7 +95,7 @@ class XStorageConnection implements IXStorageConnection {
         } catch (IOException | KeyManagementException | NoSuchAlgorithmException | CertificateException | 
                 KeyStoreException ex) {
             log.error("Unable to load certificate", ex);
-            throw new RuntimeException(ex);
+            throw new IllegalArgumentException(ex);
         }
     }
 
@@ -123,7 +123,6 @@ class XStorageConnection implements IXStorageConnection {
         log.debug(url);
         try (InputStream in = getHttpsURLConnection(url).getInputStream()) {
             MachineDataJson result = mapper.readValue(in, MachineDataJson.class);
-            System.out.println(mapper.writeValueAsString(result));
             return MachineData.fromData(result.getData());
         } catch (XStorageException | IOException e) {
             throw new XStorageException(e.getMessage(), e);
@@ -142,7 +141,6 @@ class XStorageConnection implements IXStorageConnection {
         log.debug(url);
         try (InputStream in = getHttpsURLConnection(url).getInputStream()) {
             BmsDataJson result = mapper.readValue(in, BmsDataJson.class);
-            System.out.println(mapper.writeValueAsString(result));
             return BmsData.fromData(result.getData());
         } catch (IOException e) {
             throw new XStorageException(e.getMessage(), e);
@@ -164,7 +162,7 @@ class XStorageConnection implements IXStorageConnection {
         try {
             int response = getHttpsURLConnection(url).getResponseCode();
             if (response != 200) {
-                log.error("Unexpected response " + response);
+                log.error("Unexpected response {}", response);
             }
         } catch (IOException e) {
             throw new XStorageException(e.getMessage(), e);
@@ -186,7 +184,7 @@ class XStorageConnection implements IXStorageConnection {
         try {
             int response = getHttpsURLConnection(url).getResponseCode();
             if (response != 200) {
-                log.error("Unexpected response " + response);
+                log.error("Unexpected response {}", response);
             }
         } catch (IOException e) {
             throw new XStorageException(e.getMessage(), e);
@@ -204,7 +202,7 @@ class XStorageConnection implements IXStorageConnection {
         try {
             int response = getHttpsURLConnection(url).getResponseCode();
             if (response != 200) {
-                log.error("Unexpected response " + response);
+                log.error("Unexpected response {}", response);
             }
         } catch (IOException e) {
             throw new XStorageException(e.getMessage(), e);
@@ -223,7 +221,7 @@ class XStorageConnection implements IXStorageConnection {
         try {
             int response = getHttpsURLConnection(url).getResponseCode();
             if (response != 200) {
-                log.error("Unexpected response " + response);
+                log.error("Unexpected response {}", response);
             }
         } catch (IOException e) {
             throw new XStorageException(e.getMessage(), e);
@@ -245,8 +243,7 @@ class XStorageConnection implements IXStorageConnection {
         try {
             result = mapper.readValue(src, MachineInfoJson.class);
         } catch (IOException e) {
-            //
-            throw new RuntimeException(e.getMessage(), e);
+            throw new IllegalArgumentException(e);
         }
         String[] data = result.getData();
         return MeterInfo.fromData(data[0]);

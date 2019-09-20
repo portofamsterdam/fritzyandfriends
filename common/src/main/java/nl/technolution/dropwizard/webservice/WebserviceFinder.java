@@ -55,7 +55,7 @@ public final class WebserviceFinder {
         endpoints.forEach(c -> log.info("{}", c.getSimpleName()));
         for (Class<? extends IEndpoint> clazz : endpoints) {
             if (Modifier.isPrivate(clazz.getModifiers())) {
-                log.info("Skipping private endpoint class " + clazz.getSimpleName());
+                log.info("Skipping private endpoint class {}", clazz.getSimpleName());
                 continue;
             }
             try {
