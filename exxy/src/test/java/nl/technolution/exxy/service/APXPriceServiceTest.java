@@ -14,7 +14,7 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.apxprices;
+package nl.technolution.exxy.service;
 
 import static org.junit.Assert.assertEquals;
 

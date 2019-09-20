@@ -14,7 +14,7 @@
                                                         ++++++++++++++|
                                                                  +++++|
  */
-package nl.technolution.apxprices.app;
+package nl.technolution.exxy.app;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
