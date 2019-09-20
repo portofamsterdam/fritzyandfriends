@@ -41,7 +41,8 @@ allprojects { group = 'fritzy' }
 
 
 // Configuration for all subprojects.
-subprojects {       
+subprojects { 
+    apply plugin: 'eclipse'
      
     plugins.withType(JavaPlugin) {
     
