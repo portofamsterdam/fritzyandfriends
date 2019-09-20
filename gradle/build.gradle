@@ -24,11 +24,11 @@ apply from:'dependencies.gradle'
 // NOTE: the following is only needed for (Technolution) plugins.
 buildscript {
     repositories {
-        maven { url="http://nexus/nexus/content/groups/public/" }
-        maven { url="http://nexus/nexus/content/repositories/tnl_gradle_plugins" }
+        maven {
+          url "https://plugins.gradle.org/m2/"
+        }
     }
     dependencies {        
-		classpath 'nl.technolution:techno-jax:0.2.618'
         classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.1'
         classpath "gradle.plugin.org.hidetake:gradle-swagger-generator-plugin:2.17.0"
         classpath "io.swagger.core.v3:swagger-gradle-plugin:2.0.8"
@@ -51,6 +51,11 @@ subprojects {
         dependencies {
             testCompile libraries.test_junit
         }
+        
+        repositories {
+            mavenCentral()
+            jcenter()
+        }
     }
     
     plugins.withType(ApplicationPlugin) {
@@ -61,6 +66,8 @@ subprojects {
 
 def shadowJarForDockerTask(aProject, jarName) {
     aProject.apply(plugin: 'com.github.johnrengelman.shadow')
+    
+   
     
     aProject.shadowJar {
         baseName = "${jarName}"
