@@ -42,14 +42,11 @@ import org.mockserver.model.HttpStatusCode;
 import org.mockserver.model.Parameter;
 import org.mockserver.verify.VerificationTimes;
 
-import nl.technolution.dropwizard.services.ServiceFinder;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.exxy.app.ExxyConfig;
-import nl.technolution.exxy.service.APXPriceRetriever;
-import nl.technolution.exxy.service.APXPricesService;
+import nl.technolution.exxy.client.ITransparencyPlatformClient;
+import nl.technolution.exxy.client.TransparencyPlatformClient;
 import nl.technolution.exxy.service.APXPricesService.NoPricesAvailableException;
-import nl.technolution.exxy.service.IAPXPricesService;
-import nl.technolution.exxy.service.IPriceReceiver;
 
 /**
  * Tests for APXPriceService
@@ -206,7 +203,13 @@ public class APXPriceServiceTest {
         mockServer = ClientAndServer.startClientAndServer(0);
         ExxyConfig config = new ExxyConfig("http://localhost:" + mockServer.getLocalPort() + "/api", SECURITY_TOKEN,
                 0, null, false, null);
-        ServiceFinder.setupDropWizardServices(config);
+        // ServiceFinder.setupDropWizardServices(config);
+        IAPXPricesService apxPrices = new APXPricesService();
+        apxPrices.init(config);
+        Services.put(IAPXPricesService.class, apxPrices);
+        ITransparencyPlatformClient client = new TransparencyPlatformClient();
+        client.init(config);
+        Services.put(ITransparencyPlatformClient.class, client);
         priceService = Services.get(IAPXPricesService.class);
     }
 
