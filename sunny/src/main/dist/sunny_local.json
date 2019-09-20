@@ -1,0 +1,32 @@
+{
+  "environment" : "live",
+  "apiConfig" : {
+    "apis" : [ {
+      "name" : "netty",
+      "url" : "http://localhost:8080/",
+      "connectTimeout" : 5000,
+      "readTimeout" : 5000
+    }, {
+      "name" : "exxy",
+      "url" : "http://localhost:8080/",
+      "connectTimeout" : 5000,
+      "readTimeout" : 5000
+    } ]
+  },
+  "market" : {
+    "useStub" : true,
+    "marketUrl" : "http://82.196.13.251/api",
+    "email" : "sunny@fritzy.nl",
+    "password" : "sunny"
+  },
+  "deviceId" : "sunny",
+  "marketPriceStartOffset" : 1.0,
+  "useStub" : true,
+  "solarEdgeMonitoringBaseURL" : "https://monitoringapi.solaredge.com/site/529405",
+  "solarEdgeMonitoringApikey" : "JRK97634IPJD9ABBG4MFACJVZGLK4NUN",
+  "pvCastBaseURL" : "https://api.pvcast.de/plants/908",
+  "pvCastApiKey" : "cxDhZtryzwyGHG2yMzqy",
+  "solarEdgeModbusIpAddress" : "192.168.8.240",
+  "solarEdgeModbusPort" : 502,
+  "solarEdgeModbusDeviceId" : 2
+}

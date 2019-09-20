@@ -5,29 +5,28 @@
   "host" : "192.168.8.241",
   "username" : "batty",
   "password" : "batty",
-  "truststore" : "/opt/config/batty/truststore.jks",
+  "truststore" : "src/main/dist/truststore.jks",
   "truststorepass" : "12345678",
   "buyMargin" : 2,
   "sellMargin" : 2,
-  "useStub" : false,
-  
+  "useStub" : true,
   
   "apiConfig" : {
     "apis" : [ {
       "name" : "netty",
-      "url" : "http://netty:8080/",
+      "url" : "http://localhost:8080/",
       "connectTimeout" : 5000,
       "readTimeout" : 5000
     }, {
       "name" : "exxy",
-      "url" : "http://exxy:8080/",
+      "url" : "http://localhost:8080/",
       "connectTimeout" : 5000,
       "readTimeout" : 5000
     } ]
   },
   "market" : {
-    "useStub" : false,
-    "marketUrl" : "http://82.196.13.251/api",
+    "useStub" : true,
+    "marketUrl" : "",
     "email" : "batty@fritzy.nl",
     "password" : "batty"
   }

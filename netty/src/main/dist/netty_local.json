@@ -1,0 +1,26 @@
+{
+  "environment" : "live",
+  "apiConfig" : {
+    "apis" : [ {
+      "name" : "exxy",
+      "url" : "http://localhost:8080/",
+      "connectTimeout" : 5000,
+      "readTimeout" : 5000
+    } ]
+  },
+  "market" : {
+    "useStub" : true,
+    "marketUrl" : "",
+    "email" : "netty@fritzy.nl",
+    "password" : "netty"
+  },
+  "defaultGridConnectionLimit" : 16.0,
+  "groupConnectionLimit" : 32.0,
+  "deviceLimits" : {
+    "fritzy" : 8.0,
+    "batty" : 8.0,
+    "sunny" : 8.0
+  },
+  "localusers" : [ "fritzy", "batty", "sunny" ],
+  "localreward" : 2.0
+}

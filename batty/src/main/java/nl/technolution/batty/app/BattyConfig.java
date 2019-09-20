@@ -67,10 +67,6 @@ public class BattyConfig extends FritzyAppConfig {
     @JsonProperty("sellMargin")
     private int sellMargin;
 
-    @JsonProperty("capactity")
-    private double capacity;
-
-
     @JsonProperty("useStub")
     private boolean useStub;
 
@@ -96,7 +92,6 @@ public class BattyConfig extends FritzyAppConfig {
         c.truststorepass = "12345678";
         c.buyMargin = 2;
         c.sellMargin = 2;
-        c.capacity = 4.6d;
         c.useStub = false;
 
         MarketConfig market = new MarketConfig(false, "http://82.196.13.251/api", "batty@fritzy.nl", "batty");
@@ -181,14 +176,6 @@ public class BattyConfig extends FritzyAppConfig {
 
     public void setUseStub(boolean useStub) {
         this.useStub = useStub;
-    }
-
-    public double getCapactity() {
-        return capacity;
-    }
-
-    public void setCapactity(double capactity) {
-        this.capacity = capactity;
     }
 }
 
