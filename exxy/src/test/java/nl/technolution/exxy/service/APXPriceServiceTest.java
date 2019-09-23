@@ -42,11 +42,15 @@ import org.mockserver.model.HttpStatusCode;
 import org.mockserver.model.Parameter;
 import org.mockserver.verify.VerificationTimes;
 
+import nl.technolution.dropwizard.MarketConfig;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.exxy.app.ExxyConfig;
 import nl.technolution.exxy.client.ITransparencyPlatformClient;
 import nl.technolution.exxy.client.TransparencyPlatformClient;
 import nl.technolution.exxy.service.APXPricesService.NoPricesAvailableException;
+import nl.technolution.fritzy.wallet.FritzyApiFactory;
+import nl.technolution.fritzy.wallet.FritzyApiStub;
+import nl.technolution.fritzy.wallet.IFritzyApiFactory;
 
 /**
  * Tests for APXPriceService
@@ -54,6 +58,8 @@ import nl.technolution.exxy.service.APXPricesService.NoPricesAvailableException;
  */
 public class APXPriceServiceTest {
 
+    private static final String PASSWORD = "";
+    private static final String EXXY = "exxy";
     private static final String SECURITY_TOKEN = "TEST_TOKEN";
     private static final DateTimeFormatter DATE_TIME_FORMAT = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm'Z'");
 
@@ -203,6 +209,17 @@ public class APXPriceServiceTest {
         mockServer = ClientAndServer.startClientAndServer(0);
         ExxyConfig config = new ExxyConfig("http://localhost:" + mockServer.getLocalPort() + "/api", SECURITY_TOKEN,
                 0, null, false, null);
+
+        // Setup market
+        FritzyApiStub market = FritzyApiStub.instance();
+        FritzyApiFactory service = new FritzyApiFactory();
+        MarketConfig marketConfig = new MarketConfig(true, PASSWORD, EXXY, PASSWORD);
+        config.setMarket(marketConfig);
+        service.init(config);
+        Services.put(IFritzyApiFactory.class, service);
+        FritzyApiStub.reset();
+        market.register(EXXY, EXXY, PASSWORD);
+
         // ServiceFinder.setupDropWizardServices(config);
         IAPXPricesService apxPrices = new APXPricesService();
         apxPrices.init(config);

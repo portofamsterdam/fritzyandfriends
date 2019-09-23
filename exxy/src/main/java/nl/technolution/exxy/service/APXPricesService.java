@@ -109,7 +109,7 @@ public class APXPricesService implements IAPXPricesService {
         return price;
     }
 
-    private double getSinglePrice(Instant requestedDateTime, PublicationMarketDocument prices)
+    static double getSinglePrice(Instant requestedDateTime, PublicationMarketDocument prices)
             throws NoPricesAvailableException {
         for (TimeSeries timeSeries : prices.getTimeSeries()) {
             LOG.debug("Processing timeseries with mRID={}", timeSeries.getMRID());
