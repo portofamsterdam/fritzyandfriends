@@ -55,11 +55,15 @@ public class UsageScannerTest {
     @Before
     public void setup() {
         FritzyApiFactory localFactory = new FritzyApiFactory();
-        MarketConfig marketConfig = new MarketConfig(true, "", "test", "password");
+        String username = "test";
+        MarketConfig marketConfig = new MarketConfig(true, "", username, "password");
         FritzyAppConfig fritzyAppConfig = new FritzyAppConfig();
         fritzyAppConfig.setMarket(marketConfig);
         localFactory.init(fritzyAppConfig);
         Services.put(IFritzyApiFactory.class, localFactory);
+
+        FritzyApiStub.reset();
+        FritzyApiStub.instance().register(username, username, "password");
 
         GridConnectionManager gridManager = new GridConnectionManager();
         NettyConfig nettyconfig = new NettyConfig();
@@ -79,7 +83,6 @@ public class UsageScannerTest {
     public void testUsageScanner() throws JsonParseException, JsonMappingException, IOException {
         UsageScanner s = new UsageScanner();
         FritzyApiStub instance = FritzyApiStub.instance();
-
         s.execute();
         String eventData = instance.getAllEvents()
                 .stream()
