@@ -97,7 +97,6 @@ public class NegotiatorTest {
 
     @Test
     public void emptyMarket() {
-
         FritzyApiStub market = FritzyApiStub.instance();
         BigDecimal mintedEur = BigDecimal.valueOf(10);
         market.mint(market.getAddress(), mintedEur, EContractAddress.EUR);
@@ -108,7 +107,11 @@ public class NegotiatorTest {
         assertTrue(market.getAllEvents().isEmpty()); // fillLevel unknown, it doesn't do anything
         bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
         bn.evaluate();
-        assertTrue(market.getAllEvents().isEmpty()); // system description unknown, it doesn't do anything
+        long eventCount = market.getAllEvents()
+                .stream()
+                .filter(e -> e.getTag() != EEventType.DEVICE_STATE.getTag())
+                .count();
+        assertEquals(0, eventCount); // system description unknown, it doesn't do anything
         bn.flexibilityUpdate(resourceHelper.getStorageSystemDescription());
         bn.evaluate();
 
