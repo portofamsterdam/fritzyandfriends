@@ -10,7 +10,7 @@
   },
   "market" : {
     "useStub" : false,
-    "marketUrl" : "http://82.196.13.251/api",
+    "marketUrl" : "http://api:8088/api",
     "email" : "netty@fritzy.nl",
     "password" : "netty"
   },

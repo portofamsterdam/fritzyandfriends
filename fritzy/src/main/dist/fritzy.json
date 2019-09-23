@@ -29,13 +29,11 @@
   
   "market" : {
     "useStub" : false,
-    "marketUrl" : "http://82.196.13.251/api",
+    "marketUrl" : "http://api:8088/api",
     "email" : "fritzy@fritzy.nl",
     "password" : "fritzy"
   },
-"logging": {
+  "logging": {
     "level": "INFO"
-}  
+  }  
 }
-
-
