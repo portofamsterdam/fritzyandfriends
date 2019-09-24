@@ -28,7 +28,7 @@ public final class FritzyTrader implements IFritzyTrader {
 
     @Override
     public void init(FritzyConfig config) {
-        resourceManager = new FritzyResourceManager(config);
+        resourceManager = new FritzyResourceManager(config, new FritzyController());
         cem = new FritzyNegotiator(config, resourceManager);
         resourceManager.registerCustomerEnergyManager(cem);
 
