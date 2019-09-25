@@ -23,7 +23,12 @@ import static org.junit.Assert.assertTrue;
 
 import java.io.IOException;
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Duration;
+import java.time.Instant;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.temporal.ChronoUnit;
 import java.util.Locale;
 
 import org.junit.Before;
@@ -54,6 +59,7 @@ import nl.technolution.fritzy.wallet.FritzyApiStub;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
 import nl.technolution.fritzy.wallet.model.ApiEvent;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
+import nl.technolution.protocols.efi.StorageDiscreteRunningMode.DiscreteRunningModeElement;
 import nl.technolution.protocols.efi.StorageInstruction;
 import nl.technolution.protocols.efi.StorageSystemDescription;
 
@@ -75,6 +81,7 @@ public class NegotiatorTest {
 
     private TemperatureStub temperatureStub;
     private RelayStub relayStub;
+    private FritzyResourceHelper resourceHelper;
 
     @Before
     public void setup() {
@@ -115,6 +122,8 @@ public class NegotiatorTest {
         market.register(FRITZY, FRITZY, PASSWORD);
         fn = new FritzyNegotiator(config, resourceManager);
         resourceManager.registerCustomerEnergyManager(fn);
+
+        resourceHelper = new FritzyResourceHelper(config);
     }
 
     @Rule
@@ -127,7 +136,6 @@ public class NegotiatorTest {
         market.login(FRITZY, PASSWORD);
         market.mint(market.getAddress(), mintedEur, EContractAddress.EUR);
 
-        FritzyResourceHelper resourceHelper = new FritzyResourceHelper(config);
         // Evaluate the market
         fn.evaluate();
         long eventCount = market.getAllEvents()
@@ -153,9 +161,7 @@ public class NegotiatorTest {
     @Test
     public void createOrderInEmptyMarket() {
         FritzyApiStub market = FritzyApiStub.instance();
-        FritzyResourceHelper resourceHelper = new FritzyResourceHelper(config);
         fn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate(fritzyController));
-        fn.storageSystemDescription(resourceHelper.getStorageSystemDescription());
 
         market.login(FRITZY, PASSWORD);
         netty.rewardToGive = 2;
@@ -175,9 +181,7 @@ public class NegotiatorTest {
     @Test
     public void acceptExistingOrder() {
         FritzyApiStub market = FritzyApiStub.instance();
-        FritzyResourceHelper resourceHelper = new FritzyResourceHelper(config);
         fn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate(fritzyController));
-        fn.storageSystemDescription(resourceHelper.getStorageSystemDescription());
 
         String sunny = "sunny";
         market.register(sunny, sunny, PASSWORD);
@@ -200,9 +204,7 @@ public class NegotiatorTest {
         temperatureStub.useFixedTemperature(config.getMinTemp() - 1);
 
         FritzyApiStub market = FritzyApiStub.instance();
-        FritzyResourceHelper resourceHelper = new FritzyResourceHelper(config);
         fn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate(fritzyController));
-        fn.storageSystemDescription(resourceHelper.getStorageSystemDescription());
 
         BigDecimal eur = BigDecimal.valueOf(10);
         market.login(FRITZY, PASSWORD);
@@ -219,9 +221,7 @@ public class NegotiatorTest {
     @Test
     public void acceptExistingOrderNoReward() {
         FritzyApiStub market = FritzyApiStub.instance();
-        FritzyResourceHelper resourceHelper = new FritzyResourceHelper(config);
         fn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate(fritzyController));
-        fn.storageSystemDescription(resourceHelper.getStorageSystemDescription());
 
         String sunny = "sunny";
         market.register(sunny, sunny, PASSWORD);
@@ -242,10 +242,7 @@ public class NegotiatorTest {
     public void cancelExistingOrders() {
         FritzyApiStub market = FritzyApiStub.instance();
         market.login(FRITZY, PASSWORD);
-
-        FritzyResourceHelper resourceHelper = new FritzyResourceHelper(config);
         fn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate(fritzyController));
-        fn.storageSystemDescription(resourceHelper.getStorageSystemDescription());
 
         // Give fritzy some money to create a buy order
         market.mint(market.getAddress(), BigDecimal.TEN, EContractAddress.EUR);
@@ -282,9 +279,7 @@ public class NegotiatorTest {
         FritzyApiStub market = FritzyApiStub.instance();
         String sunny = "sunny";
         market.register(sunny, sunny, PASSWORD);
-        FritzyResourceHelper resourceHelper = new FritzyResourceHelper(config);
 
-        fn.storageSystemDescription(resourceHelper.getStorageSystemDescription());
         fn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate(fritzyController));
 
         market.login(FRITZY, PASSWORD);
@@ -320,9 +315,7 @@ public class NegotiatorTest {
     @Test
     public void orderTooSmall() {
         FritzyApiStub market = FritzyApiStub.instance();
-        FritzyResourceHelper resourceHelper = new FritzyResourceHelper(config);
         fn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate(fritzyController));
-        fn.storageSystemDescription(resourceHelper.getStorageSystemDescription());
 
         String sunny = "sunny";
         market.register(sunny, sunny, PASSWORD);
@@ -347,12 +340,18 @@ public class NegotiatorTest {
 
     @Test
     public void noCoolingDueToGridLimit() {
+        FritzyApiStub market = FritzyApiStub.instance();
+
+        // re-create negotiator to undo system description send from @Before
+        FritzyResourceManager resourceManager = new FritzyResourceManager(config, fritzyController);
+        fn = new FritzyNegotiator(config, resourceManager);
+        fn.flexibilityRegistration(resourceHelper.getRegistration());
+
         // set power higher than grid limit
         config.setPower(netty.getCapacity(FRITZY).getGridConnectionLimit() * 230 + 1);
-        FritzyApiStub market = FritzyApiStub.instance();
-        FritzyResourceHelper resourceHelper = new FritzyResourceHelper(config);
-        fn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate(fritzyController));
         fn.storageSystemDescription(resourceHelper.getStorageSystemDescription());
+
+        fn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate(fritzyController));
         fn.evaluate();
         assertFalse(netty.claimed);
         assertFalse(netty.orderRewardRequested);
@@ -363,9 +362,7 @@ public class NegotiatorTest {
     @Test
     public void buyKwhOrder() {
         FritzyApiStub market = FritzyApiStub.instance();
-        FritzyResourceHelper resourceHelper = new FritzyResourceHelper(config);
         fn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate(fritzyController));
-        fn.storageSystemDescription(resourceHelper.getStorageSystemDescription());
 
         String sunny = "batty";
         market.register(sunny, sunny, PASSWORD);
@@ -390,11 +387,9 @@ public class NegotiatorTest {
 
     @Test
     public void emergencyCooling() throws IOException {
-        FritzyResourceHelper resourceHelper = new FritzyResourceHelper(config);
         // too hot but on
         temperatureStub.useFixedTemperature(config.getMaxTemp() + 1);
         relayStub.setRelay(true);
-        fn.storageSystemDescription(resourceHelper.getStorageSystemDescription());
         StorageInstruction instruction = (StorageInstruction)fn
                 .flexibilityUpdate(resourceHelper.getFlexibilityUpdate(fritzyController));
         assertFalse(instruction.isIsEmergencyInstruction());
@@ -404,9 +399,7 @@ public class NegotiatorTest {
                 instruction.getActuatorInstructions().getActuatorInstruction().get(0).getRunningModeId());
 
         // too hot but off
-        temperatureStub.useFixedTemperature(config.getMaxTemp() + 1);
         relayStub.setRelay(false);
-        fn.storageSystemDescription(resourceHelper.getStorageSystemDescription());
         instruction = (StorageInstruction)fn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate(fritzyController));
         assertTrue(instruction.isIsEmergencyInstruction());
         assertEquals(1, instruction.getActuatorInstructions().getActuatorInstruction().size());
@@ -416,10 +409,9 @@ public class NegotiatorTest {
 
     @Test
     public void emergencyStopCooling() throws IOException {
-        FritzyResourceHelper resourceHelper = new FritzyResourceHelper(config);
         // too cold but off
         temperatureStub.useFixedTemperature(config.getMinTemp() - 1);
-        fn.storageSystemDescription(resourceHelper.getStorageSystemDescription());
+        relayStub.setRelay(false);
         StorageInstruction instruction = (StorageInstruction)fn
                 .flexibilityUpdate(resourceHelper.getFlexibilityUpdate(fritzyController));
         assertFalse(instruction.isIsEmergencyInstruction());
@@ -439,10 +431,10 @@ public class NegotiatorTest {
     @Test
     public void noValidStorageSystemDescriptionAtFlexibilityUpdate() throws IOException {
         // re-create testobject to undo system description send from @Before
-        fritzyController = new FritzyController();
         FritzyResourceManager resourceManager = new FritzyResourceManager(config, fritzyController);
         fn = new FritzyNegotiator(config, resourceManager);
-        FritzyResourceHelper resourceHelper = new FritzyResourceHelper(config);
+        fn.flexibilityRegistration(resourceHelper.getRegistration());
+
         StorageSystemDescription ssd = resourceHelper.getStorageSystemDescription();
         // set actuator id so it is invalid
         ssd.getActuatorBehaviours().getActuatorBehaviour().get(0).setActuatorId(FritzyResourceHelper.ACTUATOR_ID + 1);
@@ -456,10 +448,10 @@ public class NegotiatorTest {
     @Test
     public void noValidStorageSystemDescriptionAtEvaluate() throws IOException {
         // re-create testobject to undo system description send from @Before
-        fritzyController = new FritzyController();
         FritzyResourceManager resourceManager = new FritzyResourceManager(config, fritzyController);
         fn = new FritzyNegotiator(config, resourceManager);
-        FritzyResourceHelper resourceHelper = new FritzyResourceHelper(config);
+        fn.flexibilityRegistration(resourceHelper.getRegistration());
+
         StorageSystemDescription ssd = resourceHelper.getStorageSystemDescription();
         // set actuator id so it is invalid
         ssd.getActuatorBehaviours().getActuatorBehaviour().get(0).setActuatorId(FritzyResourceHelper.ACTUATOR_ID + 1);
@@ -471,8 +463,114 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void roundDetection() throws IOException {
-        // TODO WHO: extract to 'logic' module (IRoundOracle and stub that so we can set the round from here?
+    public void roundDetection() {
+        Instant start = Instant.parse("2020-01-01T12:45:00.01Z");
+        Clock clock = Clock.fixed(start, ZoneId.systemDefault());
+        assertEquals(1, FritzyNegotiator.detectMarketRound(clock));
+
+        clock = Clock.fixed(start.plusSeconds(59), ZoneId.systemDefault());
+        assertEquals(1, FritzyNegotiator.detectMarketRound(clock));
+
+        for (int minutes = 0; minutes < 15; minutes++) {
+            clock = Clock.fixed(start.plus(minutes, ChronoUnit.MINUTES), ZoneId.systemDefault());
+            assertEquals(minutes + 1, FritzyNegotiator.detectMarketRound(clock));
+        }
+        // first round in next market period
+        clock = Clock.fixed(start.plus(15, ChronoUnit.MINUTES), ZoneId.systemDefault());
+        assertEquals(1, FritzyNegotiator.detectMarketRound(clock));
+    }
+
+    @Test
+    public void coolingNeededTest() {
+        final double maxTemp = 8d;
+        final double minTemp = 4d;
+
+        double fillLevel;
+        DiscreteRunningModeElement currentElement;
+
+        DiscreteRunningModeElement offElement = new DiscreteRunningModeElement();
+        offElement.setFillLevelLowerBound(Integer.MIN_VALUE);
+        offElement.setFillLevelUpperBound(maxTemp);
+        offElement.setFillingRate(2d / 60d / 60d); // 2 degrees per hour, 0,5 degrees per 15 minutes (= 1 market period)
+
+        DiscreteRunningModeElement onElement = new DiscreteRunningModeElement();
+        onElement.setFillLevelLowerBound(minTemp);
+        onElement.setFillLevelUpperBound(Integer.MAX_VALUE);
+        onElement.setFillingRate(-8d / 60d / 60d); // 8 degrees per hour, 2 degrees per 15 minutes (= 1 market period)
+
+        // on and temp almost at min, 1 minute to go
+        fillLevel = minTemp + 0.1;
+        currentElement = onElement;
+        assertFalse(
+                FritzyNegotiator.coolingNeededNextPeriod(fillLevel, currentElement, offElement, Duration.ofMinutes(1)));
+
+        // off and temp almost at min, 1 minute to go
+        fillLevel = minTemp + 0.1;
+        currentElement = offElement;
+        assertFalse(
+                FritzyNegotiator.coolingNeededNextPeriod(fillLevel, currentElement, offElement, Duration.ofMinutes(1)));
+
+        // off and temp at max, 15 minute to go
+        fillLevel = maxTemp;
+        currentElement = offElement;
+        assertTrue(FritzyNegotiator.coolingNeededNextPeriod(fillLevel, currentElement, offElement,
+                Duration.ofMinutes(15)));
+
+        // off and temp so it can stay of half an hour, 15 minute to go
+        fillLevel = maxTemp - offElement.getFillingRate() * 60 * 30;
+        currentElement = offElement;
+        assertFalse(FritzyNegotiator.coolingNeededNextPeriod(fillLevel, currentElement, offElement,
+                Duration.ofMinutes(15)));
+
+        // off and already too hot, 15 minute to go
+        fillLevel = 9; // is ignored by code
+        currentElement = offElement;
+        // no valid offElement for this temp
+        assertTrue(FritzyNegotiator.coolingNeededNextPeriod(fillLevel, currentElement, null, Duration.ofMinutes(15)));
+
+    }
+
+    @Test
+    public void priceCalculation() {
+        final double marketPrice = 20;
+        final double marketPriceStartOffset = 5;
+        int round;
+        boolean coolingNeeded;
+        double price;
+
+        // first round, cooling not needed.
+        round = 1;
+        coolingNeeded = false;
+        price = FritzyNegotiator.calclulateMyPrice(coolingNeeded, marketPrice, marketPriceStartOffset, round);
+        // expect minimal price possible
+        assertEquals(marketPrice - marketPriceStartOffset, price, 0.00001);
+
+        // last round, cooling not needed
+        round = 15;
+        coolingNeeded = false;
+        price = FritzyNegotiator.calclulateMyPrice(coolingNeeded, marketPrice, marketPriceStartOffset, round);
+        // expect minimal price possible
+        assertEquals(marketPrice - marketPriceStartOffset, price, 0.00001);
+
+        // first round, cooling needed
+        round = 1;
+        coolingNeeded = true;
+        price = FritzyNegotiator.calclulateMyPrice(coolingNeeded, marketPrice, marketPriceStartOffset, round);
+        // expect minimal price possible
+        assertEquals(marketPrice - marketPriceStartOffset, price, 0.00001);
+
+        // last round, cooling needed
+        round = 15;
+        coolingNeeded = true;
+        price = FritzyNegotiator.calclulateMyPrice(coolingNeeded, marketPrice, marketPriceStartOffset, round);
+        // expect full price
+        assertEquals(marketPrice, price, 0.00001);
+
+        // at round 7, cooling needed
+        round = 7;
+        coolingNeeded = true;
+        price = FritzyNegotiator.calclulateMyPrice(coolingNeeded, marketPrice, marketPriceStartOffset, round);
+        assertEquals(marketPrice - marketPriceStartOffset / 14 * (15 - round), price, 0.00001);
     }
 
     private static class APXPricesApiStub implements IAPXPricesApi {

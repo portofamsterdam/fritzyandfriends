@@ -17,6 +17,7 @@
 package nl.technolution.fritzy.marketnegotiator;
 
 import java.math.BigDecimal;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
@@ -81,8 +82,8 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
 
     private int runningModeOnId;
     private int runningModeOffId;
-    private int currentRoundRunningModeId;
-    private int nextRoundRunningModeId;
+    private int currentPeriodRunningModeId;
+    private int nextperiodRunningModeId;
 
     public FritzyNegotiator(FritzyConfig config, FritzyResourceManager resourceManager) {
         this.resourceManager = resourceManager;
@@ -107,33 +108,23 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
     /**
      * @param storageSystemDescription
      * 
-     *            TODO WHO: fix
-     *            http://sonar/project/issues?id=fritzy%3Agradle%3Amaster&issues=AWyO5Tf5rSTZrefZ59VP&open=AWyO5Tf5rSTZrefZ59VP
      */
     public void storageSystemDescription(StorageSystemDescription storageSystemDescription) {
+        if (!runningModes.isEmpty()) {
+            LOG.warn("Received a second storageSystemDescription, will be ignored!");
+            return;
+        }
+
         for (ActuatorBehaviour actuatorBehaviour : storageSystemDescription.getActuatorBehaviours()
                 .getActuatorBehaviour()) {
             if (actuatorBehaviour.getActuatorId() != actuatorId) {
-                LOG.warn("Received actuatorBehaviour for unkonwn actuator with id {}",
+                LOG.warn("Received actuatorBehaviour for unknown actuator with id {}",
                         actuatorBehaviour.getActuatorId());
                 continue;
             }
             for (RunningMode runningMode : actuatorBehaviour.getRunningModes()
                     .getDiscreteRunningModeOrContinuousRunningMode()) {
-                if (runningMode instanceof StorageDiscreteRunningMode) {
-                    for (DiscreteRunningModeElement mode : ((StorageDiscreteRunningMode)runningMode)
-                            .getDiscreteRunningModeElement()) {
-                        if (mode.getElectricalPower() > 0) {
-                            // this is the 'on' mode
-                            runningModeOnId = runningMode.getId();
-                            runningModes.put(runningModeOnId, runningMode);
-                        } else {
-                            // this is the 'idle' mode
-                            runningModeOffId = runningMode.getId();
-                            runningModes.put(runningModeOffId, runningMode);
-                        }
-                    }
-                }
+                processRunningMode(runningMode);
             }
         }
 
@@ -141,9 +132,29 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
             LOG.warn("Received storageSystemDescription did not contain all the information requered.");
         } else {
             // Initialize at 'off' because no energy was purchased for current period
-            currentRoundRunningModeId = runningModeOffId;
-            nextRoundRunningModeId = runningModeOffId;
+            currentPeriodRunningModeId = runningModeOffId;
+            nextperiodRunningModeId = runningModeOffId;
             LOG.info("Received storageSystemDescription with all the information requered.");
+        }
+    }
+
+    /**
+     * @param runningMode
+     */
+    private void processRunningMode(RunningMode runningMode) {
+        if (runningMode instanceof StorageDiscreteRunningMode) {
+            for (DiscreteRunningModeElement mode : ((StorageDiscreteRunningMode)runningMode)
+                    .getDiscreteRunningModeElement()) {
+                if (mode.getElectricalPower() > 0) {
+                    // this is the 'on' mode
+                    runningModeOnId = runningMode.getId();
+                    runningModes.put(runningModeOnId, runningMode);
+                } else {
+                    // this is the 'idle' mode
+                    runningModeOffId = runningMode.getId();
+                    runningModes.put(runningModeOffId, runningMode);
+                }
+            }
         }
     }
 
@@ -166,9 +177,9 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
         instruction.getActuatorInstructions().getActuatorInstruction().add(actuatorInstruction);
 
         if (update instanceof StorageStatus) {
-            actuatorInstruction.setRunningModeId(currentRoundRunningModeId);
+            actuatorInstruction.setRunningModeId(currentPeriodRunningModeId);
             LOG.info("Intructed mode {} based on market negotiation outcome.",
-                    runningModes.get(currentRoundRunningModeId).getLabel());
+                    runningModes.get(currentPeriodRunningModeId).getLabel());
 
             // Check if emergency action is needed (market running mode will be overruled in that case):
             fillLevel = ((StorageStatus)update).getCurrentFillLevel();
@@ -236,7 +247,7 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
             LOG.debug("Temperature ({}) too low, cooling not possible, no market activity", fillLevel);
             return;
         }
-        if (nextRoundRunningModeId == runningModeOnId) {
+        if (nextperiodRunningModeId == runningModeOnId) {
             LOG.debug("Already purchased enough energy, no market activity.");
             return;
         }
@@ -267,34 +278,24 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
         IAPXPricesApi exxy = Endpoints.get(IAPXPricesApi.class);
         double marketPrice = exxy.getNextQuarterHourPrice().getPrice();
 
-        int round = detectMarketRound();
+        int round = detectMarketRound(Clock.systemDefaultZone());
 
-        // Calculate my price based on fillLevel.
-        double offset = marketPriceStartOffset;
         DiscreteRunningModeElement runningModeOffElement = getRunningModeElement(runningModeOffId, fillLevel);
-        // cooling is needed when temperature already too high or when it will become too high next period.
-        if (runningModeOffElement == null || ((currentRoundRunningModeId != runningModeOnId) &&
-                (fillLevel + runningModeOffElement.getFillingRate() * 60 * 15) > runningModeOffElement
-                        .getFillLevelUpperBound())) {
-            LOG.debug("Cooling needed, need to buy, increasing myPrice");
-            // Cooling is needed, increase price every round (for the last round offset is 0 => accept market price)
-            offset = (marketPriceStartOffset / 15) * (15 - round);
-        }
+        DiscreteRunningModeElement currentRunningModeElement = getRunningModeElement(currentPeriodRunningModeId,
+                fillLevel);
 
-        myPrice = marketPrice - offset;
-        LOG.debug("myPrice: {} (marketPrice : {}, offset: {}, marketPriceStartOffset {})", myPrice, marketPrice, offset,
-                marketPriceStartOffset);
+        calclulateMyPrice(
+                coolingNeededNextPeriod(fillLevel, currentRunningModeElement, runningModeOffElement,
+                        Duration.between(Instant.now(), Efi.getNextQuarter())),
+                marketPrice, marketPriceStartOffset, round);
 
         if (round == 1 || neededKWh == null) {
             // reset needed energy based on running mode power
-            // TODO WHO:
-            // http://sonar/project/issues?id=fritzy%3Agradle%3Amaster&issues=AWyO5Tf5rSTZrefZ59VQ&open=AWyO5Tf5rSTZrefZ59VQ
-
             neededKWh = runningModeOnElement.getElectricalPower() / 1000 * 1 / 4;
             LOG.debug("First round, needed energy set to {} kWh.", neededKWh);
-            currentRoundRunningModeId = nextRoundRunningModeId;
+            currentPeriodRunningModeId = nextperiodRunningModeId;
             // by default no energy is bought so running mode off.
-            nextRoundRunningModeId = runningModeOffId;
+            nextperiodRunningModeId = runningModeOffId;
         }
 
         Orders orders = market.orders().getOrders();
@@ -331,10 +332,48 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
         createNewOrder(market);
     }
 
-    private static int detectMarketRound() {
-        Duration remainingTime = Duration.between(Instant.now(), Efi.getNextQuarter());
+    @VisibleForTesting
+    static double calclulateMyPrice(boolean coolingNeededNextPeriod, double marketPrice, double marketPriceStartOffset,
+            int round) {
+        double offset = marketPriceStartOffset;
+        double myPrice;
+
+        if (coolingNeededNextPeriod) {
+            LOG.debug("Cooling needed, need to buy, increasing myPrice");
+            // increase price every round (for the last round offset will be 0 => accept market price)
+            offset = (marketPriceStartOffset / (15 - 1)) * (15 - round);
+        }
+
+        myPrice = marketPrice - offset;
+        LOG.debug("myPrice: {} (marketPrice : {}, marketPriceStartOffset: {}, round: {}, calculated offset: {})",
+                myPrice, marketPrice, marketPriceStartOffset, round, offset);
+        return myPrice;
+    }
+
+    @VisibleForTesting
+    static boolean coolingNeededNextPeriod(double fillLevel, DiscreteRunningModeElement currentRunningModeElement,
+            DiscreteRunningModeElement offRunningModeElement, Duration remainingPeriod) {
+        // already too hot?
+        if (offRunningModeElement == null) {
+            LOG.debug("Cooling needed: offRunningModeElement == null (already too hot).");
+            return true;
+        }
+        // calculate temperature at end of current period based on current running mode
+        double periodEndFillLevel = fillLevel +
+                (currentRunningModeElement.getFillingRate() * remainingPeriod.getSeconds());
+        // cooling is needed when temperature will be too high at end of next period when not cooling
+        double nextPeriodOffFillLevel = periodEndFillLevel + (offRunningModeElement.getFillingRate() * 15 * 60);
+        boolean coolingNeeded = (nextPeriodOffFillLevel > offRunningModeElement.getFillLevelUpperBound());
+        LOG.debug("Cooling needed: {} (periodEndFillLevel: {} nextPeriodOffFillLevel: {})", coolingNeeded,
+                periodEndFillLevel, nextPeriodOffFillLevel);
+        return coolingNeeded;
+    }
+
+    @VisibleForTesting
+    static int detectMarketRound(Clock clock) {
+        Duration remainingTime = Duration.between(Instant.now(clock), Efi.getNextQuarter(clock));
         int round = 15 - (int)remainingTime.toMinutes();
-        LOG.debug("Market round {} detected.", round);
+        LOG.debug("Market round {} detected based on {}.", round, clock);
         return round;
     }
 
@@ -345,7 +384,7 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
         neededKWh -= purchasedKWh;
         getMarket().burn(BigDecimal.valueOf(purchasedKWh), EContractAddress.KWH);
         if (neededKWh <= 0) {
-            nextRoundRunningModeId = runningModeOnId;
+            nextperiodRunningModeId = runningModeOnId;
         }
     }
 
