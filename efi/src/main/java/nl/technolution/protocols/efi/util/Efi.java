@@ -16,11 +16,12 @@
  */
 package nl.technolution.protocols.efi.util;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.Calendar;
+import java.time.temporal.ChronoUnit;
 import java.util.GregorianCalendar;
 import java.util.UUID;
 
@@ -115,12 +116,18 @@ public final class Efi {
      * @return Instant
      */
     public static Instant getNextQuarter() {
-        Calendar instance = Calendar.getInstance();
-        instance.set(Calendar.SECOND, 0);
-        instance.set(Calendar.MILLISECOND, 0);
-        int minutesTillNextQuerter = 15 - (instance.get(Calendar.MINUTE) % 15);
-        instance.add(Calendar.MINUTE, minutesTillNextQuerter);
-        return instance.toInstant();
+        return getNextQuarter(Clock.systemDefaultZone());
+    }
+
+    /**
+     * Get Instant of next quarter based on 'clock'
+     * 
+     * @return Instant
+     */
+    public static Instant getNextQuarter(Clock clock) {
+        ZonedDateTime time = ZonedDateTime.now(clock);
+        int minutesTillNextQuerter = 15 - (time.getMinute() % 15);
+        return time.truncatedTo(ChronoUnit.MINUTES).plusMinutes(minutesTillNextQuerter).toInstant();
     }
 
     /**
