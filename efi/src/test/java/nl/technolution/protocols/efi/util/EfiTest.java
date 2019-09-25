@@ -19,6 +19,7 @@ package nl.technolution.protocols.efi.util;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
+import java.time.Clock;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -43,6 +44,9 @@ public class EfiTest {
     public void testDates() {
         Instant nowInNextQuarter = Instant.now().plus(15, ChronoUnit.MINUTES);
         Instant quarter = Efi.getNextQuarter();
+        Instant quarterClock = Efi.getNextQuarter(Clock.systemDefaultZone());
+
+        assertEquals(quarter, quarterClock);
         assertEquals(0L, quarter.toEpochMilli() % 900000L);
 
         assertEquals(LocalDateTime.ofInstant(quarter, ZoneId.systemDefault()).get(ChronoField.HOUR_OF_DAY),
