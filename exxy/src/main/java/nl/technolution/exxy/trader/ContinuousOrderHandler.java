@@ -66,12 +66,15 @@ public final class ContinuousOrderHandler {
         WebOrder order = market.order(activeOrderHash);
         if (order == null) {
             log.error("Lost order {}", activeOrderHash);
-            activeOrderHash = null;
+            activeOrderHash = null; // Clear old order. New one may not be created
+            activeOrderHash = createOrder(market); // recreate it
+            return;
         }
         if (!Strings.isNullOrEmpty(order.getTakerAddress())) {
             log.info("{} order bought {}kWh", trade, kwh);
             activeOrderHash = null; // Clear old order. New one may not be created
             activeOrderHash = createOrder(market);
+            return;
         }
     }
 

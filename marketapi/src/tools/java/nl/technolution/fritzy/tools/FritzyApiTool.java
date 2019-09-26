@@ -84,12 +84,13 @@ public class FritzyApiTool {
         String txId = api.createOrder(EContractAddress.KWH, EContractAddress.EUR, monies, monies);
 
         // Check the created order
-        Arrays.asList(api.orders().getOrders().getRecords())
+        WebOrder order = Arrays.asList(api.orders().getOrders().getRecords())
                 .stream()
                 .map(r -> r.getOrder())
                 .filter(o -> o.getHash().equals(txId))
                 .findFirst()
                 .orElseThrow(AssertionError::new);
+        LOG.debug("Found order {}", order.getHash());
         
         api.login(USER2, PASS);
         String user2Address = api.getAddress();
@@ -158,10 +159,10 @@ public class FritzyApiTool {
             }
         }
         FritzyBalance balance = api.balance();
-        if (balance.getKwh().doubleValue() != 0.0d) {
+        if (!balance.getKwh().equals(BigDecimal.ZERO)) {
             api.burn(balance.getKwh(), EContractAddress.KWH);
         }
-        if (balance.getEur().doubleValue() != 0.0d) {
+        if (!balance.getEur().equals(BigDecimal.ZERO)) {
             api.burn(balance.getEur(), EContractAddress.EUR);
         }
         LOG.info("After cleaning {}", api.balance());

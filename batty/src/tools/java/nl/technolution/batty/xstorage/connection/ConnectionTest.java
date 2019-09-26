@@ -36,7 +36,7 @@ public class ConnectionTest {
             KeyManagementException, NoSuchAlgorithmException, CertificateException, KeyStoreException {
 
         // TODO MKE create config to use here
-        BattyConfig b = null;
+        BattyConfig b = new BattyConfig();
         // BattyConfig b = new BattyConfig("", "https://172.30.133.212/assets/inc/server.inc.php", "batty", "batty",
         // "src/main/dist/truststore.jks", "12345678", 0, 0, null, false);
 

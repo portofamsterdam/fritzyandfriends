@@ -88,15 +88,15 @@ public class APXPriceServiceTool {
             fixedPrices.put(i, (double)i / 100);
         }
         ExxyConfig config = new ExxyConfig("", "", 0, null, true, null);
-        priceService = new APXPricesService();
+        IAPXPricesService priceServiceInt = new APXPricesService();
         // manually init the service
-        priceService.init(config);
+        priceServiceInt.init(config);
 
         Instant instant = OffsetDateTime.now().withHour(8).toInstant();
-        double price = priceService.getPricePerkWh(instant);
+        double price = priceServiceInt.getPricePerkWh(instant);
         // assertEquals(0.08d, price, 0.001);
 
-        price = priceService.getPricePerkWh();
+        price = priceServiceInt.getPricePerkWh();
         // assertEquals((double)LocalTime.now().get(ChronoField.HOUR_OF_DAY) / 100, price, 0.001);
     }
 }
