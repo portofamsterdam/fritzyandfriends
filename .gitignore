@@ -10,6 +10,7 @@ build/
 gradle/.gradle
 docker/*/build/*
 !docker/*/build/Dockerfile
+gen/
 
 # Log file
 *.log
