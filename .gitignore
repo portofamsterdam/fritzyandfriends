@@ -6,7 +6,7 @@
 *.lock
 
 */bin
-*/build
+build/
 gradle/.gradle
 docker/*/build/*
 !docker/*/build/Dockerfile
