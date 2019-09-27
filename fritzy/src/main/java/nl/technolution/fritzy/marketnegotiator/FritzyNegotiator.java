@@ -284,7 +284,7 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
         DiscreteRunningModeElement currentRunningModeElement = getRunningModeElement(currentPeriodRunningModeId,
                 fillLevel);
 
-        calclulateMyPrice(
+        myPrice = calclulateMyPrice(
                 coolingNeededNextPeriod(fillLevel, currentRunningModeElement, runningModeOffElement,
                         Duration.between(Instant.now(), Efi.getNextQuarter())),
                 marketPrice, marketPriceStartOffset, round);
