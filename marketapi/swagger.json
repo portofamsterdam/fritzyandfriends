@@ -4,8 +4,8 @@
     "version": "0.0.1",
     "description": "This api provides functionality to interact with an ethereum blockchain"
   },
-  "host": "82.196.13.251/api",
-  "basePath": "/",
+  "host": "82.196.13.251",
+  "basePath": "/api",
   "swagger": "2.0",
   "paths": {
     "/users": {

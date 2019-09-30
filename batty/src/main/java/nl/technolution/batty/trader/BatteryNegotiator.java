@@ -47,7 +47,6 @@ import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.order.Orders;
 import nl.technolution.fritzy.wallet.order.Record;
-import nl.technolution.marketnegotiator.AbstractCustomerEnergyManager;
 import nl.technolution.protocols.efi.ActuatorBehaviour;
 import nl.technolution.protocols.efi.Instruction;
 import nl.technolution.protocols.efi.RunningMode;
@@ -58,6 +57,7 @@ import nl.technolution.protocols.efi.StorageRegistration;
 import nl.technolution.protocols.efi.StorageStatus;
 import nl.technolution.protocols.efi.StorageSystemDescription;
 import nl.technolution.protocols.efi.StorageUpdate;
+import nl.technolution.protocols.efi.util.AbstractCustomerEnergyManager;
 import nl.technolution.protocols.efi.util.Efi;
 
 /**
