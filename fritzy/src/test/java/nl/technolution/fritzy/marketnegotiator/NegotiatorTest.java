@@ -226,16 +226,18 @@ public class NegotiatorTest {
         String sunny = "sunny";
         market.register(sunny, sunny, PASSWORD);
         market.login(sunny, PASSWORD);
-        BigDecimal eur = BigDecimal.valueOf(1);
+        BigDecimal eur = BigDecimal.valueOf(0.01);
         BigDecimal kWh = BigDecimal.valueOf(0.125d);
-        market.mint(market.getAddress(), eur, EContractAddress.EUR);
+        market.mint(market.getAddress(), kWh, EContractAddress.KWH);
         market.createOrder(EContractAddress.KWH, EContractAddress.EUR, kWh, eur);
 
         market.login(FRITZY, PASSWORD);
+        market.mint(market.getAddress(), eur, EContractAddress.EUR);
+
         netty.rewardToGive = 0;
         fn.evaluate();
         assertTrue(netty.orderRewardRequested);
-        assertFalse(netty.claimed);
+        assertTrue(netty.claimed);
     }
 
     @Test

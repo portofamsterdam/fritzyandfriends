@@ -6,10 +6,11 @@
 *.lock
 
 */bin
-*/build
-gradle/.gradle
+build/
+.gradle/
 docker/*/build/*
 !docker/*/build/Dockerfile
+gen/
 
 # Log file
 *.log

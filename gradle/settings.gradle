@@ -1,5 +1,5 @@
 // Here we set the overall project name. All other projects are seen as 'sub project' of this root project.
-rootProject.name = 'gradle'
+rootProject.name = 'Fritzy and friends'
 
 // Find all subprojects identified by a 'build.gradle'
 def discoverGradleSubProjectDirs = { ->
