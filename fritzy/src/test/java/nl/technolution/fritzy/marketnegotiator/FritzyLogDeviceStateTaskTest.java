@@ -36,11 +36,13 @@ import nl.technolution.fritzy.wallet.IFritzyApiFactory;
 import nl.technolution.fritzy.wallet.model.ApiEvent;
 
 /**
- * Test Fritzy Trader functions
+ * Test FritzyLogDeviceStateTask functions
  */
 public class FritzyLogDeviceStateTaskTest {
 
     /**
+     * test FritzyLogDeviceStateTask
+     * 
      * @throws IOException
      * 
      */
