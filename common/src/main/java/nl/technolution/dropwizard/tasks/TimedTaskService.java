@@ -134,7 +134,7 @@ public final class TimedTaskService implements Managed {
         public void run() {
             try {
                 task.execute();
-            } catch (Exception e) {
+            } catch (Throwable e) {
                 LOG.error("task encountered error {}", e.getMessage(), e);
                 // TODO WHO: schedule retry?
             }
