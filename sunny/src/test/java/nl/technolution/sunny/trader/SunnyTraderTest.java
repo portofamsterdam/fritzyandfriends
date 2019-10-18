@@ -46,7 +46,7 @@ public class SunnyTraderTest {
     @Test
     public void testTrading() throws IOException {
         SunnyConfig config = new SunnyConfig();
-        config.setUseStub(true);
+        config.setUseSolarEdgeStub(true);
         config.setMarketPriceStartOffset(0.10);
         config.setDeviceId("Test");
         config.setMarket(new MarketConfig(true, "", "test", "pwd"));

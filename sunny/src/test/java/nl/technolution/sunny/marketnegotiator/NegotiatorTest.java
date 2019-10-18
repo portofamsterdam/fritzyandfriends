@@ -82,7 +82,7 @@ public class NegotiatorTest {
         // Set locale so the string compares with balance don't fail on decimal seperator differences...
         Locale.setDefault(Locale.US);
         config = new SunnyConfig();
-        config.setUseStub(true);
+        config.setUseSolarEdgeStub(true);
         config.setMarketPriceStartOffset(0.10);
         config.setDeviceId(DEVICE_ID.getDeviceId());
         config.setMarket(new MarketConfig(true, "", "", ""));
