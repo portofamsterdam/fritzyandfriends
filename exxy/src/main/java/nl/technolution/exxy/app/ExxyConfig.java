@@ -34,7 +34,6 @@ import nl.technolution.apis.ApiConfig;
 import nl.technolution.apis.ApiConfigRecord;
 import nl.technolution.apis.EApiNames;
 import nl.technolution.dropwizard.FritzyAppConfig;
-import nl.technolution.dropwizard.MarketConfig;
 import nl.technolution.dropwizard.webservice.JacksonFactory;
 
 /**
@@ -42,13 +41,11 @@ import nl.technolution.dropwizard.webservice.JacksonFactory;
  */
 public class ExxyConfig extends FritzyAppConfig {
 
+    /** EFI devide id */
     @JsonProperty("deviceId")
     private String deviceId;
 
-    /**
-     * Base URL for the ENTSO-E API: https://transparency.entsoe.eu/api
-     * 
-     */
+    /** Base URL for the ENTSO-E API: https://transparency.entsoe.eu/api */
     @JsonProperty("baseURL")
     private String baseURL;
 
@@ -63,9 +60,7 @@ public class ExxyConfig extends FritzyAppConfig {
     @JsonProperty("securityToken")
     private String securityToken;
 
-    /**
-     * How much kWh can exxy sell in a trade period
-     */
+    /** How much kWh can exxy sell in a trade period */
     @JsonProperty("capacity")
     private int capacity;
 
@@ -77,39 +72,23 @@ public class ExxyConfig extends FritzyAppConfig {
     @JsonProperty("fixedPrices")
     private Map<Integer, Double> fixedPrices;
 
-    /**
-     * When true the prices from {@link fixedPrices} are used instead of the live day ahead prices.
-     *
-     */
+    /** When true the prices from {@link fixedPrices} are used instead of the live day ahead prices. */
     @JsonProperty("useFixedPrices")
     private boolean useFixedPrices;
 
-    /**
-     * For each size in the given list an order to buy and sell is created.
-     */
+    /** For each size in the given list an order to buy and sell is created. */
     @JsonProperty("orderSizes")
     private List<Double> orderSizes;
 
-    /**
-     * MArket properties
-     */
-    @JsonProperty("market")
-    private MarketConfig market;
-
-
     @JsonCreator
-    public ExxyConfig(@JsonProperty("baseURL") String baseURL, 
-            @JsonProperty("securityToken") String securityToken,
-            @JsonProperty("capacity") int capacity,
-            @JsonProperty("fixedPrices") Map<Integer, Double> fixedPrices,
-            @JsonProperty("useFixedPrices") boolean useFixedPrices,
-            @JsonProperty("market") MarketConfig market) {
+    public ExxyConfig(@JsonProperty("baseURL") String baseURL, @JsonProperty("securityToken") String securityToken,
+            @JsonProperty("capacity") int capacity, @JsonProperty("fixedPrices") Map<Integer, Double> fixedPrices,
+            @JsonProperty("useFixedPrices") boolean useFixedPrices) {
         this.baseURL = baseURL;
         this.securityToken = securityToken;
         this.capacity = capacity;
         this.fixedPrices = fixedPrices;
         this.useFixedPrices = useFixedPrices;
-        this.market = market;
         validateConfig();
     }
 
@@ -164,9 +143,6 @@ public class ExxyConfig extends FritzyAppConfig {
         c.fixedPrices.put(21, 0.22d);
         c.fixedPrices.put(22, 0.23d);
         c.fixedPrices.put(23, 0.24d);
-
-        MarketConfig market = new MarketConfig(false, "http://82.196.13.251/api", "exxy@fritzy.nl", "exxy");
-        c.setMarket(market);
 
         ApiConfig apiConfig = new ApiConfig();
         ApiConfigRecord netty = new ApiConfigRecord(EApiNames.NETTY.getName(), "http://netty:8080/", 5000, 5000);

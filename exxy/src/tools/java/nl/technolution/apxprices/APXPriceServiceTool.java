@@ -33,7 +33,7 @@ public class APXPriceServiceTool {
     public static void main(String[] args) throws NoPricesAvailableException {
 
         ExxyConfig config = new ExxyConfig("https://transparency.entsoe.eu/api", "0b1d9ae3-d9a6-4c6b-8dc1-c62a18387ac5",
-                0, null, false, null);
+                0, null, false);
         ServiceFinder.setupDropWizardServices(config);
         IAPXPricesService priceService = Services.get(IAPXPricesService.class);
         getPrice(priceService);
