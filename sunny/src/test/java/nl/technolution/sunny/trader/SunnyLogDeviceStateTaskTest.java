@@ -17,44 +17,36 @@
 package nl.technolution.sunny.trader;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import java.io.IOException;
 
 import org.junit.Test;
 
+import nl.technolution.dashboard.EEventType;
 import nl.technolution.dropwizard.MarketConfig;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.fritzy.wallet.FritzyApiFactory;
 import nl.technolution.fritzy.wallet.FritzyApiStub;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
+import nl.technolution.fritzy.wallet.model.ApiEvent;
 import nl.technolution.sunny.app.SunnyConfig;
 import nl.technolution.sunny.solaredge.ISESessionFactory;
 import nl.technolution.sunny.solaredge.SESessionFactory;
 import nl.technolution.sunny.solaredge.SolarEdgeSessionStub;
 
 /**
- * Test Sunny Trader functions
+ * Test Sunny Log device state
  */
-public class SunnyTraderTest {
+public class SunnyLogDeviceStateTaskTest {
 
     /**
-     * @throws IOException
-     * 
+     * Test LogDeviceEvent
      */
     @Test
-    public void testTrading() throws IOException {
-        SunnyConfig config = new SunnyConfig();
-        config.setUseSolarEdgeStub(true);
-        config.setMarketPriceStartOffset(0.10);
-        config.setDeviceId("Test");
-        config.setMarket(new MarketConfig(true, "", "test", "pwd"));
-
-        SunnyTrader trader = new SunnyTrader();
-        trader.init(config);
-
-        Services.put(ISunnyTrader.class, trader);
+    public void testLogDeviceEvent() {
+        SunnyConfig testConfig = new SunnyConfig();
+        testConfig.setDeviceId("Test");
+        testConfig.setUseSolarEdgeStub(true);
+        testConfig.setMarket(new MarketConfig(true, "", "test", "pwd"));
 
         FritzyApiStub.reset();
         FritzyApiStub fritzyApiStub = FritzyApiStub.instance();
@@ -63,19 +55,21 @@ public class SunnyTraderTest {
         fritzyApiStub.register("test", "test", "pwd");
 
         FritzyApiFactory fritzyApiFactory = new FritzyApiFactory();
-        fritzyApiFactory.init(config);
+        fritzyApiFactory.init(testConfig);
         Services.put(IFritzyApiFactory.class, fritzyApiFactory);
 
+        SunnyLogDeviceStateTask task = new SunnyLogDeviceStateTask();
+
         SESessionFactory seSessionFactory = new SESessionFactory();
-        seSessionFactory.init(config);
+        seSessionFactory.init(testConfig);
         Services.put(ISESessionFactory.class, seSessionFactory);
 
         SolarEdgeSessionStub solarEdgeSessionStub = (SolarEdgeSessionStub)seSessionFactory.getSESession();
 
-        solarEdgeSessionStub.setInverterPower(12345);
+        solarEdgeSessionStub.setInverterPower(1234.5678);
 
-        trader.sendMeasurement();
-        assertEquals(1, fritzyApiStub.getAllEvents().size());
-        assertTrue(fritzyApiStub.getAllEvents().get(0).getMsg().contains("12345"));
+        task.execute();
+        ApiEvent stateEvent = fritzyApiStub.getFirstEventOfType(EEventType.DEVICE_STATE);
+        assertEquals("State update production=1234.57", stateEvent.getMsg());
     }
 }

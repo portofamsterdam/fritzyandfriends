@@ -36,6 +36,7 @@ import nl.technolution.dropwizard.webservice.JacksonFactory;
  */
 public class FritzyConfig extends FritzyAppConfig {
 
+    /** EFI id of the device */
     @JsonProperty("deviceId")
     private String deviceId;
 
@@ -47,37 +48,46 @@ public class FritzyConfig extends FritzyAppConfig {
     @JsonProperty("port")
     private int port;
 
-    /** Port used to read temp sensor */
+    /** Serial port used to read temp sensor */
     @JsonProperty("serialPort")
     private String serialPort;
 
+    /** stub the temperature sensor */
     @JsonProperty("stubTemparature")
     private boolean stubTemparature;
 
+    /** stub the webrelay */
     @JsonProperty("stubRelay")
     private boolean stubRelay;
 
+    /** lowest acceptable temperature */
     @JsonProperty("minTemp")
     private double minTemp;
 
+    /** highest acceptable temperature */
     @JsonProperty("maxTemp")
     private double maxTemp;
 
+    /** safety margin, when temperature at maxTemp + maxMargin Fritzy will be turned on regardless of market position */
     @JsonProperty("maxMargin")
     private int maxMargin;
 
+    /**
+     * The power consumption of Fritzy in Watt (in lieu of a power meter) used for calculating the amount of energy to
+     * buy and to report consumption
+     */
     @JsonProperty("power")
-    // Power in W
     private double power;
 
+    /** The leakage rate of Fritzy in °C per second (when turned off) */
     @JsonProperty("leakageRate")
-    // in °C per second
     private double leakageRate;
 
+    /** The cooling speed of Fritzy in °C per second (when turned on) */
     @JsonProperty("coolingSpeed")
-    // in °C per second
     private double coolingSpeed;
 
+    /** offset in euro cent used at the start of the negation. First bid will be market - offset. */
     @JsonProperty("marketPriceStartOffset")
     private double marketPriceStartOffset;
 
@@ -86,7 +96,7 @@ public class FritzyConfig extends FritzyAppConfig {
     }
 
     /**
-     * Generate exxy config
+     * Generate Fritzy config
      * 
      * @param args none
      * @throws IOException

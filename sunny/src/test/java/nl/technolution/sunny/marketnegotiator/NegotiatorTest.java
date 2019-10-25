@@ -55,7 +55,6 @@ import nl.technolution.sunny.pvcast.cache.PvForecastCache;
 import nl.technolution.sunny.pvcast.client.IPvCastClient;
 import nl.technolution.sunny.solaredge.ISESessionFactory;
 import nl.technolution.sunny.solaredge.SESessionFactory;
-import nl.technolution.sunny.solaredge.SolarEdgeSessionStub;
 import nl.technolution.sunny.trader.SunnyNegotiator;
 import nl.technolution.sunny.trader.SunnyResourceHelper;
 import nl.technolution.sunny.trader.SunnyResourceManager;
@@ -75,7 +74,6 @@ public class NegotiatorTest {
 
     private SunnyConfig config;
 
-    private SolarEdgeSessionStub solarEdgeSessionStub;
     private PvCastClientStub pvCastClientStub;
     private SunnyResourceHelper resourceHelper;
 
@@ -84,7 +82,7 @@ public class NegotiatorTest {
         // Set locale so the string compares with balance don't fail on decimal seperator differences...
         Locale.setDefault(Locale.US);
         config = new SunnyConfig();
-        config.setUseStub(true);
+        config.setUseSolarEdgeStub(true);
         config.setMarketPriceStartOffset(0.10);
         config.setDeviceId(DEVICE_ID.getDeviceId());
         config.setMarket(new MarketConfig(true, "", "", ""));
@@ -111,8 +109,6 @@ public class NegotiatorTest {
         SESessionFactory seSessionFactory = new SESessionFactory();
         seSessionFactory.init(config);
         Services.put(ISESessionFactory.class, seSessionFactory);
-
-        solarEdgeSessionStub = (SolarEdgeSessionStub)(seSessionFactory.getSESession());
 
         netty = new NettyApiImpl();
         Endpoints.put(INettyApi.class, netty);
