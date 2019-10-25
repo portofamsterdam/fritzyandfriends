@@ -207,8 +207,8 @@ public class APXPriceServiceTest {
     @Before
     public void before() throws IOException {
         mockServer = ClientAndServer.startClientAndServer(0);
-        ExxyConfig config = new ExxyConfig("http://localhost:" + mockServer.getLocalPort() + "/api", SECURITY_TOKEN,
-                0, null, false, null);
+        ExxyConfig config = new ExxyConfig("http://localhost:" + mockServer.getLocalPort() + "/api", SECURITY_TOKEN, 0,
+                null, false);
 
         // Setup market
         FritzyApiStub market = FritzyApiStub.instance();
@@ -367,7 +367,7 @@ public class APXPriceServiceTest {
         for (int i = 0; i < 24; i++) {
             fixedPrices.put(i, (double)i / 100);
         }
-        ExxyConfig config = new ExxyConfig("", "", 0, fixedPrices, true, null);
+        ExxyConfig config = new ExxyConfig("", "", 0, fixedPrices, true);
         priceService = new APXPricesService();
         // manually re-init the service with the new config so fixed prices are used
         priceService.init(config);

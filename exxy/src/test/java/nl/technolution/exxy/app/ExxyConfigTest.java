@@ -24,8 +24,6 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import nl.technolution.exxy.app.ExxyConfig;
-
 /**
  * Test APXPricesConfig
  * 
@@ -33,19 +31,19 @@ import nl.technolution.exxy.app.ExxyConfig;
 public class ExxyConfigTest {
     @Test
     public void livePricesTest() {
-        ExxyConfig config = new ExxyConfig("url", "secret", 0, null, false, null);
+        ExxyConfig config = new ExxyConfig("url", "secret", 0, null, false);
         assertThat(config.getBaseURL(), is("url"));
         assertThat(config.getSecurityToken(), is("secret"));
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void livePricesNoUrlTest() {
-        new ExxyConfig(null, "secret", 0, null, false, null);
+        new ExxyConfig(null, "secret", 0, null, false);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void livePricesEmptySecretTest() {
-        new ExxyConfig("url", "", 0, null, false, null);
+        new ExxyConfig("url", "", 0, null, false);
     }
 
     @Test
@@ -55,7 +53,7 @@ public class ExxyConfigTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void noFixedPricesTest() {
-        new ExxyConfig("", "", 0, null, true, null);
+        new ExxyConfig("", "", 0, null, true);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -69,7 +67,7 @@ public class ExxyConfigTest {
         for (int i = 0; i < entries; i++) {
             fixedPrices.put(i, (double)i / 100);
         }
-        ExxyConfig config = new ExxyConfig("", "", 0, fixedPrices, true, null);
+        ExxyConfig config = new ExxyConfig("", "", 0, fixedPrices, true);
         assertThat(config.getFixedPrices(), is(fixedPrices));
         assertThat(config.isUseFixedPrices(), is(true));
     }

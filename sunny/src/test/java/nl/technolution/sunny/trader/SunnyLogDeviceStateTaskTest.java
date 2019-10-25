@@ -45,7 +45,7 @@ public class SunnyLogDeviceStateTaskTest {
     public void testLogDeviceEvent() {
         SunnyConfig testConfig = new SunnyConfig();
         testConfig.setDeviceId("Test");
-        testConfig.setUseStub(true);
+        testConfig.setUseSolarEdgeStub(true);
         testConfig.setMarket(new MarketConfig(true, "", "test", "pwd"));
 
         FritzyApiStub.reset();

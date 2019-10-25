@@ -30,7 +30,7 @@ public class SESessionFactory implements ISESessionFactory {
 
     @Override
     public void init(SunnyConfig config) {
-        if (config.isUseStub()) {
+        if (config.isUseSolarEdgeStub()) {
             solarEdgeSession = new SolarEdgeSessionStub();
             return;
         } else {
