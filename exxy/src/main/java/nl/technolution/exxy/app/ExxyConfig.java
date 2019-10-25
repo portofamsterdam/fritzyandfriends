@@ -55,19 +55,17 @@ public class ExxyConfig extends FritzyAppConfig {
      * NOTE: This is a person bound token, every user of this code should obtain their own access token! See
      * https://transparency.entsoe.eu/content/static_content/Static%20content/web%20api/Guide.html
      * #_authentication_and_authorisation
-     * 
      */
     @JsonProperty("securityToken")
     private String securityToken;
 
-    /** How much kWh can exxy sell in a trade period */
+    /** How much kWh can exxy sell in a trade period, currently not implemented */
     @JsonProperty("capacity")
     private int capacity;
 
     /**
      * Map with fixed prices in EUR per kWh for every hour of the day (local time). Hours > 23 are ignored. When
      * {@link useFixedPrices} is true these fixed prices are used instead of the live day ahead prices.
-     *
      */
     @JsonProperty("fixedPrices")
     private Map<Integer, Double> fixedPrices;
