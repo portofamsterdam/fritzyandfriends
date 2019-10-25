@@ -36,26 +36,27 @@ import nl.technolution.dropwizard.webservice.JacksonFactory;
  */
 public class BattyConfig extends FritzyAppConfig {
 
+    /** EFI id of the device */
     @JsonProperty("deviceId")
     private String deviceId;
 
-    /** host address of battery */
+    /** host address of XStorage battery */
     @JsonProperty("host")
     private String host;
 
-    /** API username */
+    /** XStorage API username */
     @JsonProperty("username")
     private String username;
 
-    /** API password */
+    /** XStorage API password */
     @JsonProperty("password")
     private String password;
 
-    /** API password */
+    /** truststore for https connection to XStorage */
     @JsonProperty("truststore")
     private String truststore;
 
-    /** API password */
+    /** truststore password */
     @JsonProperty("truststorepass")
     private String truststorepass;
 
@@ -67,11 +68,12 @@ public class BattyConfig extends FritzyAppConfig {
     @JsonProperty("sellMargin")
     private int sellMargin;
 
+    /** run application with stubbed battery */
     @JsonProperty("useStub")
     private boolean useStub;
 
     /**
-     * Generate exxy config
+     * Generate sample batty config
      * 
      * @param args none
      * @throws IOException
