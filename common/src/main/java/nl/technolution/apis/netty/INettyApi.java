@@ -16,11 +16,21 @@
  */
 package nl.technolution.apis.netty;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+
+import com.codahale.metrics.annotation.Timed;
+
 import nl.technolution.dropwizard.webservice.IEndpoint;
 
 /**
  * Netty API calls
  */
+@Path("/netty")
+@Produces(MediaType.APPLICATION_JSON)
 public interface INettyApi extends IEndpoint {
 
     /**
@@ -29,8 +39,11 @@ public interface INettyApi extends IEndpoint {
      * @param deviceId to find limit for
      * @return limit in amps
      */
-    DeviceCapacity getCapacity(String deviceId);
-
+    @GET
+    @Timed
+    @Path("capacity")
+    @Produces(MediaType.APPLICATION_JSON)
+    DeviceCapacity getCapacity(@QueryParam("deviceId") String deviceId);
 
     /**
      * Determine taker reward for a given order.
