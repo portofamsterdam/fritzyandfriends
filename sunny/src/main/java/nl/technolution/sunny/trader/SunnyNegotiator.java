@@ -223,10 +223,11 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
      */
     private static double getNextQuarterHourForcastedKWh(InflexibleForecast forecast) {
         Instant nextQuarter = Efi.getNextQuarter();
-        Instant start = forecast.getValidFrom().toGregorianCalendar().toInstant();
+        Instant itemTimeStamp = forecast.getValidFrom().toGregorianCalendar().toInstant();
         for (Element e : forecast.getForecastProfiles().getElectricityProfile().getElement()) {
             Duration duration = XmlUtils.fromXmlDuration(e.getDuration());
-            if (start.plus(duration).isAfter(nextQuarter)) {
+            itemTimeStamp = itemTimeStamp.plus(duration);
+            if (itemTimeStamp.isAfter(nextQuarter)) {
                 // convert power in W to kWh/quarter hour
                 return e.getPower() / 1000 * 0.25;
             }
