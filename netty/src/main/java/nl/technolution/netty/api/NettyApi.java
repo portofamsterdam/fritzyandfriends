@@ -18,7 +18,6 @@ package nl.technolution.netty.api;
 
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -47,7 +46,7 @@ public class NettyApi implements INettyApi {
      * @return limit in amps
      */
     @Override
-    public DeviceCapacity getCapacity(@QueryParam("deviceId") String deviceId) {
+    public DeviceCapacity getCapacity(String deviceId) {
         DeviceId id = new DeviceId(deviceId);
         IGridCapacityManager gridCapacityManager = Services.get(IGridCapacityManager.class);
         double gridConnectionLimit = gridCapacityManager.getGridConnectionLimit(id);
