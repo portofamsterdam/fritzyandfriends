@@ -16,12 +16,26 @@
  */
 package nl.technolution.apis.exxy;
 
-import io.dropwizard.jersey.params.InstantParam;
+import javax.validation.constraints.NotNull;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+
+import com.codahale.metrics.annotation.Timed;
+
+import org.hibernate.validator.valuehandling.UnwrapValidatedValue;
+
 import nl.technolution.dropwizard.webservice.IEndpoint;
+
+import io.dropwizard.jersey.params.InstantParam;
 
 /**
  * 
  */
+@Path("exxy/")
+@Produces(MediaType.APPLICATION_JSON)
 public interface IAPXPricesApi extends IEndpoint {
 
     /**
@@ -29,6 +43,10 @@ public interface IAPXPricesApi extends IEndpoint {
      * 
      * @return day ahead price for the current moment
      */
+    @GET
+    @Timed
+    @Path("currentPrice")
+    @Produces(MediaType.APPLICATION_JSON)
     ApxPrice getCurrentPrice();
 
     /**
@@ -36,6 +54,10 @@ public interface IAPXPricesApi extends IEndpoint {
      * 
      * @return day ahead price for the next quarter hour (request at 12:01 gives price for 12:15).
      */
+    @GET
+    @Timed
+    @Path("nextQuarterPrice")
+    @Produces(MediaType.APPLICATION_JSON)
     ApxPrice getNextQuarterHourPrice();
 
     /**
@@ -45,6 +67,10 @@ public interface IAPXPricesApi extends IEndpoint {
      * 
      * @return day ahead price for the requested moment
      */
-    ApxPrice getPrice(InstantParam requestedDateTime);
+    @GET
+    @Timed
+    @Path("price")
+    @Produces(MediaType.APPLICATION_JSON)
+    ApxPrice getPrice(@QueryParam(value = "dateTime") @NotNull @UnwrapValidatedValue InstantParam requestedDateTime);
 
 }

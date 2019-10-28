@@ -16,11 +16,21 @@
  */
 package nl.technolution.apis.netty;
 
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.core.MediaType;
+
+import com.codahale.metrics.annotation.Timed;
+
 import nl.technolution.dropwizard.webservice.IEndpoint;
 
 /**
  * Netty API calls
  */
+@Path("/netty")
+@Produces(MediaType.APPLICATION_JSON)
 public interface INettyApi extends IEndpoint {
 
     /**
@@ -29,8 +39,11 @@ public interface INettyApi extends IEndpoint {
      * @param deviceId to find limit for
      * @return limit in amps
      */
-    DeviceCapacity getCapacity(String deviceId);
-
+    @GET
+    @Timed
+    @Path("capacity")
+    @Produces(MediaType.APPLICATION_JSON)
+    DeviceCapacity getCapacity(@QueryParam("deviceId") String deviceId);
 
     /**
      * Determine taker reward for a given order.
@@ -39,7 +52,11 @@ public interface INettyApi extends IEndpoint {
      * @param orderHash identifying order
      * @return reward
      */
-    OrderReward getOrderReward(String taker, String orderHash);
+    @GET
+    @Timed
+    @Path("orderReward")
+    @Produces(MediaType.APPLICATION_JSON)
+    OrderReward getOrderReward(@QueryParam("taker") String taker, @QueryParam("orderHash") String orderHash);
 
     /**
      * Claim a reward
@@ -47,5 +64,8 @@ public interface INettyApi extends IEndpoint {
      * @param txHash transaction proving acceptance of order
      * @param rewardId reward to claim
      */
-    void claim(String txHash, String rewardId);
+    @GET
+    @Timed
+    @Path("claim")
+    void claim(@QueryParam("txHash") String txHash, @QueryParam("rewardId") String rewardId);
 }
