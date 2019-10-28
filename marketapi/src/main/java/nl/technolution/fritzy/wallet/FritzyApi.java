@@ -132,7 +132,11 @@ public class FritzyApi implements IFritzyApi {
         Form form = new Form();
         form.param("address", address);
         form.param("contractAddress", contractAddress.getContractName());
-        request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+        Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
+            LOG.error("add minter failed: {}", response);
+            throw new IllegalStateException("Unable to add minter " + address);
+        }
     }
 
     /**
@@ -163,7 +167,7 @@ public class FritzyApi implements IFritzyApi {
     public WebOrder order(String orderHash) {
         LOG.info("Fetching order {}", orderHash);
         Preconditions.checkArgument(accessToken != null, "login first");
-        WebTarget target = client.target(url + "/orders/" + orderHash);
+        WebTarget target = client.target(url + "/order/" + orderHash);
         Builder request = target.request();
         request.header("Authorization", "Bearer " + accessToken);
         return request.get(WebOrder.class);
