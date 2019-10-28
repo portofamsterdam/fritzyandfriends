@@ -21,7 +21,7 @@
   },
   "deviceId" : "sunny",
   "marketPriceStartOffset" : 1.0,
-  "useStub" : false,
+  "useSolarEdgeStub" : false,
   "solarEdgeMonitoringBaseURL" : "https://monitoringapi.solaredge.com/site/529405",
   "solarEdgeMonitoringApikey" : "JRK97634IPJD9ABBG4MFACJVZGLK4NUN",
   "pvCastBaseURL" : "https://api.pvcast.de/plants/908",
