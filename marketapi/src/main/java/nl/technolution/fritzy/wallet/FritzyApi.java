@@ -207,8 +207,8 @@ public class FritzyApi implements IFritzyApi {
         Form form = new Form();
         form.param("makerToken", makerToken.getContractName());
         form.param("takerToken", takerToken.getContractName());
-        form.param("makerAmount", makerAmount.multiply(TOKEN_FACTOR).toPlainString());
-        form.param("takerAmount", takerAmount.multiply(TOKEN_FACTOR).toPlainString());
+        form.param("makerAmount", makerAmount.multiply(TOKEN_FACTOR).toBigInteger().toString());
+        form.param("takerAmount", takerAmount.multiply(TOKEN_FACTOR).toBigInteger().toString());
         Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
         if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
             LOG.warn("createOrder failed(): " + response);
@@ -265,7 +265,7 @@ public class FritzyApi implements IFritzyApi {
         Form form = new Form();
         form.param("address", address);
 
-        form.param("value", "" + tokens.toPlainString());
+        form.param("value", "" + tokens.toBigInteger().toString());
         form.param("contractAddress", contractAddress.getContractName());
         Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
         if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
@@ -282,7 +282,7 @@ public class FritzyApi implements IFritzyApi {
         Builder request = target.request();
         request.header("Authorization", "Bearer " + accessToken);
         Form form = new Form();
-        form.param("value", "" + value.multiply(TOKEN_FACTOR));
+        form.param("value", "" + value.multiply(TOKEN_FACTOR).toBigInteger());
         form.param("contractAddress", contractAddress.getContractName());
         Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
         if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
@@ -299,7 +299,7 @@ public class FritzyApi implements IFritzyApi {
         request.header("Authorization", "Bearer " + accessToken);
         Form form = new Form();
         form.param("to", toAddress);
-        form.param("value", "" + value.multiply(TOKEN_FACTOR));
+        form.param("value", "" + value.multiply(TOKEN_FACTOR).toBigInteger());
         form.param("contractAddress", contractAddress.getContractName());
         Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
         if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
