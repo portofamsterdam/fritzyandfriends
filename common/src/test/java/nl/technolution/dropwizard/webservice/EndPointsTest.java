@@ -63,6 +63,10 @@ public class EndPointsTest {
         ApiEndpoints.register(cfg);
         INettyApi netty = Endpoints.get(INettyApi.class);
         assertNotNull(netty);
+        // TODO: make this test work by running the endpoint.
+        // netty.getCapacity("deviceId");
+        // netty.getOrderReward("taker", "orderHash");
+        // netty.claim("txHash", "rewardId");
     }
 
     private static class NettyApiImpl implements INettyApi {

@@ -52,7 +52,11 @@ public interface INettyApi extends IEndpoint {
      * @param orderHash identifying order
      * @return reward
      */
-    OrderReward getOrderReward(String taker, String orderHash);
+    @GET
+    @Timed
+    @Path("orderReward")
+    @Produces(MediaType.APPLICATION_JSON)
+    OrderReward getOrderReward(@QueryParam("taker") String taker, @QueryParam("orderHash") String orderHash);
 
     /**
      * Claim a reward
@@ -60,5 +64,8 @@ public interface INettyApi extends IEndpoint {
      * @param txHash transaction proving acceptance of order
      * @param rewardId reward to claim
      */
-    void claim(String txHash, String rewardId);
+    @GET
+    @Timed
+    @Path("claim")
+    void claim(@QueryParam("txHash") String txHash, @QueryParam("rewardId") String rewardId);
 }
