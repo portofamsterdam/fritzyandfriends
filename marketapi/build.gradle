@@ -57,4 +57,5 @@ sourceSets {
     }
 }
 
-compileJava.dependsOn swaggerSources.registrationsApi.code
+generateSwaggerCode.dependsOn createDirectoryForGeneratingResults
+compileJava.dependsOn generateSwaggerCode

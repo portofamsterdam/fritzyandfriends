@@ -16,8 +16,6 @@
  */
 package nl.technolution.sunny.solaredge.sunspec;
 
-import java.util.EnumSet;
-
 /**
  * Enum representing registers of a SolarEdge inverter
  */
@@ -131,17 +129,6 @@ public enum ESolarEdgeRegister {
     POWER_CONTROL_ADVANCED_ENABLE((short)0xF142, (short)2, EModbusDataType.INT32, ESunSpecUnit.NA);
 
     private static final short BASE_CORRECTION = 0;
-
-    /** Set with ranges of continuous registers which can be read in a single multiple read */
-    @SuppressWarnings("unchecked")
-    public static final EnumSet<ESolarEdgeRegister>[] SEGMENTS = new EnumSet[] {
-        EnumSet.range(C_SUNSPEC_ID, C_DEVICEADDRESS),
-        EnumSet.range(I_AC_CURRENT, I_STATUS_VENDOR),
-        EnumSet.range(EXPORT_CONTROL, REMOTE_CONTROL_DISCHARGE_LIMIT),
-        EnumSet.range(BATTERY_1_MANUFACTURER_NAME, BATTERY_1_DEVICE_ID),
-        EnumSet.range(BATTERY_1_RATED_ENERGY, BATTERY_1_MAX_DISCHARGE_PEAK_POWER),
-        EnumSet.range(BATTERY_1_AVERAGE_TEMPERATURE, BATTERY_1_EVENT_LOG_INTERNAL),
-        EnumSet.range(POWER_CONTROL_COMMIT, POWER_CONTROL_ADVANCED_ENABLE) };
 
     private final short address;
     private final short size;

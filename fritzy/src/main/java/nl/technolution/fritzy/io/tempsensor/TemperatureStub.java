@@ -28,6 +28,7 @@ public class TemperatureStub implements ITemperatureSensor {
     private IWebRelay webRelay;
     private long lastCall = System.currentTimeMillis();
     private double temperature = 4;
+    private boolean fixedTemperature = false;
 
     /**
      * Constructor
@@ -38,23 +39,34 @@ public class TemperatureStub implements ITemperatureSensor {
         this.webRelay = webRelay;
     }
 
+    /**
+     * Set stub in fixed mode, always returning the given temperature
+     * 
+     * @param temperature
+     */
+    public void useFixedTemperature(double temperature) {
+        this.temperature = temperature;
+        fixedTemperature = true;
+    }
+
     @Override
     public double getTemparature() {
-        long now = System.currentTimeMillis();
-        long msPassed = now - lastCall;
-        try {
-            if (webRelay.getState().isRelaystate()) {
-                // cooling: temperature decreases 0.1 degree every minute (6 degree / hour)
-                temperature -= msPassed / 1000d / 60d * 0.1;
-            } else {
-                // off: temperature increases 1 degree every hour
-                temperature += msPassed / 1000d / 60d / 60d * 1;
+        if (!fixedTemperature) {
+            long now = System.currentTimeMillis();
+            long msPassed = now - lastCall;
+            try {
+                if (webRelay.getState().isRelaystate()) {
+                    // cooling: temperature decreases 0.1 degree every minute (6 degree / hour)
+                    temperature -= msPassed / 1000d / 60d * 0.1;
+                } else {
+                    // off: temperature increases 1 degree every hour
+                    temperature += msPassed / 1000d / 60d / 60d * 1;
+                }
+                lastCall = now;
+            } catch (IOException e) {
+                throw new IllegalStateException(e.getMessage(), e);
             }
-            lastCall = now;
-        } catch (IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
         }
         return temperature;
-
     }
 }

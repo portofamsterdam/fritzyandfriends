@@ -1,0 +1,33 @@
+{
+  "environment" : "live",
+  
+  "deviceId" : "batty",
+  "host" : "192.168.8.241",
+  "username" : "batty",
+  "password" : "batty",
+  "truststore" : "src/main/dist/truststore.jks",
+  "truststorepass" : "12345678",
+  "buyMargin" : 2,
+  "sellMargin" : 2,
+  "useStub" : true,
+  
+  "apiConfig" : {
+    "apis" : [ {
+      "name" : "netty",
+      "url" : "http://localhost:8080/",
+      "connectTimeout" : 5000,
+      "readTimeout" : 5000
+    }, {
+      "name" : "exxy",
+      "url" : "http://localhost:8080/",
+      "connectTimeout" : 5000,
+      "readTimeout" : 5000
+    } ]
+  },
+  "market" : {
+    "useStub" : true,
+    "marketUrl" : "",
+    "email" : "batty@fritzy.nl",
+    "password" : "batty"
+  }
+}

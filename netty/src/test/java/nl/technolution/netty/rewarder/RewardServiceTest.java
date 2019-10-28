@@ -32,6 +32,7 @@ import nl.technolution.dropwizard.MarketConfig;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.fritzy.gen.model.WebUser;
 import nl.technolution.fritzy.wallet.FritzyApiFactory;
+import nl.technolution.fritzy.wallet.FritzyApiStub;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
@@ -54,8 +55,8 @@ public class RewardServiceTest {
         Services.put(IFritzyApiFactory.class, service);
 
         // Create user netty with some funds
+        FritzyApiStub.instance().register(NETTY, NETTY, "");
         IFritzyApi api = service.build();
-        api.register(NETTY, NETTY, "");
         String nettyAddr = Arrays.asList(api.getUsers()).stream().findFirst().get().getAddress();
         api.login(NETTY, "");
         api.mint(nettyAddr, BigDecimal.valueOf(1000), EContractAddress.EUR);

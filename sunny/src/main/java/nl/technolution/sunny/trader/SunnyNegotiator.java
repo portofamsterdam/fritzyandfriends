@@ -20,6 +20,8 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 
+import com.google.common.annotations.VisibleForTesting;
+
 import org.slf4j.Logger;
 
 import nl.technolution.DeviceId;
@@ -34,11 +36,11 @@ import nl.technolution.dropwizard.webservice.Endpoints;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
+import nl.technolution.fritzy.wallet.event.EventLogger;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.order.Orders;
 import nl.technolution.fritzy.wallet.order.Record;
-import nl.technolution.marketnegotiator.AbstractCustomerEnergyManager;
 import nl.technolution.protocols.efi.ElectricityProfile.Element;
 import nl.technolution.protocols.efi.InflexibleForecast;
 import nl.technolution.protocols.efi.InflexibleRegistration;
@@ -46,6 +48,7 @@ import nl.technolution.protocols.efi.InflexibleUpdate;
 import nl.technolution.protocols.efi.Instruction;
 import nl.technolution.protocols.efi.Measurement;
 import nl.technolution.protocols.efi.StorageInstruction;
+import nl.technolution.protocols.efi.util.AbstractCustomerEnergyManager;
 import nl.technolution.protocols.efi.util.Efi;
 import nl.technolution.protocols.efi.util.XmlUtils;
 import nl.technolution.sunny.app.SunnyConfig;
@@ -54,15 +57,15 @@ import nl.technolution.sunny.app.SunnyConfig;
  * 
  */
 public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleRegistration, InflexibleUpdate> {
-    private static final Logger LOG = Log.getLogger();
+    public static final int MAX_ORDER_SIZE_KWH = 1;
 
-    private static final double MAX_ORDER_SIZE_KWH = 1;
+    private static final Logger LOG = Log.getLogger();
 
     private final SunnyResourceManager resourceManager;
 
     private InflexibleForecast forecast;
     private double marketPriceStartOffset;
-    private double availableKWh;
+    private Double availableKWh = null;
 
     private double myPrice;
 
@@ -90,17 +93,21 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
      * 
      */
     public void evaluate() {
+        if (forecast == null) {
+            throw new IllegalStateException("No forecast available yet");
+        }
         DeviceId deviceId = resourceManager.getDeviceId();
         IFritzyApi market = getMarket();
+        EventLogger events = new EventLogger(market);
 
         // Get balance
         FritzyBalance balance = market.balance();
-        market.log(EEventType.BALANCE, balance.getEur().toPlainString(), null);
+        events.logBalance(balance);
 
         // Get max capacity
         INettyApi netty = Endpoints.get(INettyApi.class);
         DeviceCapacity deviceCapacity = netty.getCapacity(deviceId.getDeviceId());
-        market.log(EEventType.LIMIT_ACTOR, Double.toString(deviceCapacity.getGridConnectionLimit()), null);
+        events.logLimitActor(deviceCapacity.getGridConnectionLimit());
 
         // use market price as base for my price
         IAPXPricesApi exxy = Endpoints.get(IAPXPricesApi.class);
@@ -118,12 +125,22 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
         LOG.debug("myPrice: {} (marketPrice : {}, offset: {}, marketPriceStartOffset {})", myPrice, marketPrice, offset,
                 marketPriceStartOffset);
 
-        if (firstRound) {
+        if (firstRound || availableKWh == null) {
             // reset available energy
-            availableKWh = getNextQuarterHourForcastedKWh();
-            // TOOD WHO: what address to use?
+            availableKWh = getNextQuarterHourForcastedKWh(forecast);
             market.mint(market.getAddress(), BigDecimal.valueOf(availableKWh), EContractAddress.KWH);
             LOG.debug("First round, available energy set to {} kWh based on prediction.", availableKWh);
+
+            // check grit capacity (kWh/quarter hour * 4 = kWh/hour = kW => kW * 1000 = W => W / V (230) = A
+            double maxAmps = availableKWh * 4 * 1000 / 230d;
+            if (maxAmps > deviceCapacity.getGridConnectionLimit()) {
+                // not allowed use this much energy
+                LOG.warn(
+                        "Available energy results in {}A which doesn't fit grit capacity {}A, curtailment " +
+                                "not supported by Sunny so nothing we can do on this...",
+                        maxAmps, deviceCapacity.getGridConnectionLimit());
+                return;
+            }
         }
 
         Orders orders = market.orders().getOrders();
@@ -132,19 +149,17 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
             // my own order?
             if (order.getMakerAddress().equals(market.getAddress())) {
                 // when the taker address is set this means someone accepted our order
-                if (!order.getTakerAddress().isEmpty()) {
+                if (order.getTakerAddress() != null && !order.getTakerAddress().isEmpty()) {
                     // energy sold so no longer available:
-                    availableKWh -= getRequestedKwh(order);
+                    availableKWh -= Double.parseDouble(order.getMakerAssetAmount());
                 } else {
                     // cancel outstanding orders, new order are created later on based on the new price
-                    // TODO WHO: void method, what happens when cancel is impossible? (e.g. when it accepted by another
-                    // party during this for loop...)
                     market.cancelOrder(order.getHash());
-                    LOG.debug("Order canceled: " + order);
+                    LOG.debug("Order canceled: {}", order);
                 }
                 continue;
             }
-            if (!isInterestingOrder(order, deviceCapacity)) {
+            if (!isInterestingOrder(order)) {
                 continue;
             }
             OrderReward reward = netty.getOrderReward(market.getAddress(), order.getHash());
@@ -157,12 +172,13 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
             market.log(EEventType.REWARD_CLAIM, reward.toString(), null);
 
             // energy sold so no longer available:
-            availableKWh -= getRequestedKwh(order);
+            availableKWh -= Double.parseDouble(order.getTakerAssetAmount());
         }
-        createNewOrders(market);
+        createNewOrders(market, availableKWh, myPrice);
     }
 
-    private void createNewOrders(IFritzyApi market) {
+    @VisibleForTesting
+    public static void createNewOrders(IFritzyApi market, double availableKWh, double myPrice) {
         double totalOrderKwh = availableKWh;
         while (totalOrderKwh > 0) {
             double orderSize;
@@ -171,10 +187,12 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
             } else {
                 orderSize = totalOrderKwh;
             }
+            // price must be for the requested amount of kWh (it is not a 'euro per kwh' price).
+            double totalPrice = myPrice * orderSize;
 
             market.createOrder(EContractAddress.KWH, EContractAddress.EUR, BigDecimal.valueOf(orderSize),
-                    BigDecimal.valueOf(myPrice));
-            String orderDescription = String.format("%f %s for %f %s", orderSize, EContractAddress.KWH, myPrice,
+                    BigDecimal.valueOf(totalPrice));
+            String orderDescription = String.format("%f %s for %f %s", orderSize, EContractAddress.KWH, totalPrice,
                     EContractAddress.EUR);
             market.log(EEventType.ORDER_OFFER, orderDescription, null);
 
@@ -182,50 +200,51 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
         }
     }
 
-    private boolean isInterestingOrder(WebOrder order, DeviceCapacity deviceCapacity) {
+    private boolean isInterestingOrder(WebOrder order) {
         // Only interested in selling kWh for EUR:
         if (!(order.getMakerAssetData().equalsIgnoreCase("EUR") && order.getTakerAssetData().equalsIgnoreCase("kWh"))) {
-            LOG.info("Order {} declined because it offered {} for {} (instead of EUR for kWh)",
+            LOG.info("Order {} declined because it offered {} for {} (instead of EUR for kWh)", order,
                     order.getMakerAssetData(), order.getTakerAssetData());
             return false;
         }
 
         // check if requested Wh can be met
-        double requestedKWh = getRequestedKwh(order);
+        double requestedKWh = Double.parseDouble(order.getTakerAssetAmount());
         if (requestedKWh > availableKWh) {
             LOG.info("Order {} declined because requestedKWh ({})> availableKWh ({})", order, requestedKWh,
                     availableKWh);
             return false;
         }
-        LOG.debug("Order {} is interesingOrder");
+        LOG.debug("Order {} is interesingOrder", order);
         return true;
-    }
-
-    private static double getRequestedKwh(WebOrder order) {
-        return Double.parseDouble(order.getMakerAssetAmount());
     }
 
     /**
      * @return
      */
-    private double getNextQuarterHourForcastedKWh() {
+    private static double getNextQuarterHourForcastedKWh(InflexibleForecast forecast) {
         Instant nextQuarter = Efi.getNextQuarter();
         Instant start = forecast.getValidFrom().toGregorianCalendar().toInstant();
         for (Element e : forecast.getForecastProfiles().getElectricityProfile().getElement()) {
             Duration duration = XmlUtils.fromXmlDuration(e.getDuration());
             if (start.plus(duration).isAfter(nextQuarter)) {
-                return e.getPower() * 0.25 / 1000; // W to kWh/quarter hour;
+                // convert power in W to kWh/quarter hour
+                return e.getPower() / 1000 * 0.25;
             }
         }
-        throw new Error("No forcasted power info available for next quarter (" + nextQuarter + ")");
+        throw new IllegalStateException("No forcasted power info available for next quarter (" + nextQuarter + ")");
     }
 
     private boolean checkAcceptOffer(WebOrder order, OrderReward reward) {
         // check if price is ok
-        double priceOffered = Double.parseDouble(order.getTakerAssetAmount());
-        if (priceOffered + reward.getReward() < myPrice) {
-            LOG.info("Order {} declined because priceOffered ({}) + reward ({}) < myPrice ({})", order, priceOffered,
-                    reward, myPrice);
+        double priceOffered = Double.parseDouble(order.getMakerAssetAmount());
+        // price is for the offered amount of kWh (it is not a 'euro per kwh' price).
+        double kWhAsked = Double.parseDouble(order.getTakerAssetAmount());
+        double myTotalPrice = myPrice * kWhAsked;
+
+        if (priceOffered + reward.getReward() < myTotalPrice) {
+            LOG.info("Order {} declined because priceOffered ({}) + reward ({}) < myTotalPrice ({} ({} * {}))", order,
+                    priceOffered, reward.getReward(), myTotalPrice, myPrice, kWhAsked);
             return false;
         }
         return true;

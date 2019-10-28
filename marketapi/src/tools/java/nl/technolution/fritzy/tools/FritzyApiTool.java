@@ -23,6 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Uninterruptibles;
@@ -32,6 +33,7 @@ import org.slf4j.Logger;
 import nl.technolution.Log;
 import nl.technolution.apis.exxy.ApxPrice;
 import nl.technolution.dashboard.EEventType;
+import nl.technolution.dropwizard.webservice.JacksonFactory;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.FritzyApi;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
@@ -54,9 +56,13 @@ public class FritzyApiTool {
 
     private static FritzyApi api;
 
-    public static void main(String[] args) {
-        String url = "http://82.196.13.251/api";
+    public static void main(String[] args) throws JsonProcessingException {
+        String url = "http://192.168.8.242/api";
         api = new FritzyApi(url, "FritzyApiTool");
+
+        // api.register(USER1, USER1, PASS);
+
+        // api.register(USER2, USER2, PASS);
 
         setMinters(ADMIN, ADMINPASS, Lists.newArrayList(USER1, USER2));
         resetUser(USER1, PASS);
@@ -78,12 +84,13 @@ public class FritzyApiTool {
         String txId = api.createOrder(EContractAddress.KWH, EContractAddress.EUR, monies, monies);
 
         // Check the created order
-        Arrays.asList(api.orders().getOrders().getRecords())
+        WebOrder order = Arrays.asList(api.orders().getOrders().getRecords())
                 .stream()
                 .map(r -> r.getOrder())
                 .filter(o -> o.getHash().equals(txId))
                 .findFirst()
                 .orElseThrow(AssertionError::new);
+        LOG.debug("Found order {}", order.getHash());
         
         api.login(USER2, PASS);
         String user2Address = api.getAddress();
@@ -117,7 +124,7 @@ public class FritzyApiTool {
 
         api.log(EEventType.BALANCE, currentBalance.toPlainString() + " eur", null);
         api.log(EEventType.LIMIT_ACTOR, "8A", null);
-        api.log(EEventType.CHAT, "chat text", new ApxPrice(1d));
+        api.log(EEventType.CHAT, "chat text", JacksonFactory.defaultMapper().writeValueAsString(new ApxPrice(1d)));
 
 
         GetEventResponse events = api.getEvents(Instant.now().minus(2, ChronoUnit.HOURS),
@@ -152,10 +159,10 @@ public class FritzyApiTool {
             }
         }
         FritzyBalance balance = api.balance();
-        if (balance.getKwh().doubleValue() != 0.0d) {
+        if (!balance.getKwh().equals(BigDecimal.ZERO)) {
             api.burn(balance.getKwh(), EContractAddress.KWH);
         }
-        if (balance.getEur().doubleValue() != 0.0d) {
+        if (!balance.getEur().equals(BigDecimal.ZERO)) {
             api.burn(balance.getEur(), EContractAddress.EUR);
         }
         LOG.info("After cleaning {}", api.balance());

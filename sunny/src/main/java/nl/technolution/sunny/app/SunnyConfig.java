@@ -36,33 +36,43 @@ import nl.technolution.dropwizard.webservice.JacksonFactory;
  */
 public class SunnyConfig extends FritzyAppConfig {
 
+    /** EFI id of the device */
     @JsonProperty("deviceId")
     private String deviceId;
 
+    /** offset in euro cent used at the start of the negation. First bid will be marketprice + offset. */
     @JsonProperty("marketPriceStartOffset")
     private double marketPriceStartOffset;
 
-    @JsonProperty("useStub")
-    private boolean useStub;
+    /** use stub instead of inverter */
+    @JsonProperty("useSolarEdgeStub")
+    private boolean useSolarEdgeStub;
 
+    /** base URL to SolarEdge monitoring portal. Used to retrieve hourly values which are needed by pvCast */
     @JsonProperty("solarEdgeMonitoringBaseURL")
     private String solarEdgeMonitoringBaseURL;
 
+    /** API key for SolarEdge monitoring portal. */
     @JsonProperty("solarEdgeMonitoringApikey")
     private String solarEdgeMonitoringApikey;
 
+    /** base URL to pvCast. pvCast supplies the forecasts so Sunny 'knows' how much energy it has to offer */
     @JsonProperty("pvCastBaseURL")
     private String pvCastBaseURL;
 
+    /** API key for pvCast. */
     @JsonProperty("pvCastApiKey")
     private Object pvCastApiKey;
 
+    /** IP address of the SolarEdge inverter */
     @JsonProperty("solarEdgeModbusIpAddress")
     private String solarEdgeModbusIpAddress;
 
+    /** modbus port of the SolarEdge inverter */
     @JsonProperty("solarEdgeModbusPort")
     private int solarEdgeModbusPort;
 
+    /** modbus device id of the SolarEdge inverter */
     @JsonProperty("solarEdgeModbusDeviceId")
     private int solarEdgeModbusDeviceId;
 
@@ -82,7 +92,7 @@ public class SunnyConfig extends FritzyAppConfig {
         MarketConfig market = new MarketConfig(false, "http://82.196.13.251/api", "sunny@fritzy.nl", "sunny");
         c.setMarket(market);
         c.marketPriceStartOffset = 1;
-        c.useStub = false;
+        c.useSolarEdgeStub = false;
         c.solarEdgeMonitoringBaseURL = "https://monitoringapi.solaredge.com/site/529405";
         c.solarEdgeMonitoringApikey = "JRK97634IPJD9ABBG4MFACJVZGLK4NUN";
         c.pvCastBaseURL = "https://api.pvcast.de/plants/908";
@@ -115,12 +125,12 @@ public class SunnyConfig extends FritzyAppConfig {
         this.marketPriceStartOffset = marketPriceStartOffset;
     }
 
-    public boolean isUseStub() {
-        return useStub;
+    public boolean isUseSolarEdgeStub() {
+        return useSolarEdgeStub;
     }
 
-    public void setUseStub(boolean useStub) {
-        this.useStub = useStub;
+    public void setUseSolarEdgeStub(boolean useSolarEdgeStub) {
+        this.useSolarEdgeStub = useSolarEdgeStub;
     }
 
     public String getSolarEdgeMonitoringBaseURL() {

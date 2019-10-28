@@ -19,7 +19,7 @@ dependencies {
     compile libraries.dropwizard
 	compile files(generateIec62325Lib.outputLib)
     compile project(':common');
-    compile project(':marketnegotiator');
+    compile project(':devicecontroller');
 	
 	testImplementation libraries.mockserver_netty
 	

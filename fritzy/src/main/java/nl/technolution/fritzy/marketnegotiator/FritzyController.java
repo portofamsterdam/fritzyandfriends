@@ -59,7 +59,7 @@ public class FritzyController {
         try {
             return Services.get(IIoFactory.class).getWebRelay().getState().isRelaystate();
         } catch (IOException e) {
-            LOG.error("Error powering off fritzy:", e);
+            LOG.error("Error at getState:", e);
         }
         return null;
     }

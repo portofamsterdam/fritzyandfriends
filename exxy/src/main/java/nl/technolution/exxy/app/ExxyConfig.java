@@ -17,6 +17,7 @@
 package nl.technolution.exxy.app;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
@@ -33,7 +34,6 @@ import nl.technolution.apis.ApiConfig;
 import nl.technolution.apis.ApiConfigRecord;
 import nl.technolution.apis.EApiNames;
 import nl.technolution.dropwizard.FritzyAppConfig;
-import nl.technolution.dropwizard.MarketConfig;
 import nl.technolution.dropwizard.webservice.JacksonFactory;
 
 /**
@@ -41,13 +41,11 @@ import nl.technolution.dropwizard.webservice.JacksonFactory;
  */
 public class ExxyConfig extends FritzyAppConfig {
 
+    /** EFI devide id */
     @JsonProperty("deviceId")
     private String deviceId;
 
-    /**
-     * Base URL for the ENTSO-E API: https://transparency.entsoe.eu/api
-     * 
-     */
+    /** Base URL for the ENTSO-E API: https://transparency.entsoe.eu/api */
     @JsonProperty("baseURL")
     private String baseURL;
 
@@ -57,52 +55,38 @@ public class ExxyConfig extends FritzyAppConfig {
      * NOTE: This is a person bound token, every user of this code should obtain their own access token! See
      * https://transparency.entsoe.eu/content/static_content/Static%20content/web%20api/Guide.html
      * #_authentication_and_authorisation
-     * 
      */
     @JsonProperty("securityToken")
     private String securityToken;
 
-    /**
-     * How much kWh can exxy sell in a trade period
-     */
+    /** How much kWh can exxy sell in a trade period, currently not implemented */
     @JsonProperty("capacity")
     private int capacity;
 
     /**
      * Map with fixed prices in EUR per kWh for every hour of the day (local time). Hours > 23 are ignored. When
      * {@link useFixedPrices} is true these fixed prices are used instead of the live day ahead prices.
-     *
      */
     @JsonProperty("fixedPrices")
     private Map<Integer, Double> fixedPrices;
 
-    /**
-     * When true the prices from {@link fixedPrices} are used instead of the live day ahead prices.
-     *
-     */
+    /** When true the prices from {@link fixedPrices} are used instead of the live day ahead prices. */
     @JsonProperty("useFixedPrices")
     private boolean useFixedPrices;
 
-    /**
-     * MArket properties
-     */
-    @JsonProperty("market")
-    private MarketConfig market;
-
+    /** For each size in the given list an order to buy and sell is created. */
+    @JsonProperty("orderSizes")
+    private List<Double> orderSizes;
 
     @JsonCreator
-    public ExxyConfig(@JsonProperty("baseURL") String baseURL, 
-            @JsonProperty("securityToken") String securityToken,
-            @JsonProperty("capacity") int capacity,
-            @JsonProperty("fixedPrices") Map<Integer, Double> fixedPrices,
-            @JsonProperty("useFixedPrices") boolean useFixedPrices,
-            @JsonProperty("market") MarketConfig market) {
+    public ExxyConfig(@JsonProperty("baseURL") String baseURL, @JsonProperty("securityToken") String securityToken,
+            @JsonProperty("capacity") int capacity, @JsonProperty("fixedPrices") Map<Integer, Double> fixedPrices,
+            @JsonProperty("useFixedPrices") boolean useFixedPrices) {
         this.baseURL = baseURL;
         this.securityToken = securityToken;
         this.capacity = capacity;
         this.fixedPrices = fixedPrices;
         this.useFixedPrices = useFixedPrices;
-        this.market = market;
         validateConfig();
     }
 
@@ -158,13 +142,12 @@ public class ExxyConfig extends FritzyAppConfig {
         c.fixedPrices.put(22, 0.23d);
         c.fixedPrices.put(23, 0.24d);
 
-        MarketConfig market = new MarketConfig(false, "http://82.196.13.251/api", "exxy@fritzy.nl", "exxy");
-        c.setMarket(market);
-
         ApiConfig apiConfig = new ApiConfig();
         ApiConfigRecord netty = new ApiConfigRecord(EApiNames.NETTY.getName(), "http://netty:8080/", 5000, 5000);
         apiConfig.setApis(Lists.newArrayList(netty));
         c.setApiConfig(apiConfig);
+
+        c.orderSizes = Lists.newArrayList(0.1d, 0.5d, 1d);
 
         mapper.writerWithDefaultPrettyPrinter().writeValue(System.out, c);
     }
@@ -202,4 +185,19 @@ public class ExxyConfig extends FritzyAppConfig {
         return useFixedPrices;
     }
 
+    public List<Double> getOrderSizes() {
+        return orderSizes;
+    }
+
+    public void setOrderSizes(List<Double> orderSizes) {
+        this.orderSizes = orderSizes;
+    }
+
+    public void setFixedPrices(Map<Integer, Double> fixedPrices) {
+        this.fixedPrices = fixedPrices;
+    }
+
+    public void setUseFixedPrices(boolean useFixedPrices) {
+        this.useFixedPrices = useFixedPrices;
+    }
 }

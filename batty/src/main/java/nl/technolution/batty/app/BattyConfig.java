@@ -36,44 +36,44 @@ import nl.technolution.dropwizard.webservice.JacksonFactory;
  */
 public class BattyConfig extends FritzyAppConfig {
 
+    /** EFI id of the device */
     @JsonProperty("deviceId")
     private String deviceId;
 
-    /** host address of battery */
+    /** host address of XStorage battery */
     @JsonProperty("host")
     private String host;
 
-    /** API username */
+    /** XStorage API username */
     @JsonProperty("username")
     private String username;
 
-    /** API password */
+    /** XStorage API password */
     @JsonProperty("password")
     private String password;
 
-    /** API password */
+    /** truststore for https connection to XStorage */
     @JsonProperty("truststore")
     private String truststore;
 
-    /** API password */
+    /** truststore password */
     @JsonProperty("truststorepass")
     private String truststorepass;
 
+    /** buy margin in cents */
     @JsonProperty("buyMargin")
     private int buyMargin;
 
+    /** sell margin in cents */
     @JsonProperty("sellMargin")
     private int sellMargin;
 
-    @JsonProperty("capactity")
-    private double capacity;
-
-
+    /** run application with stubbed battery */
     @JsonProperty("useStub")
     private boolean useStub;
 
     /**
-     * Generate exxy config
+     * Generate sample batty config
      * 
      * @param args none
      * @throws IOException
@@ -94,7 +94,6 @@ public class BattyConfig extends FritzyAppConfig {
         c.truststorepass = "12345678";
         c.buyMargin = 2;
         c.sellMargin = 2;
-        c.capacity = 4.6d;
         c.useStub = false;
 
         MarketConfig market = new MarketConfig(false, "http://82.196.13.251/api", "batty@fritzy.nl", "batty");
@@ -179,14 +178,6 @@ public class BattyConfig extends FritzyAppConfig {
 
     public void setUseStub(boolean useStub) {
         this.useStub = useStub;
-    }
-
-    public double getCapactity() {
-        return capacity;
-    }
-
-    public void setCapactity(double capactity) {
-        this.capacity = capactity;
     }
 }
 

@@ -38,6 +38,10 @@ import nl.technolution.dropwizard.webservice.RSJacksonProvider;
  */
 public final class ApiEndpoints {
 
+    private ApiEndpoints() {
+        // hide constructor
+    }
+
     /**
      * Register all API's
      * 

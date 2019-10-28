@@ -52,9 +52,9 @@ public class FritzyResourceManager implements IResourceManager {
 
     private DeviceId deviceId;
 
-    public FritzyResourceManager(FritzyConfig config) {
+    public FritzyResourceManager(FritzyConfig config, FritzyController controller) {
         this.helper = new FritzyResourceHelper(config);
-        this.controller = new FritzyController();
+        this.controller = controller;
         this.config = config;
         deviceId = new DeviceId(config.getDeviceId());
     }

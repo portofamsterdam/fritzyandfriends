@@ -23,8 +23,6 @@ import java.util.Arrays;
  */
 public enum EBattyInstruction {
 
-    IDLE(0),
-
     CHARGE(1),
 
     DISCHARGE(2);

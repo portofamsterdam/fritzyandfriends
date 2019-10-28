@@ -9,7 +9,6 @@
   "truststorepass" : "12345678",
   "buyMargin" : 2,
   "sellMargin" : 2,
-  "capacity" : 4.6,
   "useStub" : false,
   
   
@@ -28,7 +27,7 @@
   },
   "market" : {
     "useStub" : false,
-    "marketUrl" : "http://82.196.13.251/api",
+    "marketUrl" : "http://api:8088/api",
     "email" : "batty@fritzy.nl",
     "password" : "batty"
   }

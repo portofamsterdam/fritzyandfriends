@@ -27,12 +27,11 @@ import com.google.common.base.Preconditions;
 
 import org.slf4j.Logger;
 
+import io.dropwizard.lifecycle.Managed;
 import nl.technolution.Log;
 import nl.technolution.dropwizard.FritzyDropWizardApp;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.services.TypeFinder;
-
-import io.dropwizard.lifecycle.Managed;
 
 /**
  * Manages task with @Timed annotation
@@ -67,7 +66,8 @@ public final class TimedTaskService implements Managed {
                             .plus(1, unit)
                             .plus(timedTaskAnnotation.offset(), convert(timedTaskAnnotation.offsetUnit())),
                             ChronoUnit.MILLIS);
-            long periodMs = timedTaskAnnotation.period() * unit.getDuration().toMillis();
+
+            long periodMs = timedTaskAnnotation.period() * (unit != null ? unit.getDuration().toMillis() : 1L);
 
             // Find the implementation of ITask to run and register
             Class taskInterface = null;
@@ -80,7 +80,7 @@ public final class TimedTaskService implements Managed {
             Preconditions.checkNotNull(taskInterface, "TimedTask does not implement ITaskRunner");
 
             // Build an instance to run in scheduler
-            Class<? extends ITaskRunner> typedClazz = (Class<? extends ITaskRunner>)timedTaskAnnotatedClass;
+            Class<? extends ITaskRunner> typedClazz = timedTaskAnnotatedClass;
             ITaskRunner task = typedClazz.newInstance();
             executor.scheduleAtFixedRate(new SafeTaskRunnable(task), delay, periodMs, TimeUnit.MILLISECONDS);
             LOG.info("Starting task {} in {} seconds", typedClazz.getSimpleName(), delay / 1000);
@@ -123,7 +123,7 @@ public final class TimedTaskService implements Managed {
         }
     }
 
-    private final class SafeTaskRunnable implements Runnable {
+    private static final class SafeTaskRunnable implements Runnable {
         private final ITaskRunner task;
 
         private SafeTaskRunnable(ITaskRunner task) {
