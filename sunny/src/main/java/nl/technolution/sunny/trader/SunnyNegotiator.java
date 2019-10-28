@@ -46,7 +46,6 @@ import nl.technolution.protocols.efi.InflexibleForecast;
 import nl.technolution.protocols.efi.InflexibleRegistration;
 import nl.technolution.protocols.efi.InflexibleUpdate;
 import nl.technolution.protocols.efi.Instruction;
-import nl.technolution.protocols.efi.Measurement;
 import nl.technolution.protocols.efi.StorageInstruction;
 import nl.technolution.protocols.efi.util.AbstractCustomerEnergyManager;
 import nl.technolution.protocols.efi.util.Efi;
@@ -257,11 +256,5 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
         }
         // Curtailment is not possible so instruction is always empty
         return Efi.build(StorageInstruction.class, getDeviceId());
-    }
-
-    @Override
-    public void measurement(Measurement measurement) {
-        getMarket().log(EEventType.DEVICE_STATE,
-                "Generating power: " + measurement.getElectricityMeasurement().getPower() + "W", null);
     }
 }
