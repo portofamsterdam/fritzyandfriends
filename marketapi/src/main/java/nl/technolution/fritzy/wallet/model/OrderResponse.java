@@ -16,22 +16,25 @@
  */
 package nl.technolution.fritzy.wallet.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * response object for order() call on fritzy api
  */
 public class OrderResponse {
 
-    private MetaDataOrder metaDataOrder;
+    @JsonProperty("order")
+    private MetaDataOrder order;
 
     public MetaDataOrder getMetaDataOrder() {
-        return metaDataOrder;
+        return order;
     }
 
     public void setMetaDataOrder(MetaDataOrder order) {
-        this.metaDataOrder = order;
+        this.order = order;
     }
 
     public String getTakerAddress() {
-        return metaDataOrder.getHashlessOrder().getTakerAddress();
+        return order.getHashlessOrder().getTakerAddress();
     }
 }

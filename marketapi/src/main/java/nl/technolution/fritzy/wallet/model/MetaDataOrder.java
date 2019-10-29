@@ -16,21 +16,25 @@
  */
 package nl.technolution.fritzy.wallet.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 /**
  * Order with meta data information
  */
 public class MetaDataOrder {
 
+    @JsonProperty("metaData")
     private MetaData metaData;
 
-    private HashlessOrder hashlessOrder;
+    @JsonProperty("order")
+    private HashlessOrder order;
 
     public HashlessOrder getHashlessOrder() {
-        return hashlessOrder;
+        return order;
     }
 
     public void setHashlessOrder(HashlessOrder order) {
-        this.hashlessOrder = order;
+        this.order = order;
     }
 
     public MetaData getMetaData() {
