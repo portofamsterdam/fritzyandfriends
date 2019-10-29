@@ -25,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Uninterruptibles;
 
 import org.slf4j.Logger;
@@ -60,11 +59,11 @@ public class FritzyApiTool {
         String url = "http://192.168.8.242/api";
         api = new FritzyApi(url, "FritzyApiTool");
 
-        // api.register(USER1, USER1, PASS);
+        // api.register(ADMIN, ADMIN, ADMINPASS);
 
         // api.register(USER2, USER2, PASS);
 
-        setMinters(ADMIN, ADMINPASS, Lists.newArrayList(USER1, USER2));
+        // setMinters(ADMIN, ADMINPASS, Lists.newArrayList(USER1, USER2));
         resetUser(USER1, PASS);
         resetUser(USER2, PASS);
 
@@ -91,6 +90,8 @@ public class FritzyApiTool {
                 .findFirst()
                 .orElseThrow(AssertionError::new);
         LOG.debug("Found order {}", order.getHash());
+        WebOrder orderByHash = api.order(order.getHash());
+        LOG.debug("Found order again {}", orderByHash);
         
         api.login(USER2, PASS);
         String user2Address = api.getAddress();

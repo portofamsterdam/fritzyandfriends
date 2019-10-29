@@ -54,7 +54,6 @@ import nl.technolution.fritzy.wallet.order.Record;
  */
 public final class FritzyApiStub implements IFritzyApi {
 
-
     private static FritzyApiStub stubbedApi;
 
     private final ObjectMapper mapper = JacksonFactory.defaultMapper();
@@ -179,7 +178,7 @@ public final class FritzyApiStub implements IFritzyApi {
 
         log.debug("{} gives {}{}", loginInUser.getEmail(), takerGive, order.getMakerAssetData());
         decr(EContractAddress.valueOf(order.getTakerAssetData().toUpperCase()), takerGet, order.getTakerAddress());
-        
+
         log.debug("{} gets  {}{}", loginInUser.getEmail(), takerGet, order.getTakerAssetData());
         incr(EContractAddress.valueOf(order.getMakerAssetData().toUpperCase()), takerGive, order.getTakerAddress());
 
@@ -190,7 +189,6 @@ public final class FritzyApiStub implements IFritzyApi {
         decr(EContractAddress.valueOf(order.getMakerAssetData().toUpperCase()), makerGet, order.getMakerAddress());
         log.debug("{} gives {}{}", otherUser, makerGive, order.getTakerAssetData());
         incr(EContractAddress.valueOf(order.getTakerAssetData().toUpperCase()), makerGive, order.getMakerAddress());
-        
 
         return generateHash(Objects.hash(orderHash));
     }
@@ -239,7 +237,6 @@ public final class FritzyApiStub implements IFritzyApi {
         }
     }
 
-
     @Override
     public void cancelOrder(String hash) {
         log.debug("cancelOrder {}", hash);
@@ -252,7 +249,6 @@ public final class FritzyApiStub implements IFritzyApi {
         }
         orders.setRecords(ordersList.toArray(new Record[ordersList.size()]));
     }
-
 
     @Override
     public void log(EEventType tag, String msg, String dataStr) {

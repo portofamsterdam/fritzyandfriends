@@ -47,6 +47,8 @@ import nl.technolution.fritzy.wallet.model.Balance;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.model.GetEventResponse;
+import nl.technolution.fritzy.wallet.model.HashlessOrder;
+import nl.technolution.fritzy.wallet.model.OrderResponse;
 import nl.technolution.fritzy.wallet.order.CreateOrderResponse;
 import nl.technolution.fritzy.wallet.order.FillOrderResponse;
 import nl.technolution.fritzy.wallet.order.GetOrdersResponse;
@@ -154,8 +156,9 @@ public class FritzyApi implements IFritzyApi {
         Response response = request.get();
         if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
             LOG.warn("orders() failed: {}", response);
+            throw new IllegalStateException("orders() failed");
         }
-        return request.get(GetOrdersResponse.class);
+        return response.readEntity(GetOrdersResponse.class);
     }
 
     /**
@@ -170,7 +173,13 @@ public class FritzyApi implements IFritzyApi {
         WebTarget target = client.target(url + "/order/" + orderHash);
         Builder request = target.request();
         request.header("Authorization", "Bearer " + accessToken);
-        return request.get(WebOrder.class);
+        Response response = request.get();
+        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
+            LOG.warn("order({}) failed: {}", orderHash, response);
+            throw new IllegalStateException("order() failed");
+        }
+        OrderResponse ordercontainer = response.readEntity(OrderResponse.class);
+        return convert(ordercontainer, orderHash);
     }
 
     /**
@@ -188,10 +197,9 @@ public class FritzyApi implements IFritzyApi {
         request.header("Authorization", "Bearer " + accessToken);
         Response response = request.post(Entity.json(null));
 
-        // LOG.debug("Response: " + response.readEntity(String.class));
-
         if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
             LOG.warn("createOrder failed(): " + response);
+            throw new IllegalStateException("fillOrder() failed");
         }
         return response.readEntity(FillOrderResponse.class).getTransactionHash();
     }
@@ -212,6 +220,7 @@ public class FritzyApi implements IFritzyApi {
         Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
         if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
             LOG.warn("createOrder failed(): " + response);
+            throw new IllegalStateException("createOrder() failed");
         }
         return response.readEntity(CreateOrderResponse.class).getOrder().getHash();
     }
@@ -230,6 +239,7 @@ public class FritzyApi implements IFritzyApi {
         Response response = request.post(Entity.json(null));
         if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
             LOG.warn("cancelOrder failed: " + response);
+            throw new IllegalStateException("cancelOrder() failed");
         }
     }
 
@@ -372,4 +382,24 @@ public class FritzyApi implements IFritzyApi {
         return response.readEntity(GetEventResponse.class);
     }
 
+    static WebOrder convert(OrderResponse singleOrder, String hash) {
+        WebOrder o = new WebOrder();
+        HashlessOrder hashlessOrder = singleOrder.getMetaDataOrder().getHashlessOrder();
+        o.setHash(hash);
+        o.setSignature(hashlessOrder.getSignature());
+        o.setSenderAddress(hashlessOrder.getSenderAddress());
+        o.setMakerAddress(hashlessOrder.getMakerAddress());
+        o.setTakerAddress(hashlessOrder.getTakerAddress());
+        o.setMakerFee(hashlessOrder.getMakerFee());
+        o.setTakerFee(hashlessOrder.getTakerFee());
+        o.setMakerAssetAmount(hashlessOrder.getMakerAssetAmount());
+        o.setTakerAssetAmount(hashlessOrder.getTakerAssetAmount());
+        o.setMakerAssetData(hashlessOrder.getMakerAssetData());
+        o.setTakerAssetData(hashlessOrder.getTakerAssetData());
+        o.setSalt(hashlessOrder.getSalt());
+        o.setExchangeAddress(hashlessOrder.getExchangeAddress());
+        o.setFeeRecipientAddress(hashlessOrder.getFeeRecipientAddress());
+        o.setExpirationTimeSeconds(hashlessOrder.getExpirationTimeSeconds());
+        return o;
+    }
 }
