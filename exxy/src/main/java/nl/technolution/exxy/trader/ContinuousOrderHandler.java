@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import nl.technolution.Log;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.fritzy.gen.model.WebOrder;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
@@ -51,8 +52,10 @@ public final class ContinuousOrderHandler {
 
     /**
      * Check an order
+     * 
+     * @throws FritzyApiException
      */
-    public void check() {
+    public void check() throws FritzyApiException {
         if (pricePerkWh == null) {
             log.warn("Waiting for price");
             return;
@@ -78,7 +81,7 @@ public final class ContinuousOrderHandler {
         }
     }
 
-    private String createOrder(IFritzyApi market) {
+    private String createOrder(IFritzyApi market) throws FritzyApiException {
         BigDecimal kwhsToSell = BigDecimal.valueOf(kwh);
         BigDecimal pricePerkWhBd = kwhsToSell.multiply(BigDecimal.valueOf(pricePerkWh));
         switch (trade) {
@@ -99,8 +102,9 @@ public final class ContinuousOrderHandler {
 
     /**
      * @param pricePerkWh
+     * @throws FritzyApiException
      */
-    public void changePerkWh(Double pricePerkWh) {
+    public void changePerkWh(Double pricePerkWh) throws FritzyApiException {
         this.pricePerkWh = pricePerkWh;
         if (activeOrderHash != null) {
             Services.get(IFritzyApiFactory.class).build().cancelOrder(activeOrderHash);

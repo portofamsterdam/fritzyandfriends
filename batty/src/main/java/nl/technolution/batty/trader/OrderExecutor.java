@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import nl.technolution.Log;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.fritzy.gen.model.WebOrder;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
@@ -67,9 +68,10 @@ public class OrderExecutor {
      * @param system batty
      * @param resourceManager controller
      * @return true if order is still relevant
+     * @throws FritzyApiException
      */
     public EOrderCommand evaluate(BattyResourceManager resourceManager, StorageSystemDescription system,
-            double fillLevel) {
+            double fillLevel) throws FritzyApiException {
         log.info("Processing order state {}", orderHash);
         IFritzyApi market = Services.get(IFritzyApiFactory.class).build();
         WebOrder order = market.order(orderHash);

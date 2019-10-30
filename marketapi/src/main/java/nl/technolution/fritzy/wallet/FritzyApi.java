@@ -85,7 +85,7 @@ public class FritzyApi implements IFritzyApi {
      * @param password of login
      */
     @Override
-    public void login(String user, String password) {
+    public void login(String user, String password) throws FritzyApiException {
         LOG.info("Login user {}", user);
         WebTarget target = client.target(url + "/login");
         Builder request = target.request();
@@ -93,10 +93,7 @@ public class FritzyApi implements IFritzyApi {
         loginParameters.setEmail(user);
         loginParameters.setPassword(password);
         Response response = request.post(Entity.entity(loginParameters, MediaType.APPLICATION_JSON));
-        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
-            LOG.error("login failed: {}", response);
-            throw new IllegalStateException("Unable to login as " + user);
-        }
+        FritzyApiException.checkResponse(response);
         LoginResponse login = response.readEntity(LoginResponse.class);
         this.address = login.getUser().getAddress();
         this.actor = login.getUser().getName();
@@ -105,12 +102,13 @@ public class FritzyApi implements IFritzyApi {
     }
 
     /**
-     * @param email
-     * @param user
-     * @param password
+     * @param email of user
+     * @param user name
+     * @param password pw
+     * @throws FritzyApiException when registration fails
      */
     @Override
-    public WebUser register(String email, String user, String password) {
+    public WebUser register(String email, String user, String password) throws FritzyApiException {
         LOG.info("Register user {} ({})", email, user);
         WebTarget target = client.target(url + "/register");
         Builder request = target.request();
@@ -119,14 +117,14 @@ public class FritzyApi implements IFritzyApi {
         registerParameters.setEmail(email);
         registerParameters.setName(user);
         registerParameters.setPassword(password);
-        String post = request.post(Entity.entity(registerParameters, MediaType.APPLICATION_JSON), String.class);
-        System.out.println(post);
+        Response response = request.post(Entity.entity(registerParameters, MediaType.APPLICATION_JSON));
+        FritzyApiException.checkResponse(response);
         return null;
     }
 
 
     @Override
-    public void addMinter(String address, EContractAddress contractAddress) {
+    public void addMinter(String address, EContractAddress contractAddress) throws FritzyApiException {
         LOG.info("Adding minter {}", address);
         WebTarget target = client.target(url + "/node/addMinter");
         Builder request = target.request();
@@ -135,29 +133,24 @@ public class FritzyApi implements IFritzyApi {
         form.param("address", address);
         form.param("contractAddress", contractAddress.getContractName());
         Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
-        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
-            LOG.error("add minter failed: {}", response);
-            throw new IllegalStateException("Unable to add minter " + address);
-        }
+        FritzyApiException.checkResponse(response);
     }
 
     /**
      * Get all orders
      * 
      * @return
+     * @throws FritzyApiException
      */
     @Override
-    public GetOrdersResponse orders() {
+    public GetOrdersResponse orders() throws FritzyApiException {
         LOG.info("Fetching Orders");
         Preconditions.checkArgument(accessToken != null, "login first");
         WebTarget target = client.target(url + "/orders");
         Builder request = target.request();
         request.header("Authorization", "Bearer " + accessToken);
         Response response = request.get();
-        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
-            LOG.warn("orders() failed: {}", response);
-            throw new IllegalStateException("orders() failed");
-        }
+        FritzyApiException.checkResponse(response);
         return response.readEntity(GetOrdersResponse.class);
     }
 
@@ -165,19 +158,17 @@ public class FritzyApi implements IFritzyApi {
      * Get an order
      * 
      * @return
+     * @throws FritzyApiException
      */
     @Override
-    public WebOrder order(String orderHash) {
+    public WebOrder order(String orderHash) throws FritzyApiException {
         LOG.info("Fetching order {}", orderHash);
         Preconditions.checkArgument(accessToken != null, "login first");
         WebTarget target = client.target(url + "/order/" + orderHash);
         Builder request = target.request();
         request.header("Authorization", "Bearer " + accessToken);
         Response response = request.get();
-        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
-            LOG.warn("order({}) failed: {}", orderHash, response);
-            throw new IllegalStateException("order() failed");
-        }
+        FritzyApiException.checkResponse(response);
         OrderResponse ordercontainer = response.readEntity(OrderResponse.class);
         return convert(ordercontainer, orderHash);
     }
@@ -185,11 +176,12 @@ public class FritzyApi implements IFritzyApi {
     /**
      * Fill order by hash
      * 
-     * @param orderHash
+     * @param orderHash of order to fill
      * @return hash of order
+     * @throws FritzyApiException
      */
     @Override
-    public String fillOrder(String orderHash) {
+    public String fillOrder(String orderHash) throws FritzyApiException {
         Preconditions.checkArgument(accessToken != null, "login first");
         LOG.info("Filling order {} by {}", orderHash, actor);
         WebTarget target = client.target(url + "/me/order/" + orderHash);
@@ -197,16 +189,13 @@ public class FritzyApi implements IFritzyApi {
         request.header("Authorization", "Bearer " + accessToken);
         Response response = request.post(Entity.json(null));
 
-        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
-            LOG.warn("createOrder failed(): " + response);
-            throw new IllegalStateException("fillOrder() failed");
-        }
+        FritzyApiException.checkResponse(response);
         return response.readEntity(FillOrderResponse.class).getTransactionHash();
     }
 
     @Override
     public String createOrder(EContractAddress makerToken, EContractAddress takerToken, BigDecimal makerAmount,
-            BigDecimal takerAmount) {
+            BigDecimal takerAmount) throws FritzyApiException {
         Preconditions.checkArgument(accessToken != null, "login first");
         LOG.info("Creating order {} {} for {} {} by {}", makerAmount, makerToken, takerAmount, takerToken, actor);
         WebTarget target = client.target(url + "/me/order");
@@ -218,18 +207,16 @@ public class FritzyApi implements IFritzyApi {
         form.param("makerAmount", makerAmount.multiply(TOKEN_FACTOR).toBigInteger().toString());
         form.param("takerAmount", takerAmount.multiply(TOKEN_FACTOR).toBigInteger().toString());
         Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
-        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
-            LOG.warn("createOrder failed(): " + response);
-            throw new IllegalStateException("createOrder() failed");
-        }
+        FritzyApiException.checkResponse(response);
         return response.readEntity(CreateOrderResponse.class).getOrder().getHash();
     }
 
     /**
      * @param hash
+     * @throws FritzyApiException
      */
     @Override
-    public void cancelOrder(String hash) {
+    public void cancelOrder(String hash) throws FritzyApiException {
         Preconditions.checkArgument(accessToken != null, "login first");
         LOG.info("Cancel order {} by {}", hash, actor);
         WebTarget target = client.target(url + "/me/order/" + hash + "/cancel");
@@ -237,25 +224,25 @@ public class FritzyApi implements IFritzyApi {
         request.header("Authorization", "Bearer " + accessToken);
 
         Response response = request.post(Entity.json(null));
-        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
-            LOG.warn("cancelOrder failed: " + response);
-            throw new IllegalStateException("cancelOrder() failed");
-        }
+        FritzyApiException.checkResponse(response);
     }
 
     /**
      * Get balance
      * 
      * @return balance
+     * @throws FritzyApiException
      */
     @Override
-    public FritzyBalance balance() {
+    public FritzyBalance balance() throws FritzyApiException {
         Preconditions.checkArgument(accessToken != null, "login first");
         LOG.info("Fetching balance of {}", actor);
         WebTarget target = client.target(url + "/me/balance");
         Builder request = target.request();
         request.header("Authorization", "Bearer " + accessToken);
-        return request.get(Balance.class).getBalance();
+        Response response = request.get();
+        FritzyApiException.checkResponse(response);
+        return response.readEntity(Balance.class).getBalance();
     }
 
     /**
@@ -263,9 +250,10 @@ public class FritzyApi implements IFritzyApi {
      * 
      * @param address to send value to
      * @param value to mint
+     * @throws FritzyApiException
      */
     @Override
-    public void mint(String address, BigDecimal value, EContractAddress contractAddress) {
+    public void mint(String address, BigDecimal value, EContractAddress contractAddress) throws FritzyApiException {
         Preconditions.checkArgument(accessToken != null, "login first");
         BigDecimal tokens = value.multiply(TOKEN_FACTOR);
         LOG.info("Minting {} {} to {} tokens: {}", value, contractAddress, actor, tokens);
@@ -278,14 +266,12 @@ public class FritzyApi implements IFritzyApi {
         form.param("value", "" + tokens.toBigInteger().toString());
         form.param("contractAddress", contractAddress.getContractName());
         Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
-        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
-            LOG.warn("mint() failed: {}", response);
-        }
+        FritzyApiException.checkResponse(response);
     }
 
 
     @Override
-    public void burn(BigDecimal value, EContractAddress contractAddress) {
+    public void burn(BigDecimal value, EContractAddress contractAddress) throws FritzyApiException {
         Preconditions.checkArgument(accessToken != null, "login first");
         LOG.info("{} is burning {} {}", actor, value, contractAddress.getContractName());
         WebTarget target = client.target(url + "/me/token/burn");
@@ -295,13 +281,12 @@ public class FritzyApi implements IFritzyApi {
         form.param("value", "" + value.multiply(TOKEN_FACTOR).toBigInteger());
         form.param("contractAddress", contractAddress.getContractName());
         Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
-        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
-            LOG.warn("burn failed: {}", response);
-        }
+        FritzyApiException.checkResponse(response);
     }
 
     @Override
-    public String transfer(BigDecimal value, EContractAddress contractAddress, String toAddress) {
+    public String transfer(BigDecimal value, EContractAddress contractAddress, String toAddress)
+            throws FritzyApiException {
         Preconditions.checkArgument(accessToken != null, "login first");
         LOG.info("{} is tranfering {} {} to {}", actor, value, contractAddress.getContractName(), toAddress);
         WebTarget target = client.target(url + "/me/token/transfer");
@@ -312,9 +297,7 @@ public class FritzyApi implements IFritzyApi {
         form.param("value", "" + value.multiply(TOKEN_FACTOR).toBigInteger());
         form.param("contractAddress", contractAddress.getContractName());
         Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
-        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
-            LOG.warn("transfer failed: {}", response);
-        }
+        FritzyApiException.checkResponse(response);
         return response.readEntity(WebTransaction.class).getTx();
     }
 
@@ -322,22 +305,26 @@ public class FritzyApi implements IFritzyApi {
      * Get users
      * 
      * @return all users
+     * @throws FritzyApiException
      */
     @Override
-    public WebUser[] getUsers() {
+    public WebUser[] getUsers() throws FritzyApiException {
         LOG.info("Fetching all users");
         WebTarget target = client.target(url + "/users");
         Builder request = target.request();
-        return request.get(WebUser[].class);
+        Response response = request.get();
+        FritzyApiException.checkResponse(response);
+        return response.readEntity(WebUser[].class);
     }
 
     /**
-     * @param tag
-     * @param msg
-     * @param data
+     * @param tag of event
+     * @param msg information about event
+     * @param data json object with actor specific information
+     * @throws FritzyApiException
      */
     @Override
-    public void log(EEventType tag, String msg, String dataString) {
+    public void log(EEventType tag, String msg, String dataString) throws FritzyApiException {
         LOG.info("Logging event {}: {}", tag, msg != null ? msg : "");
         WebTarget target = client.target(url + "/event");
         Builder request = target.request();
@@ -353,9 +340,7 @@ public class FritzyApi implements IFritzyApi {
         form.param("roundId", "" + roundId);
         form.param("data", dataString);
         Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
-        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
-            LOG.warn("log event failed: {}", response);
-        }
+        FritzyApiException.checkResponse(response);
     }
 
     @Override
@@ -364,7 +349,7 @@ public class FritzyApi implements IFritzyApi {
     }
 
     @Override
-    public GetEventResponse getEvents(Instant from, Instant to) {
+    public GetEventResponse getEvents(Instant from, Instant to) throws FritzyApiException {
         LOG.info("Getting events from {} till {}", from, to);
 
         DateTimeFormatter fromatter = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
@@ -375,14 +360,11 @@ public class FritzyApi implements IFritzyApi {
 
         Builder request = target.request();
         Response response = request.get();
-        if (!response.getStatusInfo().getFamily().equals(Response.Status.Family.SUCCESSFUL)) {
-            LOG.error("log event failed: {}", response);
-            return null;
-        }
+        FritzyApiException.checkResponse(response);
         return response.readEntity(GetEventResponse.class);
     }
 
-    static WebOrder convert(OrderResponse singleOrder, String hash) {
+    private static WebOrder convert(OrderResponse singleOrder, String hash) {
         WebOrder o = new WebOrder();
         HashlessOrder hashlessOrder = singleOrder.getMetaDataOrder().getHashlessOrder();
         o.setHash(hash);

@@ -21,6 +21,7 @@ import org.slf4j.Logger;
 import nl.technolution.Log;
 import nl.technolution.dashboard.EEventType;
 import nl.technolution.fritzy.wallet.FritzyApi;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 
 /**
  * 
@@ -36,8 +37,9 @@ public class FritzyApiTester {
 
     /**
      * @param args
+     * @throws FritzyApiException
      */
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FritzyApiException {
 
         String url = "http://82.196.13.251/api";
         api = new FritzyApi(url, "FritzyApiTool");

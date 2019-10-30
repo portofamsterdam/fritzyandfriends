@@ -34,6 +34,7 @@ import nl.technolution.dashboard.EEventType;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.webservice.Endpoints;
 import nl.technolution.fritzy.gen.model.WebOrder;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
 import nl.technolution.fritzy.wallet.event.EventLogger;
@@ -90,8 +91,10 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
     /**
      * Call periodically to evaluate market changes
      * 
+     * @throws FritzyApiException
+     * 
      */
-    public void evaluate() {
+    public void evaluate() throws FritzyApiException {
         if (forecast == null) {
             throw new IllegalStateException("No forecast available yet");
         }
@@ -177,7 +180,8 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
     }
 
     @VisibleForTesting
-    public static void createNewOrders(IFritzyApi market, double availableKWh, double myPrice) {
+    public static void createNewOrders(IFritzyApi market, double availableKWh, double myPrice)
+            throws FritzyApiException {
         double totalOrderKwh = availableKWh;
         while (totalOrderKwh > 0) {
             double orderSize;

@@ -16,7 +16,11 @@
  */
 package nl.technolution.sunny.trader;
 
+import org.slf4j.Logger;
+
 import nl.technolution.DeviceId;
+import nl.technolution.Log;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.sunny.app.SunnyConfig;
 
 /**
@@ -24,6 +28,7 @@ import nl.technolution.sunny.app.SunnyConfig;
  */
 public class SunnyTrader implements ISunnyTrader {
 
+    private final Logger log = Log.getLogger();
     private SunnyResourceManager resourceManager;
     private SunnyNegotiator cem;
 
@@ -36,7 +41,11 @@ public class SunnyTrader implements ISunnyTrader {
 
     @Override
     public void evaluateMarket() {
-        cem.evaluate();
+        try {
+            cem.evaluate();
+        } catch (FritzyApiException e) {
+            log.error("Unable to evaluate market", e);
+        }
     }
 
     @Override

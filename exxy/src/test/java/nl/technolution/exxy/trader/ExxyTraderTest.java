@@ -33,6 +33,7 @@ import nl.technolution.dropwizard.services.Services;
 import nl.technolution.exxy.app.ExxyConfig;
 import nl.technolution.exxy.service.APXPricesService;
 import nl.technolution.exxy.service.IAPXPricesService;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.FritzyApiFactory;
 import nl.technolution.fritzy.wallet.FritzyApiStub;
 import nl.technolution.fritzy.wallet.IFritzyApi;
@@ -79,9 +80,11 @@ public class ExxyTraderTest {
 
     /**
      * Test Exxy trading
+     * 
+     * @throws FritzyApiException
      */
     @Test
-    public void exxyTraderTest() {
+    public void exxyTraderTest() throws FritzyApiException {
         ExxyTraderTask exxyTraderTask = new ExxyTraderTask();
         exxyTraderTask.execute();
         IFritzyApi market = Services.get(IFritzyApiFactory.class).build();

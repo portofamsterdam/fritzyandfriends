@@ -20,7 +20,9 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.slf4j.Logger;
 
+import nl.technolution.Log;
 import nl.technolution.batty.app.BattyConfig;
 import nl.technolution.batty.xstorage.connection.IXStorageConnection;
 import nl.technolution.batty.xstorage.connection.IXStorageFactory;
@@ -28,6 +30,7 @@ import nl.technolution.batty.xstorage.connection.XStorageException;
 import nl.technolution.batty.xstorage.types.EModeByte1;
 import nl.technolution.batty.xstorage.types.MachineData;
 import nl.technolution.dropwizard.services.Services;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
 import nl.technolution.fritzy.wallet.event.EventLogger;
 
@@ -37,6 +40,7 @@ import nl.technolution.fritzy.wallet.event.EventLogger;
 public class MachineDataCache implements IMachineDataCacher {
 
     private static final Set<EModeByte1> CHARGE_MODES = EnumSet.of(EModeByte1.CHARGE, EModeByte1.DISCHARGE);
+    private final Logger log = Log.getLogger();
     private MachineData cachedSoc;
 
     @Override
@@ -68,9 +72,13 @@ public class MachineDataCache implements IMachineDataCacher {
         EventLogger logger = new EventLogger(Services.get(IFritzyApiFactory.class).build());
         boolean isCharging = CHARGE_MODES.contains(machineData.getMode().getMode1());
         String batteryState = machineData.getMode().getMode1().name();
-        logger.logDeviceState(
-                new ImmutablePair<String, Object>("isCharging", isCharging),
-                new ImmutablePair<String, Object>("batteryState", batteryState),
-                new ImmutablePair<String, Object>("chargeLevel", machineData.getSoc()));
+        try {
+            logger.logDeviceState(
+                    new ImmutablePair<String, Object>("isCharging", isCharging),
+                    new ImmutablePair<String, Object>("batteryState", batteryState),
+                    new ImmutablePair<String, Object>("chargeLevel", machineData.getSoc()));
+        } catch (FritzyApiException e) {
+            log.error("Unable to log event", e);
+        }
     }
 }

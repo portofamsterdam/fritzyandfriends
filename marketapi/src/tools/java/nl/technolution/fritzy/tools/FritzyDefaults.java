@@ -28,13 +28,14 @@ import org.slf4j.Logger;
 
 import nl.technolution.Log;
 import nl.technolution.fritzy.wallet.FritzyApi;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 
 public class FritzyDefaults {
 
     private static final Logger LOG = Log.getLogger();
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws FritzyApiException {
 
         String url = "http://192.168.8.242/api";
         FritzyApi api = new FritzyApi(url, "FritzyApiTool");

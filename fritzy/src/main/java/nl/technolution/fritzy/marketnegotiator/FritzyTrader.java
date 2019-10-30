@@ -16,13 +16,19 @@
  */
 package nl.technolution.fritzy.marketnegotiator;
 
+
+import org.slf4j.Logger;
+
+import nl.technolution.Log;
 import nl.technolution.fritzy.app.FritzyConfig;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 
 /**
  * 
  */
 public final class FritzyTrader implements IFritzyTrader {
 
+    private final Logger log = Log.getLogger();
     private FritzyResourceManager resourceManager;
     private FritzyNegotiator cem;
 
@@ -36,7 +42,11 @@ public final class FritzyTrader implements IFritzyTrader {
 
     @Override
     public void evaluateMarket() {
-        cem.evaluate();
+        try {
+            cem.evaluate();
+        } catch (FritzyApiException e) {
+            log.error("Unable to evaluate market", e);
+        }
     }
 
     @Override

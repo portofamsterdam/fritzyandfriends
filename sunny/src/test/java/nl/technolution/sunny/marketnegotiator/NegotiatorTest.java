@@ -31,6 +31,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.slf4j.Logger;
 
+import io.dropwizard.jersey.params.InstantParam;
 import nl.technolution.DeviceId;
 import nl.technolution.Log;
 import nl.technolution.apis.exxy.ApxPrice;
@@ -43,6 +44,7 @@ import nl.technolution.dropwizard.MarketConfig;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.webservice.Endpoints;
 import nl.technolution.fritzy.gen.model.WebOrder;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.FritzyApiFactory;
 import nl.technolution.fritzy.wallet.FritzyApiStub;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
@@ -58,8 +60,6 @@ import nl.technolution.sunny.solaredge.SESessionFactory;
 import nl.technolution.sunny.trader.SunnyNegotiator;
 import nl.technolution.sunny.trader.SunnyResourceHelper;
 import nl.technolution.sunny.trader.SunnyResourceManager;
-
-import io.dropwizard.jersey.params.InstantParam;
 
 /**
  * Test negotiator
@@ -127,14 +127,14 @@ public class NegotiatorTest {
     public ExpectedException expectedEx = ExpectedException.none();
 
     @Test
-    public void noFrocast() {
+    public void noFrocast() throws FritzyApiException {
         expectedEx.expect(IllegalStateException.class);
         // Evaluate the market
         sn.evaluate();
     }
 
     @Test
-    public void emptyMarket() {
+    public void emptyMarket() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         BigDecimal mintedEur = BigDecimal.valueOf(10);
         market.login(SUNNY, PASSWORD);
@@ -157,7 +157,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void createOrderInEmptyMarket() {
+    public void createOrderInEmptyMarket() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
 
         market.login(SUNNY, PASSWORD);
@@ -173,7 +173,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void createMultipleOrderInEmptyMarket() {
+    public void createMultipleOrderInEmptyMarket() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
 
         market.login(SUNNY, PASSWORD);
@@ -191,7 +191,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void acceptExistingOrder() {
+    public void acceptExistingOrder() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
 
         pvCastClientStub.setForcastedPower(125 * 4);
@@ -217,7 +217,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void acceptExistingOrders() {
+    public void acceptExistingOrders() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
 
         pvCastClientStub.setForcastedPower(1000 * 4);
@@ -260,7 +260,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void notEnoughEnergyforOrder() {
+    public void notEnoughEnergyforOrder() throws FritzyApiException {
         int whThisQuarter = 1000;
         FritzyApiStub market = FritzyApiStub.instance();
 
@@ -292,7 +292,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void acceptExistingOrderNoReward() {
+    public void acceptExistingOrderNoReward() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
 
         pvCastClientStub.setForcastedPower(125 * 4);
@@ -318,7 +318,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void NotAcceptOrderPriceTooLow() {
+    public void NotAcceptOrderPriceTooLow() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
 
         pvCastClientStub.setForcastedPower(125 * 4);
@@ -345,7 +345,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void cancelExistingOrders() {
+    public void cancelExistingOrders() throws FritzyApiException {
         int whThisQuarter = 1000;
         FritzyApiStub market = FritzyApiStub.instance();
 
@@ -379,7 +379,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void noNewOrdersBattyAcceptedSunny() {
+    public void noNewOrdersBattyAcceptedSunny() throws FritzyApiException {
         int whThisQuarter = 500;
         FritzyApiStub market = FritzyApiStub.instance();
 
@@ -418,7 +418,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void sellKwhOrder() {
+    public void sellKwhOrder() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         sn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
 
@@ -442,7 +442,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void noOrderDueToGridLimit() {
+    public void noOrderDueToGridLimit() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
 
         // set power higher than grid limit
@@ -457,7 +457,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void orderCreation() {
+    public void orderCreation() throws FritzyApiException {
         double availableKWh = (SunnyNegotiator.MAX_ORDER_SIZE_KWH * 9) + 1;
         double myPrice = 0.12;
         FritzyApiStub market = FritzyApiStub.instance();

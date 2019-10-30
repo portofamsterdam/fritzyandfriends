@@ -25,6 +25,7 @@ import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Uninterruptibles;
 
 import org.slf4j.Logger;
@@ -35,6 +36,7 @@ import nl.technolution.dashboard.EEventType;
 import nl.technolution.dropwizard.webservice.JacksonFactory;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.FritzyApi;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.model.GetEventResponse;
@@ -55,7 +57,7 @@ public class FritzyApiTool {
 
     private static FritzyApi api;
 
-    public static void main(String[] args) throws JsonProcessingException {
+    public static void main(String[] args) throws JsonProcessingException, FritzyApiException {
         String url = "http://192.168.8.242/api";
         api = new FritzyApi(url, "FritzyApiTool");
 
@@ -63,7 +65,7 @@ public class FritzyApiTool {
 
         // api.register(USER2, USER2, PASS);
 
-        // setMinters(ADMIN, ADMINPASS, Lists.newArrayList(USER1, USER2));
+        setMinters(ADMIN, ADMINPASS, Lists.newArrayList(USER1, USER2));
         resetUser(USER1, PASS);
         resetUser(USER2, PASS);
 
@@ -138,7 +140,8 @@ public class FritzyApiTool {
         });
     }
 
-    private static void setMinters(String adminUser, String adminpass, List<String> newMinter) {
+    private static void setMinters(String adminUser, String adminpass, List<String> newMinter)
+            throws FritzyApiException {
         for (String user : newMinter) {
             // Login as user to get address
             api.login(user, PASS);
@@ -151,7 +154,7 @@ public class FritzyApiTool {
         }
     }
 
-    private static void resetUser(String user, String password) {
+    private static void resetUser(String user, String password) throws FritzyApiException {
         api.login(user, password);
         for (Record record : api.orders().getOrders().getRecords()) {
             WebOrder order = record.getOrder();
