@@ -30,6 +30,7 @@ import nl.technolution.dropwizard.tasks.ITaskRunner;
 import nl.technolution.dropwizard.tasks.TimedTask;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.gen.model.WebUser;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
 import nl.technolution.fritzy.wallet.event.EventLogger;
@@ -58,6 +59,17 @@ public class UsageScanner implements ITaskRunner {
         IFritzyApi fritzyApi = getFritzyApi();
         EventLogger eventlogger = new EventLogger(fritzyApi);
 
+        try {
+            scanUsage(previousQuarter, nextQuarter, fritzyApi, eventlogger);
+        } catch (FritzyApiException e) {
+            //
+            throw new RuntimeException(e.getMessage(), e);
+        }
+
+    }
+
+    private void scanUsage(Instant previousQuarter, Instant nextQuarter, IFritzyApi fritzyApi,
+            EventLogger eventlogger) throws FritzyApiException {
         double groupConnectionLimit = Services.get(IGridCapacityManager.class).getGroupConnectionLimit();
         eventlogger.logLimitTotal(groupConnectionLimit);
 
@@ -75,7 +87,7 @@ public class UsageScanner implements ITaskRunner {
         }
     }
 
-    private String getTakerName(ApiEvent event) {
+    private String getTakerName(ApiEvent event) throws FritzyApiException {
         WebOrder order = getFritzyApi().order(event.getMsg());
         if (order == null) {
             log.error("Could not find order");
@@ -89,7 +101,7 @@ public class UsageScanner implements ITaskRunner {
         return "unknown";
     }
 
-    private double getUsage(ApiEvent event) {
+    private double getUsage(ApiEvent event) throws FritzyApiException {
         WebOrder order = getFritzyApi().order(event.getMsg());
         if (order == null) {
             log.error("Could not find order");

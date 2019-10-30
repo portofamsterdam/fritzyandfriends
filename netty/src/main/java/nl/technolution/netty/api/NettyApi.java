@@ -23,10 +23,12 @@ import javax.ws.rs.core.MediaType;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import nl.technolution.DeviceId;
+import nl.technolution.Log;
 import nl.technolution.apis.netty.DeviceCapacity;
 import nl.technolution.apis.netty.INettyApi;
 import nl.technolution.apis.netty.OrderReward;
 import nl.technolution.dropwizard.services.Services;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
 import nl.technolution.fritzy.wallet.event.EventLogger;
 import nl.technolution.netty.rewarder.IRewardService;
@@ -68,8 +70,12 @@ public class NettyApi implements INettyApi {
     @SuppressWarnings("unchecked")
     private static void logDeviceState(DeviceId id, double gridConnectionLimit, double groupConnectionLimit) {
         EventLogger logger = new EventLogger(Services.get(IFritzyApiFactory.class).build());
-        logger.logDeviceState(new ImmutablePair<String, Object>("connectionLimit", gridConnectionLimit),
-                new ImmutablePair<String, Object>("gridConnectionLimit", groupConnectionLimit),
-                new ImmutablePair<String, Object>("actor", id.getDeviceId()));
+        try {
+            logger.logDeviceState(new ImmutablePair<String, Object>("connectionLimit", gridConnectionLimit),
+                    new ImmutablePair<String, Object>("gridConnectionLimit", groupConnectionLimit),
+                    new ImmutablePair<String, Object>("actor", id.getDeviceId()));
+        } catch (FritzyApiException e) {
+            Log.getLogger().error("Unable to log device state {}", e);
+        }
     }
 }

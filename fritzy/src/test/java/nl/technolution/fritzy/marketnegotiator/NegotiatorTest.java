@@ -37,6 +37,7 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.slf4j.Logger;
 
+import io.dropwizard.jersey.params.InstantParam;
 import nl.technolution.DeviceId;
 import nl.technolution.Log;
 import nl.technolution.apis.exxy.ApxPrice;
@@ -54,6 +55,7 @@ import nl.technolution.fritzy.io.IIoFactory;
 import nl.technolution.fritzy.io.IoFactory;
 import nl.technolution.fritzy.io.tempsensor.TemperatureStub;
 import nl.technolution.fritzy.io.webrelay.RelayStub;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.FritzyApiFactory;
 import nl.technolution.fritzy.wallet.FritzyApiStub;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
@@ -62,8 +64,6 @@ import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.protocols.efi.StorageDiscreteRunningMode.DiscreteRunningModeElement;
 import nl.technolution.protocols.efi.StorageInstruction;
 import nl.technolution.protocols.efi.StorageSystemDescription;
-
-import io.dropwizard.jersey.params.InstantParam;
 
 /**
  * Test negotiator
@@ -130,7 +130,7 @@ public class NegotiatorTest {
     public ExpectedException expectedEx = ExpectedException.none();
 
     @Test
-    public void emptyMarket() {
+    public void emptyMarket() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         BigDecimal mintedEur = BigDecimal.valueOf(10);
         market.login(FRITZY, PASSWORD);
@@ -159,7 +159,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void createOrderInEmptyMarket() {
+    public void createOrderInEmptyMarket() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         fn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate(fritzyController));
 
@@ -179,7 +179,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void acceptExistingOrder() {
+    public void acceptExistingOrder() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         fn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate(fritzyController));
 
@@ -200,7 +200,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void tooColdCanNotCool() {
+    public void tooColdCanNotCool() throws FritzyApiException {
         temperatureStub.useFixedTemperature(config.getMinTemp() - 1);
 
         FritzyApiStub market = FritzyApiStub.instance();
@@ -219,7 +219,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void acceptExistingOrderNoReward() {
+    public void acceptExistingOrderNoReward() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         fn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate(fritzyController));
 
@@ -241,7 +241,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void cancelExistingOrders() {
+    public void cancelExistingOrders() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         market.login(FRITZY, PASSWORD);
         fn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate(fritzyController));
@@ -277,7 +277,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void cancelExistingSunnyAcceptedFritzy() {
+    public void cancelExistingSunnyAcceptedFritzy() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         String sunny = "sunny";
         market.register(sunny, sunny, PASSWORD);
@@ -315,7 +315,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void orderTooSmall() {
+    public void orderTooSmall() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         fn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate(fritzyController));
 
@@ -341,7 +341,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void noCoolingDueToGridLimit() {
+    public void noCoolingDueToGridLimit() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
 
         // re-create negotiator to undo system description send from @Before
@@ -362,7 +362,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void buyKwhOrder() {
+    public void buyKwhOrder() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         fn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate(fritzyController));
 
@@ -448,7 +448,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void noValidStorageSystemDescriptionAtEvaluate() throws IOException {
+    public void noValidStorageSystemDescriptionAtEvaluate() throws IOException, FritzyApiException {
         // re-create testobject to undo system description send from @Before
         FritzyResourceManager resourceManager = new FritzyResourceManager(config, fritzyController);
         fn = new FritzyNegotiator(config, resourceManager);

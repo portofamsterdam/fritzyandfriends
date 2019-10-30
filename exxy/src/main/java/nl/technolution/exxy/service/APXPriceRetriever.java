@@ -28,6 +28,7 @@ import nl.technolution.dropwizard.tasks.TimedTask;
 import nl.technolution.exxy.client.ITransparencyPlatformClient;
 import nl.technolution.exxy.client.PublicationMarketDocument;
 import nl.technolution.exxy.service.APXPricesService.NoPricesAvailableException;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
 import nl.technolution.fritzy.wallet.event.EventLogger;
 import nl.technolution.protocols.efi.util.Efi;
@@ -61,7 +62,7 @@ public final class APXPriceRetriever implements IPriceReceiver {
         try {
             double price = APXPricesService.getSinglePrice(Efi.getNextQuarter(), cachedPrices);
             logger.logDeviceState(new ImmutablePair<String, Object>("price", price));
-        } catch (NoPricesAvailableException ex) {
+        } catch (NoPricesAvailableException | FritzyApiException ex) {
             LOG.error("Unable to log price", ex);
         }
     }

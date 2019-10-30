@@ -17,6 +17,7 @@
 package nl.technolution.netty.rewarder;
 
 import java.math.BigDecimal;
+import java.net.HttpURLConnection;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -27,12 +28,15 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.UUID;
 
+import javax.ws.rs.WebApplicationException;
+
 import com.google.common.collect.Maps;
 
 import nl.technolution.apis.netty.OrderReward;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.gen.model.WebUser;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
@@ -60,14 +64,19 @@ public final class RewardService implements IRewardService {
         if (existingReward != null) {
             return existingReward;
         }
-        WebOrder order = market.order(orderHash);
-        if (order == null) {
-            // Do not store empty rewards, the order may exist later
-            return OrderReward.none(taker, orderHash);
+        try {
+            WebOrder order = market.order(orderHash);
+            if (order == null) {
+                // Do not store empty rewards, the order may exist later
+                return OrderReward.none(taker, orderHash);
+            }
+            if (isLocal(taker, order, market)) {
+                return calculateReward(taker, order);
+            }
+        } catch (FritzyApiException e) {
+            throw new WebApplicationException(e, HttpURLConnection.HTTP_UNAVAILABLE);
         }
-        if (isLocal(taker, order, market)) {
-            return calculateReward(taker, order);
-        }
+
         return OrderReward.none(taker, orderHash);
     }
 
@@ -104,7 +113,7 @@ public final class RewardService implements IRewardService {
         return order;
     }
 
-    private boolean isLocal(String taker, WebOrder orderHash, IFritzyApi market) {
+    private boolean isLocal(String taker, WebOrder orderHash, IFritzyApi market) throws FritzyApiException {
         WebUser uTaker = null;
         WebUser uMaker = null;
         for (WebUser user : Arrays.asList(market.getUsers())) {
@@ -138,14 +147,18 @@ public final class RewardService implements IRewardService {
         }
 
         IFritzyApi market = Services.get(IFritzyApiFactory.class).build();
-        WebOrder order = market.order(orderHash);
-
-        if (order.getTakerAddress() != null && order.getTakerAddress().equals(reward.getClaimTaker())) {
-            payReward(market, reward);
+        WebOrder order;
+        try {
+            order = market.order(orderHash);
+            if (order.getTakerAddress() != null && order.getTakerAddress().equals(reward.getClaimTaker())) {
+                payReward(market, reward);
+            }
+        } catch (FritzyApiException e) {
+            throw new WebApplicationException(e, HttpURLConnection.HTTP_UNAVAILABLE);
         }
     }
 
-    private void payReward(IFritzyApi market, OrderReward reward) {
+    private void payReward(IFritzyApi market, OrderReward reward) throws FritzyApiException {
         market.transfer(BigDecimal.valueOf(reward.getReward()), EContractAddress.EUR, reward.getClaimTaker());
         rewards.remove(reward.getOrderHash());
     }

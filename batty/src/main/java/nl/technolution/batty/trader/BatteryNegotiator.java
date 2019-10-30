@@ -40,6 +40,7 @@ import nl.technolution.batty.app.BattyConfig;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.webservice.Endpoints;
 import nl.technolution.fritzy.gen.model.WebOrder;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
 import nl.technolution.fritzy.wallet.event.EventLogger;
@@ -104,8 +105,10 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
 
     /**
      * Call periodicly to evaluate market changes
+     * 
+     * @throws FritzyApiException
      */
-    public void evaluate() {
+    public void evaluate() throws FritzyApiException {
 
         // Can only do something if we know our capabilities
         if (fillLevel == null || systemDescription == null) {
@@ -167,7 +170,8 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
         createOrder(market, balance, deviceCapacity);
     }
 
-    private void acceptOrder(IFritzyApi market, INettyApi netty, WebOrder order, OrderReward reward) {
+    private void acceptOrder(IFritzyApi market, INettyApi netty, WebOrder order, OrderReward reward)
+            throws FritzyApiException {
         log.info("accepting order {} receiving {}{} spending {}{}", order.getHash(), order.getMakerAssetAmount(),
                 order.getMakerAssetData(), order.getTakerAssetAmount(), order.getTakerAssetData());
         if (order.getTakerAssetData().equals(EContractAddress.KWH.getContractName())) {
@@ -184,7 +188,7 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
         cancelExistingBattyOrders(market);
     }
 
-    private void checkOpenOrders(IFritzyApi market) {
+    private void checkOpenOrders(IFritzyApi market) throws FritzyApiException {
         Iterator<OrderExecutor> itr = activeBattyOrders.iterator();
         while (itr.hasNext()) {
             OrderExecutor activeBattyOrder = itr.next();
@@ -200,14 +204,15 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
         }
     }
 
-    private void createOrder(IFritzyApi market, FritzyBalance balance, DeviceCapacity deviceCapacity) {
+    private void createOrder(IFritzyApi market, FritzyBalance balance, DeviceCapacity deviceCapacity)
+            throws FritzyApiException {
         ApxPrice apxPrice = Endpoints.get(IAPXPricesApi.class).getNextQuarterHourPrice();
         createBuyKWhOrder(market, balance, deviceCapacity, apxPrice);
         createSellOrder(market, deviceCapacity, apxPrice);
     }
 
     private void createSellOrder(IFritzyApi market, DeviceCapacity deviceCapacity,
-            ApxPrice apxPrice) {
+            ApxPrice apxPrice) throws FritzyApiException {
         if (openSellOrderHash != null) {
             WebOrder sellOrder = market.order(openSellOrderHash);
             if (sellOrder != null) {
@@ -242,7 +247,7 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
     }
 
     private void createBuyKWhOrder(IFritzyApi market, FritzyBalance balance, DeviceCapacity deviceCapacity,
-            ApxPrice apxPrice) {
+            ApxPrice apxPrice) throws FritzyApiException {
         if (openBuyOrderHash != null) {
             WebOrder buyOrder = market.order(openSellOrderHash);
             if (buyOrder != null) {
@@ -293,8 +298,9 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
 
     /**
      * @param market
+     * @throws FritzyApiException
      */
-    private void cancelExistingBattyOrders(IFritzyApi market) {
+    private void cancelExistingBattyOrders(IFritzyApi market) throws FritzyApiException {
         // Cancel existing orders
         cancelOrder(market, openBuyOrderHash);
         openBuyOrderHash = null;
@@ -302,7 +308,7 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
         openSellOrderHash = null;
     }
 
-    private static void cancelOrder(IFritzyApi market, @Nullable String hash) {
+    private static void cancelOrder(IFritzyApi market, @Nullable String hash) throws FritzyApiException {
         if (hash == null) {
             return;
         }

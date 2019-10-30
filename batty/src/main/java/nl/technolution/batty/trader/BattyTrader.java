@@ -16,16 +16,21 @@
  */
 package nl.technolution.batty.trader;
 
+import org.slf4j.Logger;
+
 import nl.technolution.DeviceId;
+import nl.technolution.Log;
 import nl.technolution.batty.app.BattyConfig;
 import nl.technolution.batty.xstorage.cache.IMachineDataCacher;
 import nl.technolution.dropwizard.services.Services;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 
 /**
  * 
  */
 public class BattyTrader implements IBattyTrader {
 
+    private final Logger log = Log.getLogger();
     private BattyResourceManager resourceManager;
     private BatteryNegotiator cem;
 
@@ -38,7 +43,11 @@ public class BattyTrader implements IBattyTrader {
 
     @Override
     public void evaluateMarket() {
-        cem.evaluate();
+        try {
+            cem.evaluate();
+        } catch (FritzyApiException e) {
+            log.error("Error during trade evaluation", e);
+        }
     }
 
     @Override

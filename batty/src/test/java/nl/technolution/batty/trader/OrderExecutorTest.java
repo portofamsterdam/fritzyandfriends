@@ -33,6 +33,7 @@ import nl.technolution.batty.xstorage.connection.XStorageFactory;
 import nl.technolution.batty.xstorage.connection.XStorageStub;
 import nl.technolution.dropwizard.MarketConfig;
 import nl.technolution.dropwizard.services.Services;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.FritzyApiFactory;
 import nl.technolution.fritzy.wallet.FritzyApiStub;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
@@ -75,10 +76,11 @@ public class OrderExecutorTest {
     }
 
     /**
+     * @throws FritzyApiException
      * 
      */
     @Test
-    public void testExecutorOrderNotAcceptedYet() {
+    public void testExecutorOrderNotAcceptedYet() throws FritzyApiException {
         // Prepare rm
         BattyResourceManager resourceManager = new BattyResourceManager(deviceId);
         StorageSystemDescription system = battyResourceHelper.getStorageSystemDescription();
@@ -96,7 +98,7 @@ public class OrderExecutorTest {
     }
 
     @Test
-    public void testExecutorNoOrder() {
+    public void testExecutorNoOrder() throws FritzyApiException {
         BattyResourceManager resourceManager = new BattyResourceManager(deviceId);
         StorageSystemDescription system = battyResourceHelper.getStorageSystemDescription();
 
@@ -105,7 +107,7 @@ public class OrderExecutorTest {
     }
 
     @Test
-    public void orderAcceptedDischarge() {
+    public void orderAcceptedDischarge() throws FritzyApiException {
         BattyResourceManager resourceManager = new BattyResourceManager(deviceId);
         StorageSystemDescription system = battyResourceHelper.getStorageSystemDescription();
 
@@ -133,7 +135,7 @@ public class OrderExecutorTest {
     }
 
     @Test
-    public void tooLargeOrderDischargeAccepted() {
+    public void tooLargeOrderDischargeAccepted() throws FritzyApiException {
         BattyResourceManager resourceManager = new BattyResourceManager(deviceId);
         StorageSystemDescription system = battyResourceHelper.getStorageSystemDescription();
 
@@ -161,7 +163,7 @@ public class OrderExecutorTest {
     }
 
     @Test
-    public void orderAcceptedCharging() {
+    public void orderAcceptedCharging() throws FritzyApiException {
         BattyResourceManager resourceManager = new BattyResourceManager(deviceId);
         StorageSystemDescription system = battyResourceHelper.getStorageSystemDescription();
 
@@ -189,7 +191,7 @@ public class OrderExecutorTest {
     }
 
     @Test
-    public void orderAcceptFromOtherCharging() {
+    public void orderAcceptFromOtherCharging() throws FritzyApiException {
         BattyResourceManager resourceManager = new BattyResourceManager(deviceId);
         StorageSystemDescription system = battyResourceHelper.getStorageSystemDescription();
 
@@ -217,7 +219,7 @@ public class OrderExecutorTest {
     }
 
     @Test
-    public void orderAcceptFromOtherDischarging() {
+    public void orderAcceptFromOtherDischarging() throws FritzyApiException {
         BattyResourceManager resourceManager = new BattyResourceManager(deviceId);
         StorageSystemDescription system = battyResourceHelper.getStorageSystemDescription();
 

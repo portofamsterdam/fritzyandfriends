@@ -38,6 +38,7 @@ import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.webservice.Endpoints;
 import nl.technolution.fritzy.app.FritzyConfig;
 import nl.technolution.fritzy.gen.model.WebOrder;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
 import nl.technolution.fritzy.wallet.event.EventLogger;
@@ -160,9 +161,13 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
 
     @Override
     public void measurement(Measurement measurement) {
-        getMarket().log(EEventType.DEVICE_STATE,
-                "Power consumption: " + measurement.getElectricityMeasurement().getPower() + "W", null);
-        LOG.debug("Measurement send to market: {}W", measurement.getElectricityMeasurement().getPower());
+        try {
+            getMarket().log(EEventType.DEVICE_STATE,
+                    "Power consumption: " + measurement.getElectricityMeasurement().getPower() + "W", null);
+            LOG.debug("Measurement send to market: {}W", measurement.getElectricityMeasurement().getPower());
+        } catch (FritzyApiException e) {
+            LOG.error("Unable to send Measurement: {}W", measurement.getElectricityMeasurement().getPower(), e);
+        }
     }
 
     @Override
@@ -232,8 +237,10 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
     /**
      * Call periodically to evaluate market changes
      * 
+     * @throws FritzyApiException
+     * 
      */
-    public void evaluate() {
+    public void evaluate() throws FritzyApiException {
         if (runningModes.isEmpty()) {
             throw new IllegalStateException("No storageSystemDescription recevied yet");
         }
@@ -379,8 +386,9 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
 
     /**
      * @param order
+     * @throws FritzyApiException
      */
-    private void handleEnergyPurchased(double purchasedKWh) {
+    private void handleEnergyPurchased(double purchasedKWh) throws FritzyApiException {
         neededKWh -= purchasedKWh;
         getMarket().burn(BigDecimal.valueOf(purchasedKWh), EContractAddress.KWH);
         if (neededKWh <= 0) {
@@ -388,7 +396,7 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
         }
     }
 
-    private void createNewOrder(IFritzyApi market) {
+    private void createNewOrder(IFritzyApi market) throws FritzyApiException {
         // price must be for the requested amount of kWh (it is not a 'euro per kwh' price).
         double totalPrice = myPrice * neededKWh;
         if (neededKWh > 0) {

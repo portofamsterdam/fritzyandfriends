@@ -31,6 +31,7 @@ import nl.technolution.dropwizard.FritzyAppConfig;
 import nl.technolution.dropwizard.MarketConfig;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.fritzy.gen.model.WebUser;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.FritzyApiFactory;
 import nl.technolution.fritzy.wallet.FritzyApiStub;
 import nl.technolution.fritzy.wallet.IFritzyApi;
@@ -48,7 +49,7 @@ public class RewardServiceTest {
     private static final String USERB = "B@test.be";
 
     @Before
-    public void setup() {
+    public void setup() throws FritzyApiException {
         FritzyApiFactory service = new FritzyApiFactory();
         MarketConfig marketConfig = new MarketConfig(true, "", NETTY, "");
         service.init(new FritzyAppConfig(RewardServiceTest.class.getSimpleName(), null, marketConfig));
@@ -63,10 +64,11 @@ public class RewardServiceTest {
     }
 
     /**
+     * @throws FritzyApiException
      * 
      */
     @Test
-    public void testRewards() {
+    public void testRewards() throws FritzyApiException {
         IFritzyApi api = Services.get(IFritzyApiFactory.class).build();
         // Create local users
         WebUser userA = api.register(USERA, USERA, "");

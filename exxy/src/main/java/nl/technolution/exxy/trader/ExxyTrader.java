@@ -30,6 +30,7 @@ import nl.technolution.exxy.app.ExxyConfig;
 import nl.technolution.exxy.service.APXPricesService.NoPricesAvailableException;
 import nl.technolution.exxy.service.IAPXPricesService;
 import nl.technolution.exxy.trader.ContinuousOrderHandler.ETrade;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.protocols.efi.util.Efi;
 
 /**
@@ -53,11 +54,21 @@ public class ExxyTrader implements IExxyTrader {
 
     @Override
     public void evaluateMarket() {
+        try {
+            checkNextPrice();
+        } catch (FritzyApiException e) {
+            log.error("Unable to push price change to market", e);
+        }
+    }
+
+    private void checkNextPrice() throws FritzyApiException {
         if (nextPriceTs.isBefore(Instant.now())) {
             IAPXPricesService pricesService = Services.get(IAPXPricesService.class);
             try {
                 pricePerkWh = pricesService.getPricePerkWh();
-                orders.forEach(o -> o.changePerkWh(pricePerkWh));
+                for (ContinuousOrderHandler orderHandler : orders) {
+                    orderHandler.changePerkWh(pricePerkWh);
+                }
                 nextPriceTs = Efi.getNextQuarter();
             } catch (NoPricesAvailableException e) {
                 log.error("Unable to get apx price information. Can't trade");
@@ -65,6 +76,8 @@ public class ExxyTrader implements IExxyTrader {
             }
         }
         Preconditions.checkNotNull(pricePerkWh);
-        orders.forEach(ContinuousOrderHandler::check);
+        for (ContinuousOrderHandler orderHandler: orders) {
+            orderHandler.check();
+        }
     }
 }

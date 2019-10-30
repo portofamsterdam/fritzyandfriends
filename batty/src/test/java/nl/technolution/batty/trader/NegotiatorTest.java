@@ -46,6 +46,7 @@ import nl.technolution.dropwizard.MarketConfig;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.webservice.Endpoints;
 import nl.technolution.fritzy.gen.model.WebOrder;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.FritzyApiFactory;
 import nl.technolution.fritzy.wallet.FritzyApiStub;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
@@ -96,7 +97,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void emptyMarket() {
+    public void emptyMarket() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         BigDecimal mintedEur = BigDecimal.valueOf(10);
         market.mint(market.getAddress(), mintedEur, EContractAddress.EUR);
@@ -128,7 +129,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void createOrderInEmptyMarket() {
+    public void createOrderInEmptyMarket() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
         bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
@@ -150,7 +151,7 @@ public class NegotiatorTest {
     }
 
     @Test 
-    public void acceptExistingOrderCharge() {
+    public void acceptExistingOrderCharge() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
         bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
@@ -174,7 +175,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void acceptExistingOrderDischarge() {
+    public void acceptExistingOrderDischarge() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
         bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
@@ -196,7 +197,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void almostEmptyBattery() {
+    public void almostEmptyBattery() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         XStorageStub.instance().setStateOfCharge(10);
         Services.get(IMachineDataCacher.class).update();
@@ -219,7 +220,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void acceptExistingOrderNoReward() {
+    public void acceptExistingOrderNoReward() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
         bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
@@ -241,7 +242,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void acceptExistingOrderChargeBroke() {
+    public void acceptExistingOrderChargeBroke() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
         bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
@@ -263,7 +264,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void onlyChargeOrderByBatty() {
+    public void onlyChargeOrderByBatty() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
         bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
@@ -287,7 +288,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void onlyDischargeOrderByBatty() {
+    public void onlyDischargeOrderByBatty() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
         bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
@@ -309,7 +310,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void chargeOrderTooLargeForGrid() {
+    public void chargeOrderTooLargeForGrid() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
         bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
@@ -331,7 +332,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void dischargeOrderTooLargeForGrid() {
+    public void dischargeOrderTooLargeForGrid() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
         bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
@@ -353,7 +354,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void dischargeOrderTooLargeForBatty() {
+    public void dischargeOrderTooLargeForBatty() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
         bn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
@@ -381,7 +382,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void cancelExistingOrders() {
+    public void cancelExistingOrders() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         market.login(BATTY, PASSWORD);
         BattyResourceHelper resourceHelper = new BattyResourceHelper(DEVICE_ID);
@@ -421,7 +422,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void cancelExistingSunnyAcceptedBatty() {
+    public void cancelExistingSunnyAcceptedBatty() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         String sunny = "sunny";
         market.register(sunny, sunny, PASSWORD);

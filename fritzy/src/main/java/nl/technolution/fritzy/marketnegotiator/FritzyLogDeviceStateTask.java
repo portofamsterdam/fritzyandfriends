@@ -27,6 +27,7 @@ import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.tasks.ITaskRunner;
 import nl.technolution.dropwizard.tasks.TimedTask;
 import nl.technolution.fritzy.io.IIoFactory;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
 import nl.technolution.fritzy.wallet.event.EventLogger;
 
@@ -54,8 +55,11 @@ public class FritzyLogDeviceStateTask implements ITaskRunner {
         double temperature = ioFactory.getTemparatureSensor().getTemparature();
 
         EventLogger logger = new EventLogger(Services.get(IFritzyApiFactory.class).build());
-        logger.logDeviceState(new ImmutablePair<String, Object>("isCooling", isCooling),
-                new ImmutablePair<String, Object>("temperature", String.format("%.2f", temperature)));
-
+        try {
+            logger.logDeviceState(new ImmutablePair<String, Object>("isCooling", isCooling),
+                    new ImmutablePair<String, Object>("temperature", String.format("%.2f", temperature)));
+        } catch (FritzyApiException e) {
+            LOG.error("Unable to log event {} {}", isCooling, temperature, e);
+        }
     }
 }

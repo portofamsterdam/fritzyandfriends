@@ -29,6 +29,7 @@ import nl.technolution.dropwizard.MarketConfig;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.exxy.app.ExxyConfig;
 import nl.technolution.exxy.trader.ContinuousOrderHandler.ETrade;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.FritzyApiFactory;
 import nl.technolution.fritzy.wallet.FritzyApiStub;
 import nl.technolution.fritzy.wallet.IFritzyApi;
@@ -60,10 +61,11 @@ public class ContinuousOrderHandlerTest {
     }
 
     /**
+     * @throws FritzyApiException
      * 
      */
     @Test
-    public void buyTest() {
+    public void buyTest() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         double kWh = 1d;
         double pricePerkWh = 0.2d;
@@ -109,7 +111,7 @@ public class ContinuousOrderHandlerTest {
     }
 
     @Test
-    public void sellTest() {
+    public void sellTest() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         double kWh = 0.1d;
         double pricePerkWh = 0.21d;
@@ -136,10 +138,11 @@ public class ContinuousOrderHandlerTest {
     }
 
     /**
+     * @throws FritzyApiException
      * 
      */
     @Test
-    public void buyButBrokeTest() {
+    public void buyButBrokeTest() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         ContinuousOrderHandler orderHandler = new ContinuousOrderHandler(ETrade.BUY, 1d);
         orderHandler.changePerkWh(0.2d);
@@ -148,10 +151,11 @@ public class ContinuousOrderHandlerTest {
     }
 
     /**
+     * @throws FritzyApiException
      * 
      */
     @Test
-    public void noPriceTest() {
+    public void noPriceTest() throws FritzyApiException {
         Services.put(IFritzyApiFactory.class, new IFritzyApiFactory() {
             @Override
             public void init(FritzyAppConfig config) {

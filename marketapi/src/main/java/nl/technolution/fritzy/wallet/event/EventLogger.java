@@ -27,6 +27,7 @@ import org.apache.commons.lang3.tuple.ImmutablePair;
 
 import nl.technolution.dashboard.EEventType;
 import nl.technolution.dropwizard.webservice.JacksonFactory;
+import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
 
@@ -51,9 +52,10 @@ public final class EventLogger {
      * Log balance of a user
      * 
      * @param balance retrieve from API
+     * @throws FritzyApiException
      * @throws JsonProcessingException
      */
-    public void logBalance(FritzyBalance balance) {
+    public void logBalance(FritzyBalance balance) throws FritzyApiException {
         String msg = String.format("Balance KWH: %.2f, EUR: %.2f", balance.getKwh().doubleValue(),
                 balance.getEur().doubleValue());
         String data;
@@ -69,9 +71,10 @@ public final class EventLogger {
      * Log device state
      * 
      * @param states to include in the log message
+     * @throws FritzyApiException
      * @throws JsonProcessingException
      */
-    public void logDeviceState(ImmutablePair<String, Object>... states) {
+    public void logDeviceState(ImmutablePair<String, Object>... states) throws FritzyApiException {
         String stateMsg = Arrays.asList(states)
                 .stream()
                 .map(s -> String.format("%s=%s", s.left, s.right.toString()))
@@ -88,9 +91,10 @@ public final class EventLogger {
 
     /**
      * @param limit to log
+     * @throws FritzyApiException
      * @throws JsonProcessingException
      */
-    public void logLimitActor(double limit) {
+    public void logLimitActor(double limit) throws FritzyApiException {
         String msg = String.format("Limit actor update limit=%.2f", limit);
         String data;
         try {
@@ -103,8 +107,9 @@ public final class EventLogger {
 
     /**
      * @param actor that exceeded threshold
+     * @throws FritzyApiException
      */
-    public void logLimitExceeded(String actor) {
+    public void logLimitExceeded(String actor) throws FritzyApiException {
         String msg = String.format("Limit exceeded by actor %s", actor);
         String data = "{}";
         market.log(EEventType.LIMIT_EXCEEDED, msg, data);
@@ -114,8 +119,9 @@ public final class EventLogger {
      * Log total limit
      * 
      * @param limit to show in log
+     * @throws FritzyApiException
      */
-    public void logLimitTotal(double limit) {
+    public void logLimitTotal(double limit) throws FritzyApiException {
         String msg = String.format("Limit total update limit=%.2f", limit);
         String data;
         try {
