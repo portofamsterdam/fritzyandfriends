@@ -65,15 +65,26 @@ public class FritzyDefaults {
         }
         api.login(adminuser, password);
 
-        api.addMinter(api.getAddress(), EContractAddress.EUR);
-        api.addMinter(api.getAddress(), EContractAddress.KWH);
+        try {
+            api.addMinter(api.getAddress(), EContractAddress.EUR);
+            api.addMinter(api.getAddress(), EContractAddress.KWH);
+        } catch (FritzyApiException e) {
+            LOG.info("Admin already is minter");
+        }
 
         for (String address : addresses) {
             LOG.info("Add kWh minting rights to {}", address);
-            api.addMinter(address, EContractAddress.KWH);
+            try {
+                api.addMinter(address, EContractAddress.KWH);
+            } catch (FritzyApiException e) {
+                LOG.info("{} already allowed to mint kWh", address);
+            }
             int eur = 100;
             LOG.info("Add {} eur to {}", eur, address);
             api.mint(address, BigDecimal.valueOf(eur), EContractAddress.EUR);
+            api.mintEth(address, BigDecimal.valueOf(1L));
         }
+
+        LOG.info("Done");
     }
 }

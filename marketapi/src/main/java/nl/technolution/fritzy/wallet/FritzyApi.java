@@ -136,6 +136,20 @@ public class FritzyApi implements IFritzyApi {
         FritzyApiException.checkResponse(response);
     }
 
+    @Override
+    public void mintEth(String address, BigDecimal value) throws FritzyApiException {
+        LOG.info("Minter eth to {}", address);
+        WebTarget target = client.target(url + "/node/mintEth");
+        Builder request = target.request();
+        request.header("Authorization", "Bearer " + accessToken);
+        Form form = new Form();
+        form.param("address", address);
+        form.param("value", "" + value.multiply(TOKEN_FACTOR).toBigInteger().toString());
+        form.param("contractAddress", EContractAddress.ETH.getContractName());
+        Response response = request.post(Entity.entity(form, MediaType.APPLICATION_FORM_URLENCODED_TYPE));
+        FritzyApiException.checkResponse(response);
+    }
+
     /**
      * Get all orders
      * 

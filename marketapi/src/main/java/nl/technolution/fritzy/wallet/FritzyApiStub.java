@@ -153,6 +153,12 @@ public final class FritzyApiStub implements IFritzyApi {
     }
 
     @Override
+    public void mintEth(String address, BigDecimal value) throws FritzyApiException {
+        // NOTE only used for transaction costs, not used for stub.
+        mint(address, value, EContractAddress.ETH);
+    }
+
+    @Override
     public String fillOrder(String orderHash) {
         log.debug("fillOrder {}", orderHash);
         WebOrder order = order(orderHash);
@@ -391,11 +397,26 @@ public final class FritzyApiStub implements IFritzyApi {
         return Lists.newArrayList(events);
     }
 
+    /**
+     * @param type to get
+     * @return vent
+     */
     @VisibleForTesting
     public ApiEvent getFirstEventOfType(EEventType type) {
         return events.stream().filter(e -> type.getTag().equals(e.getTag())).findFirst().orElse(null);
     }
 
+    /**
+     * stub order
+     * 
+     * @param makerAddress from
+     * @param takerAddress to
+     * @param makerAmount how much
+     * @param makerToken of
+     * @param takerAmount to how much
+     * @param takerToken of
+     * @returnhash
+     */
     @VisibleForTesting
     public String mockCompleteOrder(String makerAddress, String takerAddress, BigDecimal makerAmount,
             EContractAddress makerToken, BigDecimal takerAmount, EContractAddress takerToken) {
@@ -415,4 +436,5 @@ public final class FritzyApiStub implements IFritzyApi {
         orders.setRecords(ordersList.toArray(new Record[ordersList.size()]));
         return generateHash;
     }
+
 }

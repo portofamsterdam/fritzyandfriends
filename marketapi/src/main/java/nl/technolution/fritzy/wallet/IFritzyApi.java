@@ -129,6 +129,14 @@ public interface IFritzyApi {
     void addMinter(String address, EContractAddress contractAddress) throws FritzyApiException;
 
     /**
+     * Call to mint ether
+     * 
+     * @param address mint to
+     * @throws FritzyApiException
+     */
+    void mintEth(String address, BigDecimal value) throws FritzyApiException;
+
+    /**
      * Transfer money to an address
      * 
      * @param value how much
@@ -149,5 +157,6 @@ public interface IFritzyApi {
      * 
      */
     GetEventResponse getEvents(Instant from, Instant till) throws FritzyApiException;
+
 
 }
