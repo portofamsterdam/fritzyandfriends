@@ -1,0 +1,11 @@
+apply plugin: 'java'
+apply plugin: 'application'
+
+mainClassName = 'nl.technolution.actorsetup.Defaults'
+
+dependencies {
+    compile project(':common')
+    compile project(':marketapi')
+    compile libraries.org_apache_cli
+    
+}

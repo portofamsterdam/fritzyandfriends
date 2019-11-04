@@ -73,8 +73,6 @@ subprojects {
 def shadowJarForDockerTask(aProject, jarName) {
     aProject.apply(plugin: 'com.github.johnrengelman.shadow')
     
-   
-    
     aProject.shadowJar {
         baseName = "${jarName}"
         classifier = null

@@ -30,7 +30,6 @@ import javax.ws.rs.core.Form;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.common.base.Preconditions;
 
 import org.glassfish.jersey.client.JerseyClientBuilder;
@@ -60,9 +59,7 @@ import nl.technolution.fritzy.wallet.register.RegisterParameters;
 public class FritzyApi implements IFritzyApi {
     private static final BigDecimal TOKEN_FACTOR = new BigDecimal("1000000000000000000");
     private static final Logger LOG = Log.getLogger();
-    private static final String BURN_ADDRESS = "0x0000000000000000000000000000000000000000";
 
-    private final ObjectMapper mapper = new ObjectMapper();
     private final String url;
     private final String environment;
 
@@ -270,7 +267,7 @@ public class FritzyApi implements IFritzyApi {
     public void mint(String address, BigDecimal value, EContractAddress contractAddress) throws FritzyApiException {
         Preconditions.checkArgument(accessToken != null, "login first");
         BigDecimal tokens = value.multiply(TOKEN_FACTOR);
-        LOG.info("Minting {} {} to {} tokens: {}", value, contractAddress, actor, tokens);
+        LOG.info("Minting {} {} by {} for {} tokens: {}", value, contractAddress, actor, address, tokens);
         WebTarget target = client.target(url + "/me/token/mint");
         Builder request = target.request();
         request.header("Authorization", "Bearer " + accessToken);

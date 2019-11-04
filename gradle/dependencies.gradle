@@ -31,6 +31,7 @@ libraries.swagger_core = [
     'io.swagger.core.v3:swagger-jaxrs2-servlet-initializer:' + versions.swaggercode
 ]
 
+libraries.org_apache_cli = 'commons-cli:commons-cli:1.4'
 libraries.org_apache_commons_lang = 'org.apache.commons:commons-lang3:3.7'
 libraries.guava = 'com.google.guava:guava:23.0'
 
@@ -87,3 +88,4 @@ libraries.codegen = [
 ]
 
 libraries.modbus = 'com.ghgande:j2mod:2.5.3'
+
