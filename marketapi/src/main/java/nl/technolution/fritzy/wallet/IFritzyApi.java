@@ -25,6 +25,7 @@ import nl.technolution.fritzy.gen.model.WebUser;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.model.GetEventResponse;
+import nl.technolution.fritzy.wallet.model.UsersResponseEntry;
 import nl.technolution.fritzy.wallet.order.GetOrdersResponse;
 
 /**
@@ -119,7 +120,7 @@ public interface IFritzyApi {
      * 
      * @return registered users
      */
-    WebUser[] getUsers() throws FritzyApiException;
+    UsersResponseEntry[] getUsers() throws FritzyApiException;
 
 
     /**

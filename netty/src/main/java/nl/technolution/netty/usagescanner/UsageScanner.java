@@ -29,7 +29,6 @@ import nl.technolution.dropwizard.services.Services;
 import nl.technolution.dropwizard.tasks.ITaskRunner;
 import nl.technolution.dropwizard.tasks.TimedTask;
 import nl.technolution.fritzy.gen.model.WebOrder;
-import nl.technolution.fritzy.gen.model.WebUser;
 import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
@@ -37,6 +36,7 @@ import nl.technolution.fritzy.wallet.event.EventLogger;
 import nl.technolution.fritzy.wallet.model.ApiEvent;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.GetEventResponse;
+import nl.technolution.fritzy.wallet.model.UsersResponseEntry;
 import nl.technolution.netty.rewarder.IRewardService;
 import nl.technolution.netty.supplylimit.IGridCapacityManager;
 import nl.technolution.protocols.efi.util.Efi;
@@ -93,7 +93,7 @@ public class UsageScanner implements ITaskRunner {
             log.error("Could not find order");
             return "unknown";
         }
-        for (WebUser u : getFritzyApi().getUsers()) {
+        for (UsersResponseEntry u : getFritzyApi().getUsers()) {
             if (u.getAddress().equals(order.getTakerAddress())) {
                 return u.getName();
             }
@@ -110,7 +110,7 @@ public class UsageScanner implements ITaskRunner {
 
         String makerUsername = null;
         String takerUsername = null;
-        for (WebUser u : getFritzyApi().getUsers()) {
+        for (UsersResponseEntry u : getFritzyApi().getUsers()) {
             if (u.getAddress().equals(order.getMakerAddress())) {
                 makerUsername = u.getName();
                 continue;

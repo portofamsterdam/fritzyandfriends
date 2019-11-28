@@ -7,5 +7,15 @@ dependencies {
     compile project(':common')
     compile project(':marketapi')
     compile libraries.org_apache_cli
+    runtime libraries.jersey
     
+}
+
+jar {
+    manifest {
+      attributes(
+        'Class-Path': project.sourceSets.main.runtimeClasspath.collect { it.getName() }.join(' '),
+        'Main-Class': project.mainClassName
+      )
+    }
 }

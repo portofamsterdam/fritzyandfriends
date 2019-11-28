@@ -25,7 +25,6 @@ import java.util.concurrent.TimeUnit;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.google.common.base.Preconditions;
-import com.google.common.collect.Lists;
 import com.google.common.util.concurrent.Uninterruptibles;
 
 import org.slf4j.Logger;
@@ -40,6 +39,7 @@ import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.model.GetEventResponse;
+import nl.technolution.fritzy.wallet.model.UsersResponseEntry;
 import nl.technolution.fritzy.wallet.order.Record;
 
 /**
@@ -61,11 +61,16 @@ public class FritzyApiTool {
         String url = "http://192.168.8.242/api";
         api = new FritzyApi(url, "FritzyApiTool");
 
+        UsersResponseEntry[] webUsers = api.getUsers();
+        if (true) {
+            return;
+        }
         // api.register(ADMIN, ADMIN, ADMINPASS);
+
 
         // api.register(USER2, USER2, PASS);
 
-        setMinters(ADMIN, ADMINPASS, Lists.newArrayList(USER1, USER2));
+        // setMinters(ADMIN, ADMINPASS, Lists.newArrayList(USER1, USER2));
         resetUser(USER1, PASS);
         resetUser(USER2, PASS);
 
@@ -82,7 +87,14 @@ public class FritzyApiTool {
         api.mint(user1Address, monies.add(BigDecimal.ONE), EContractAddress.KWH);
 
         // offer 10 kwh for 10 eur
+        String txIdToCancel = api.createOrder(EContractAddress.KWH, EContractAddress.EUR, monies, monies);
+        // Cancel it
+        api.cancelOrder(txIdToCancel);
+        // make it again
         String txId = api.createOrder(EContractAddress.KWH, EContractAddress.EUR, monies, monies);
+
+        // user 1 mints 10 kwh
+        api.mint(user1Address, monies.add(BigDecimal.ONE), EContractAddress.KWH);
 
         // Check the created order
         WebOrder order = Arrays.asList(api.orders().getOrders().getRecords())
@@ -117,6 +129,7 @@ public class FritzyApiTool {
         LOG.info("{} balance {}", USER1, balance);
         Preconditions.checkArgument(euros.add(monies).equals(balance.getEur()));
         
+
         BigDecimal user1eurBalanceAfterOrder = balance.getEur();
         api.transfer(user1eurBalanceAfterOrder, EContractAddress.EUR, user2Address);
 
