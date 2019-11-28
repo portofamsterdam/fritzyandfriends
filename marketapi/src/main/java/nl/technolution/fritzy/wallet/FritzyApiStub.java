@@ -45,6 +45,7 @@ import nl.technolution.fritzy.wallet.model.ApiEvent;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.model.GetEventResponse;
+import nl.technolution.fritzy.wallet.model.UsersResponseEntry;
 import nl.technolution.fritzy.wallet.order.GetOrdersResponse;
 import nl.technolution.fritzy.wallet.order.Orders;
 import nl.technolution.fritzy.wallet.order.Record;
@@ -314,9 +315,12 @@ public final class FritzyApiStub implements IFritzyApi {
     }
 
     @Override
-    public WebUser[] getUsers() {
+    public UsersResponseEntry[] getUsers() {
         log.debug("getUsers");
-        return users.toArray(new WebUser[users.size()]);
+        return users.stream()
+                .map(u -> new UsersResponseEntry(u.getName(), u.getEmail(), u.getAddress(), ""))
+                .collect(Collectors.toList())
+                .toArray(new UsersResponseEntry[users.size()]);
     }
 
     private String generateHash(int hash) {

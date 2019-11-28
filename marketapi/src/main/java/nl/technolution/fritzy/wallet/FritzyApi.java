@@ -48,6 +48,7 @@ import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.model.GetEventResponse;
 import nl.technolution.fritzy.wallet.model.HashlessOrder;
 import nl.technolution.fritzy.wallet.model.OrderResponse;
+import nl.technolution.fritzy.wallet.model.UsersResponseEntry;
 import nl.technolution.fritzy.wallet.order.CreateOrderResponse;
 import nl.technolution.fritzy.wallet.order.FillOrderResponse;
 import nl.technolution.fritzy.wallet.order.GetOrdersResponse;
@@ -156,10 +157,10 @@ public class FritzyApi implements IFritzyApi {
     @Override
     public GetOrdersResponse orders() throws FritzyApiException {
         LOG.info("Fetching Orders");
-        Preconditions.checkArgument(accessToken != null, "login first");
+        // Preconditions.checkArgument(accessToken != null, "login first");
         WebTarget target = client.target(url + "/orders");
         Builder request = target.request();
-        request.header("Authorization", "Bearer " + accessToken);
+        // request.header("Authorization", "Bearer " + accessToken);
         Response response = request.get();
         FritzyApiException.checkResponse(response);
         return response.readEntity(GetOrdersResponse.class);
@@ -319,13 +320,13 @@ public class FritzyApi implements IFritzyApi {
      * @throws FritzyApiException
      */
     @Override
-    public WebUser[] getUsers() throws FritzyApiException {
+    public UsersResponseEntry[] getUsers() throws FritzyApiException {
         LOG.info("Fetching all users");
         WebTarget target = client.target(url + "/users");
         Builder request = target.request();
         Response response = request.get();
         FritzyApiException.checkResponse(response);
-        return response.readEntity(WebUser[].class);
+        return response.readEntity(UsersResponseEntry[].class);
     }
 
     /**

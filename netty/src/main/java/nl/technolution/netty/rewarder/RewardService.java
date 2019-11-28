@@ -35,11 +35,11 @@ import com.google.common.collect.Maps;
 import nl.technolution.apis.netty.OrderReward;
 import nl.technolution.dropwizard.services.Services;
 import nl.technolution.fritzy.gen.model.WebOrder;
-import nl.technolution.fritzy.gen.model.WebUser;
 import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
+import nl.technolution.fritzy.wallet.model.UsersResponseEntry;
 import nl.technolution.netty.app.NettyConfig;
 import nl.technolution.protocols.efi.util.Efi;
 
@@ -114,9 +114,9 @@ public final class RewardService implements IRewardService {
     }
 
     private boolean isLocal(String taker, WebOrder orderHash, IFritzyApi market) throws FritzyApiException {
-        WebUser uTaker = null;
-        WebUser uMaker = null;
-        for (WebUser user : Arrays.asList(market.getUsers())) {
+        UsersResponseEntry uTaker = null;
+        UsersResponseEntry uMaker = null;
+        for (UsersResponseEntry user : Arrays.asList(market.getUsers())) {
             if (user.getAddress().equals(taker)) {
                 uTaker = user;
                 continue;
