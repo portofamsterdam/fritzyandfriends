@@ -37,6 +37,7 @@ import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
+import nl.technolution.fritzy.wallet.OrderHelper;
 import nl.technolution.fritzy.wallet.event.EventLogger;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
@@ -151,7 +152,7 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
             // my own order?
             if (order.getMakerAddress().equals(market.getAddress())) {
                 // when the taker address is set this means someone accepted our order
-                if (order.getTakerAddress() != null && !order.getTakerAddress().isEmpty()) {
+                if (OrderHelper.isAccepted(order)) {
                     // energy sold so no longer available:
                     availableKWh -= Double.parseDouble(order.getMakerAssetAmount());
                 } else {

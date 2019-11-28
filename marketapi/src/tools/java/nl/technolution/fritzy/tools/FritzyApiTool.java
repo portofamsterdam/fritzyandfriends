@@ -36,10 +36,10 @@ import nl.technolution.dropwizard.webservice.JacksonFactory;
 import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.FritzyApi;
 import nl.technolution.fritzy.wallet.FritzyApiException;
+import nl.technolution.fritzy.wallet.OrderHelper;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.model.GetEventResponse;
-import nl.technolution.fritzy.wallet.model.UsersResponseEntry;
 import nl.technolution.fritzy.wallet.order.Record;
 
 /**
@@ -49,8 +49,8 @@ public class FritzyApiTool {
 
     private static final Logger LOG = Log.getLogger();
 
-    private static final String ADMIN = "juriaa4thrthn@oneup.company";
-    private static final String ADMINPASS = "abc123";
+    private static final String ADMIN = "admin@fritzy.nl";
+    private static final String ADMINPASS = "admin";
     private static final String PASS = "qazqaz";
     private static final String USER1 = "test@fiets.be";
     private static final String USER2 = "testcase@martin.nl";
@@ -61,18 +61,15 @@ public class FritzyApiTool {
         String url = "http://192.168.8.242/api";
         api = new FritzyApi(url, "FritzyApiTool");
 
-        UsersResponseEntry[] webUsers = api.getUsers();
-        if (true) {
-            return;
-        }
         // api.register(ADMIN, ADMIN, ADMINPASS);
 
 
+        // api.register(USER1, USER1, PASS);
         // api.register(USER2, USER2, PASS);
 
         // setMinters(ADMIN, ADMINPASS, Lists.newArrayList(USER1, USER2));
-        resetUser(USER1, PASS);
-        resetUser(USER2, PASS);
+        // resetUser(USER1, PASS);
+        // resetUser(USER2, PASS);
 
         // api.register(USER, "test", PASS);
         api.login(USER1, PASS);
@@ -88,6 +85,9 @@ public class FritzyApiTool {
 
         // offer 10 kwh for 10 eur
         String txIdToCancel = api.createOrder(EContractAddress.KWH, EContractAddress.EUR, monies, monies);
+
+        WebOrder orderToCheck = api.order(txIdToCancel);
+        Preconditions.checkArgument(!OrderHelper.isAccepted(orderToCheck));
         // Cancel it
         api.cancelOrder(txIdToCancel);
         // make it again
@@ -123,6 +123,8 @@ public class FritzyApiTool {
         LOG.info("{} balance {}", USER2, balance);
         Preconditions.checkArgument(kwhs.add(monies).equals(balance.getKwh()));
         BigDecimal user2eurBalanceAfterOrder = balance.getEur();
+
+        Preconditions.checkArgument(OrderHelper.isAccepted(api.order(txId)));
 
         api.login(USER1, PASS);
         balance = api.balance();

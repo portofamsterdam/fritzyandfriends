@@ -20,7 +20,6 @@ import java.math.BigDecimal;
 import java.time.Instant;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 
 import org.slf4j.Logger;
 
@@ -30,6 +29,7 @@ import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
+import nl.technolution.fritzy.wallet.OrderHelper;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.protocols.efi.ActuatorInstruction;
 import nl.technolution.protocols.efi.ActuatorInstructions;
@@ -80,7 +80,7 @@ public class OrderExecutor {
             return EOrderCommand.FINISHED; // order is gone
         }
 
-        if (Strings.isNullOrEmpty(order.getTakerAddress())) {
+        if (!OrderHelper.isAccepted(order)) {
             log.debug("order {} not accepted yet", orderHash);
             return EOrderCommand.NONE; // Order is still open
         }

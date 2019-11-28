@@ -18,8 +18,6 @@ package nl.technolution.exxy.trader;
 
 import java.math.BigDecimal;
 
-import com.google.common.base.Strings;
-
 import org.slf4j.Logger;
 
 import nl.technolution.Log;
@@ -28,6 +26,7 @@ import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
+import nl.technolution.fritzy.wallet.OrderHelper;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 
 /**
@@ -73,7 +72,7 @@ public final class ContinuousOrderHandler {
             activeOrderHash = createOrder(market); // recreate it
             return;
         }
-        if (!Strings.isNullOrEmpty(order.getTakerAddress())) {
+        if (OrderHelper.isAccepted(order)) {
             log.info("{} order bought {}kWh", trade, kwh);
             activeOrderHash = null; // Clear old order. New one may not be created
             activeOrderHash = createOrder(market);

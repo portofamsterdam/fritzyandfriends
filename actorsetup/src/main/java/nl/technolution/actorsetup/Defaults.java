@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 
@@ -39,6 +38,7 @@ import org.slf4j.LoggerFactory;
 import nl.technolution.fritzy.wallet.FritzyApi;
 import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.IFritzyApi;
+import nl.technolution.fritzy.wallet.OrderHelper;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
 import nl.technolution.fritzy.wallet.model.UsersResponseEntry;
@@ -120,7 +120,7 @@ public final class Defaults {
             api.login(getUsername(user), user);
             orders.stream()
                     .filter(o -> o.getOrder().getMakerAddress().equals(api.getAddress()))
-                    .filter(o -> Strings.isNullOrEmpty(o.getOrder().getTakerAddress()))
+                    .filter(o -> !OrderHelper.isAccepted(o.getOrder()))
                     .forEach(o -> {
                         try {
                             api.cancelOrder(o.getOrder().getHash());

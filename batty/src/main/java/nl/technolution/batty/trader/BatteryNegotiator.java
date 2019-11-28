@@ -24,7 +24,6 @@ import java.util.List;
 import javax.annotation.Nullable;
 
 import com.google.common.base.Preconditions;
-import com.google.common.base.Strings;
 import com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
@@ -43,6 +42,7 @@ import nl.technolution.fritzy.gen.model.WebOrder;
 import nl.technolution.fritzy.wallet.FritzyApiException;
 import nl.technolution.fritzy.wallet.IFritzyApi;
 import nl.technolution.fritzy.wallet.IFritzyApiFactory;
+import nl.technolution.fritzy.wallet.OrderHelper;
 import nl.technolution.fritzy.wallet.event.EventLogger;
 import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.fritzy.wallet.model.FritzyBalance;
@@ -142,7 +142,7 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
                 continue; // This is batty himself
             }
 
-            if (!Strings.isNullOrEmpty(order.getTakerAddress())) {
+            if (OrderHelper.isAccepted(order)) {
                 continue; // order is already filled (shouldn't happen?)
             }
 
@@ -313,7 +313,7 @@ public class BatteryNegotiator extends AbstractCustomerEnergyManager<StorageRegi
             return;
         }
         WebOrder order = market.order(hash);
-        if (Strings.isNullOrEmpty(order.getTakerAddress())) {
+        if (!OrderHelper.isAccepted(order)) {
             market.cancelOrder(hash);
         }
     }
