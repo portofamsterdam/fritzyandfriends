@@ -180,7 +180,12 @@ public class FritzyApi implements IFritzyApi {
         Builder request = target.request();
         request.header("Authorization", "Bearer " + accessToken);
         Response response = request.get();
-        FritzyApiException.checkResponse(response);
+        try {
+            FritzyApiException.checkResponse(response);
+        } catch (FritzyApiException e) {
+            // Order probably doesn't exist, convert to null
+            return null;
+        }
         OrderResponse ordercontainer = response.readEntity(OrderResponse.class);
         return convert(ordercontainer, orderHash);
     }
