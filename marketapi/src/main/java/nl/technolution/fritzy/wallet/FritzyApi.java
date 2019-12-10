@@ -157,10 +157,10 @@ public class FritzyApi implements IFritzyApi {
     @Override
     public GetOrdersResponse orders() throws FritzyApiException {
         LOG.info("Fetching Orders");
-        // Preconditions.checkArgument(accessToken != null, "login first");
+        Preconditions.checkArgument(accessToken != null, "login first");
         WebTarget target = client.target(url + "/orders");
         Builder request = target.request();
-        // request.header("Authorization", "Bearer " + accessToken);
+        request.header("Authorization", "Bearer " + accessToken);
         Response response = request.get();
         FritzyApiException.checkResponse(response);
         return response.readEntity(GetOrdersResponse.class);
