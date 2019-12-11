@@ -21,9 +21,11 @@ import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
 
@@ -86,6 +88,8 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
     private int runningModeOffId;
     private int currentPeriodRunningModeId;
     private int nextperiodRunningModeId;
+
+    private List<WebOrder> acceptedOrders = Lists.newArrayList();
 
     public FritzyNegotiator(FritzyConfig config, FritzyResourceManager resourceManager) {
         this.resourceManager = resourceManager;
@@ -184,7 +188,7 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
 
         if (update instanceof StorageStatus) {
             actuatorInstruction.setRunningModeId(currentPeriodRunningModeId);
-            LOG.info("Intructed mode {} based on market negotiation outcome.",
+            LOG.info("Instructed mode {} based on market negotiation outcome.",
                     runningModes.get(currentPeriodRunningModeId).getLabel());
 
             // Check if emergency action is needed (market running mode will be overruled in that case):
@@ -309,11 +313,18 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
         Orders orders = market.orders().getOrders();
         for (Record record : orders.getRecords()) {
             WebOrder order = record.getOrder();
+            // check if this order was already accepted before (if so we don't want to re-process it).
+            if (acceptedOrders.contains(order)) {
+                LOG.debug("Skipped accepted order because it is already processed: {}", order);
+                continue;
+            }
             // my own order?
             if (order.getMakerAddress().equals(market.getAddress())) {
                 // when the taker address is set this means someone accepted our order
                 if (OrderHelper.isAccepted(order)) {
                     handleEnergyPurchased(Double.parseDouble(order.getTakerAssetAmount()));
+                    LOG.debug("My order is accepted, availableKwh now: {}. Order: {}", neededKWh, order);
+                    acceptedOrders.add(order);
                 } else {
                     // cancel outstanding orders, new order are created later on based on the new price
                     // TODO WHO: void method, what happens when cancel is impossible? (e.g. when it accepted by another
@@ -336,6 +347,8 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
             market.log(EEventType.REWARD_CLAIM, reward.toString(), null);
 
             handleEnergyPurchased(Double.parseDouble(order.getMakerAssetAmount()));
+            LOG.debug("Accepted others order, neededKWh now: {}. Order: {}", neededKWh, order);
+            acceptedOrders.add(order);
         }
         createNewOrder(market);
     }
@@ -433,10 +446,10 @@ public class FritzyNegotiator extends AbstractCustomerEnergyManager<StorageRegis
             return false;
         }
 
-        // check if offered kWh is what we need (or more)
+        // check if offered kWh is what we need (or less)
         double offeredKWh = Double.parseDouble(order.getMakerAssetAmount());
-        if (offeredKWh < neededKWh) {
-            LOG.info("Order {} declined because offeredKWh ({}) < neededKWh ({})", order, offeredKWh, neededKWh);
+        if (offeredKWh > neededKWh) {
+            LOG.info("Order {} declined because offeredKWh ({}) > neededKWh ({})", order, offeredKWh, neededKWh);
             return false;
         }
         LOG.debug("Order {} is interesing order", order);

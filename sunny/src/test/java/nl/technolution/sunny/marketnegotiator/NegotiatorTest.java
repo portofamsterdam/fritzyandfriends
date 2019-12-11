@@ -31,7 +31,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.slf4j.Logger;
 
-import io.dropwizard.jersey.params.InstantParam;
 import nl.technolution.DeviceId;
 import nl.technolution.Log;
 import nl.technolution.apis.exxy.ApxPrice;
@@ -60,6 +59,8 @@ import nl.technolution.sunny.solaredge.SESessionFactory;
 import nl.technolution.sunny.trader.SunnyNegotiator;
 import nl.technolution.sunny.trader.SunnyResourceHelper;
 import nl.technolution.sunny.trader.SunnyResourceManager;
+
+import io.dropwizard.jersey.params.InstantParam;
 
 /**
  * Test negotiator
@@ -194,7 +195,7 @@ public class NegotiatorTest {
     public void acceptExistingOrder() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
 
-        pvCastClientStub.setForcastedPower(125 * 4);
+        pvCastClientStub.setForcastedPower(125 * 4 * 2);
         sn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate());
 
         String batty = "batty";
@@ -211,9 +212,15 @@ public class NegotiatorTest {
         assertTrue(netty.orderRewardRequested);
         assertTrue(netty.claimed);
 
-        // order accepted by sunny
-        assertEquals(1, market.orders().getOrders().getRecords().length);
+        // 1 of 2 orders accepted by sunny
+        assertEquals(2, market.orders().getOrders().getRecords().length);
         assertEquals(market.getAddress(), market.orders().getOrders().getRecords()[0].getOrder().getTakerAddress());
+
+        sn.evaluate();
+        // reset netty and evaluate again to test if the accepted order is not processed again
+        netty.orderRewardRequested = false;
+        sn.evaluate();
+        assertFalse(netty.orderRewardRequested);
     }
 
     @Test
@@ -414,7 +421,7 @@ public class NegotiatorTest {
         // no new orders created, there is only 1 order left (the batty order that is accepted by sunny)
         market.login(batty, batty);
         assertEquals(market.getAddress(), market.orders().getOrders().getRecords()[0].getOrder().getTakerAddress());
-
+        sn.evaluate();
     }
 
     @Test
