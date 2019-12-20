@@ -37,7 +37,6 @@ import org.junit.Test;
 import org.junit.rules.ExpectedException;
 import org.slf4j.Logger;
 
-import io.dropwizard.jersey.params.InstantParam;
 import nl.technolution.DeviceId;
 import nl.technolution.Log;
 import nl.technolution.apis.exxy.ApxPrice;
@@ -64,6 +63,8 @@ import nl.technolution.fritzy.wallet.model.EContractAddress;
 import nl.technolution.protocols.efi.StorageDiscreteRunningMode.DiscreteRunningModeElement;
 import nl.technolution.protocols.efi.StorageInstruction;
 import nl.technolution.protocols.efi.StorageSystemDescription;
+
+import io.dropwizard.jersey.params.InstantParam;
 
 /**
  * Test negotiator
@@ -187,7 +188,7 @@ public class NegotiatorTest {
         market.register(sunny, sunny, PASSWORD);
         market.login(sunny, PASSWORD);
         BigDecimal eur = BigDecimal.valueOf(1);
-        BigDecimal kWh = BigDecimal.valueOf(0.125d);
+        BigDecimal kWh = BigDecimal.valueOf(0.125d / 2d);
         market.mint(market.getAddress(), kWh, EContractAddress.KWH);
         market.createOrder(EContractAddress.KWH, EContractAddress.EUR, kWh, eur);
 
@@ -197,6 +198,11 @@ public class NegotiatorTest {
         fn.evaluate();
         assertTrue(netty.orderRewardRequested);
         assertTrue(netty.claimed);
+        // test that already processed order are not processed again:
+        netty.orderRewardRequested = false;
+        fn.evaluate();
+        assertFalse(netty.orderRewardRequested);
+
     }
 
     @Test
@@ -315,7 +321,7 @@ public class NegotiatorTest {
     }
 
     @Test
-    public void orderTooSmall() throws FritzyApiException {
+    public void orderTooBig() throws FritzyApiException {
         FritzyApiStub market = FritzyApiStub.instance();
         fn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate(fritzyController));
 
@@ -323,7 +329,7 @@ public class NegotiatorTest {
         market.register(sunny, sunny, PASSWORD);
         market.login(sunny, PASSWORD);
         BigDecimal eur = BigDecimal.valueOf(0.01);
-        BigDecimal kWh = BigDecimal.valueOf((config.getPower() / 4d - 1) / 1000d);
+        BigDecimal kWh = BigDecimal.valueOf((config.getPower() / 4d + 1) / 1000d);
         market.mint(market.getAddress(), kWh, EContractAddress.KWH);
         market.createOrder(EContractAddress.KWH, EContractAddress.EUR, kWh, eur);
 
@@ -332,6 +338,32 @@ public class NegotiatorTest {
         netty.rewardToGive = 2;
         fn.evaluate();
         assertFalse(netty.orderRewardRequested);
+        assertFalse(netty.claimed);
+
+        // Expect 2 unaccepted orders to be left (one sunny, one fritzy)
+        assertEquals(2, market.orders().getOrders().getRecords().length);
+        assertNull(market.orders().getOrders().getRecords()[0].getOrder().getTakerAddress());
+        assertNull(market.orders().getOrders().getRecords()[1].getOrder().getTakerAddress());
+    }
+
+    @Test
+    public void NotAcceptOrderPriceTooHigh() throws FritzyApiException {
+        FritzyApiStub market = FritzyApiStub.instance();
+        fn.flexibilityUpdate(resourceHelper.getFlexibilityUpdate(fritzyController));
+
+        String sunny = "sunny";
+        market.register(sunny, sunny, PASSWORD);
+        market.login(sunny, PASSWORD);
+        BigDecimal eur = BigDecimal.valueOf(3.0);
+        BigDecimal kWh = BigDecimal.valueOf((config.getPower() / 4d) / 1000d);
+        market.mint(market.getAddress(), kWh, EContractAddress.KWH);
+        market.createOrder(EContractAddress.KWH, EContractAddress.EUR, kWh, eur);
+
+        market.login(FRITZY, PASSWORD);
+        market.mint(market.getAddress(), eur, EContractAddress.EUR);
+        netty.rewardToGive = 2;
+        fn.evaluate();
+        assertTrue(netty.orderRewardRequested);
         assertFalse(netty.claimed);
 
         // Expect 2 unaccepted orders to be left (one sunny, one fritzy)

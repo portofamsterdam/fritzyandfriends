@@ -19,8 +19,10 @@ package nl.technolution.sunny.trader;
 import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 
 import com.google.common.annotations.VisibleForTesting;
+import com.google.common.collect.Lists;
 
 import org.slf4j.Logger;
 
@@ -71,6 +73,8 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
     private double myPrice;
 
     private IFritzyApi cachedFritzyApi;
+
+    private List<WebOrder> acceptedOrders = Lists.newArrayList();
 
     /**
      *
@@ -149,12 +153,19 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
         Orders orders = market.orders().getOrders();
         for (Record record : orders.getRecords()) {
             WebOrder order = record.getOrder();
+            // check if this order was already accepted before (if so we don't want to re-process it).
+            if (acceptedOrders.contains(order)) {
+                LOG.debug("Skipped accepted order because it is already processed: {}", order);
+                continue;
+            }
             // my own order?
             if (order.getMakerAddress().equals(market.getAddress())) {
                 // when the taker address is set this means someone accepted our order
                 if (OrderHelper.isAccepted(order)) {
                     // energy sold so no longer available:
                     availableKWh -= Double.parseDouble(order.getMakerAssetAmount());
+                    LOG.debug("My order is accepted, availableKwh now: {}. Order: {}", availableKWh, order);
+                    acceptedOrders.add(order);
                 } else {
                     // cancel outstanding orders, new order are created later on based on the new price
                     market.cancelOrder(order.getHash());
@@ -176,6 +187,8 @@ public class SunnyNegotiator extends AbstractCustomerEnergyManager<InflexibleReg
 
             // energy sold so no longer available:
             availableKWh -= Double.parseDouble(order.getTakerAssetAmount());
+            LOG.debug("Accepted others order, availableKwh now: {}. Order: {}", availableKWh, order);
+            acceptedOrders.add(order);
         }
         createNewOrders(market, availableKWh, myPrice);
     }
